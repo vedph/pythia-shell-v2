@@ -1,0 +1,59 @@
+<form [formGroup]="form" (submit)="save()">
+  @if (args) {
+  <fieldset>
+    <legend i18n>arguments</legend>
+    <div formArrayName="arguments" class="form-row">
+      @for ( g of arguments.controls; track g; let i = $index; let first =
+      $first; let last = $last) {
+      <div>
+        <!-- child form -->
+        <div [formGroupName]="i">
+          <mat-form-field class="arg">
+            <mat-label>{{
+              $any(g)["controls"].def.value.label ??
+                $any(g)["controls"].def.value.id
+            }}</mat-label>
+            <input
+              matInput
+              formControlName="value"
+              [type]="$any(g)['controls'].def.value.numeric ? 'number' : 'text'"
+            />
+            @if ( $any(g)['controls'].value.errors?.required &&
+            ($any(g)['controls'].value.dirty ||
+            $any(g)['controls'].value.touched) ) {
+            <mat-error i18n>value required</mat-error>
+            } @if ( $any(g)['controls'].value.errors?.maxLength &&
+            ($any(g)['controls'].value.dirty ||
+            $any(g)['controls'].value.touched) ) {
+            <mat-error i18n>value too long</mat-error>
+            } @if ( $any(g)['controls'].value.errors?.min &&
+            ($any(g)['controls'].value.dirty ||
+            $any(g)['controls'].value.touched) ) {
+            <mat-error i18n>value too low</mat-error>
+            } @if ( $any(g)['controls'].value.errors?.max &&
+            ($any(g)['controls'].value.dirty ||
+            $any(g)['controls'].value.touched) ) {
+            <mat-error i18n>value too big</mat-error>
+            } @if ( $any(g)['controls'].value.errors?.pattern &&
+            ($any(g)['controls'].value.dirty ||
+            $any(g)['controls'].value.touched) ) {
+            <mat-error i18n>invalid value</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+      }
+    </div>
+    <div>
+      <button
+        type="submit"
+        mat-icon-button
+        class="mat-primary"
+        [disabled]="form.invalid || form.pristine"
+      >
+        <mat-icon>check_circle</mat-icon>
+      </button>
+    </div>
+  </fieldset>
+  }
+</form>

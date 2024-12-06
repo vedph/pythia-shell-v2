@@ -1,0 +1,108 @@
+<div id="container">
+  <!-- filters -->
+  <div id="filters">
+    <mat-card>
+      <mat-card-content>
+        <pythia-document-filter
+          [hiddenFilters]="hiddenFilters"
+          (filterChange)="onFilterChange($event)"
+        />
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- list -->
+  @if (page$ | async; as page) {
+  <div id="list">
+    @if (loading$ | async) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+    <table>
+      <thead>
+        <th></th>
+        <th i18n>id</th>
+        <th i18n>author</th>
+        <th i18n>title</th>
+        <th i18n>date</th>
+        <th i18n class="noif-lt-md">profile</th>
+        <th i18n class="noif-lt-md">source</th>
+        <th i18n class="noif-lt-md">last modified</th>
+      </thead>
+      <tbody>
+        @for (item of page.items; track item) {
+        <tr>
+          <td class="fit-width">
+            <button
+              mat-icon-button
+              type="button"
+              i18n-matTooltip
+              matTooltip="Read this document"
+              class="mat-primary"
+              (click)="requestRead(item)"
+            >
+              <mat-icon class="mat-primary">auto_stories</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              type="button"
+              i18n-matTooltip
+              matTooltip="View document info"
+              (click)="selectDocument(item)"
+            >
+              <mat-icon>info</mat-icon>
+            </button>
+          </td>
+          <td>{{ item.id }}</td>
+          <td>{{ item.author }}</td>
+          <td>{{ item.title }}</td>
+          <td>{{ item.dateValue }}</td>
+          <td class="noif-lt-md">{{ item.profileId }}</td>
+          <td class="noif-lt-md">{{ item.source }}</td>
+          <td class="noif-lt-md">{{ item.lastModified | date : "short" }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+    <!-- pagination -->
+    <div class="form-row" id="pagination">
+      <button
+        type="button"
+        mat-icon-button
+        class="mat-warn"
+        i18n-matTooltip
+        matTooltip="Refresh"
+        (click)="refresh()"
+      >
+        <mat-icon class="mat-warn">refresh</mat-icon>
+      </button>
+      <mat-paginator
+        [length]="page.total"
+        [pageIndex]="page.pageNumber - 1"
+        [pageSize]="page.pageSize"
+        [pageSizeOptions]="[5, 10, 20, 50, 100]"
+        (page)="onPageChange($event)"
+        [showFirstLastButtons]="true"
+      ></mat-paginator>
+    </div>
+    <!-- info -->
+    <div id="info">
+      <pythia-document-info
+        [document]="activeDocument$ | async"
+        (readRequest)="requestRead($event)"
+        (closeRequest)="onDocumentClose()"
+      ></pythia-document-info>
+    </div>
+    <!-- corpus -->
+    <div id="corpus">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title> corpus </mat-panel-title>
+        </mat-expansion-panel-header>
+        <pythia-document-corpus
+          (corpusAction)="onCorpusAction($event)"
+        ></pythia-document-corpus>
+      </mat-expansion-panel>
+    </div>
+  </div>
+  }
+</div>

@@ -1,0 +1,43 @@
+<div>
+  <!-- corpus picker -->
+  <div class="form-row">
+    <cadmus-ref-lookup
+      [service]="corpusLookupService"
+      [baseFilter]="{ userId: userId }"
+      label="corpus"
+      (itemChange)="onCorpusChange($event)"
+    ></cadmus-ref-lookup>
+    <button type="button" mat-icon-button class="mat-warn" (click)="clear()">
+      <mat-icon class="mat-warn">clear</mat-icon>
+    </button>
+  </div>
+
+  <!-- corpora list -->
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th>ID</th>
+        <th i18n>title</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (c of corpora; track c; let i = $index) {
+      <tr>
+        <td>
+          <button
+            type="button"
+            class="mat-warn"
+            mat-icon-button
+            (click)="deleteCorpus(i)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+        <td>{{ c.id }}</td>
+        <td>{{ c.title }}</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>

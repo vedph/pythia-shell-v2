@@ -1,0 +1,235 @@
+<form [formGroup]="form" (submit)="apply()">
+  <!-- corpus -->
+  @if (!hiddenFilters?.corpus) {
+  <div class="form-row" style="margin-bottom: 8px">
+    <cadmus-ref-lookup
+      [service]="corpusLookupService"
+      [item]="corpus.value"
+      label="corpus"
+      (itemChange)="onCorpusChange($event)"
+    ></cadmus-ref-lookup>
+    <button
+      type="button"
+      mat-icon-button
+      class="mat-warn"
+      (click)="removeCorpus()"
+    >
+      <mat-icon class="mat-warn">clear</mat-icon>
+    </button>
+  </div>
+  }
+
+  <!-- author -->
+  @if (!hiddenFilters?.author) {
+  <div class="short-field">
+    <mat-form-field>
+      <mat-label i18n>author(s)</mat-label>
+      <input matInput [formControl]="author" maxlength="500" />
+    </mat-form-field>
+  </div>
+  }
+
+  <!-- title -->
+  @if (!hiddenFilters?.title) {
+  <div>
+    <mat-form-field>
+      <mat-label i18n>title</mat-label>
+      <input matInput [formControl]="title" maxlength="500" />
+    </mat-form-field>
+  </div>
+  }
+
+  <!-- source -->
+  @if (!hiddenFilters?.source) {
+  <div>
+    <mat-form-field>
+      <mat-label i18n>source</mat-label>
+      <input matInput [formControl]="source" maxlength="500" />
+    </mat-form-field>
+  </div>
+  }
+
+  <!-- profile -->
+  @if (!hiddenFilters?.profile) {
+  <div>
+    <cadmus-ref-lookup
+      [service]="profileLookupService"
+      [item]="profile.value"
+      i18n-label
+      label="profile"
+      (itemChange)="onProfileChange($event)"
+    ></cadmus-ref-lookup>
+    @if (profile.value) {
+    <mat-chip removable="true" (removed)="onProfileRemoved()">
+      {{ profile.value.id }}
+    </mat-chip>
+    }
+  </div>
+  }
+
+  <!-- date -->
+  @if (!hiddenFilters?.date) {
+  <h3 i18n>date</h3>
+  <div class="form-row">
+    <!-- minDateValue -->
+    <mat-form-field class="short-field">
+      <mat-label>min</mat-label>
+      <input matInput type="number" [formControl]="minDateValue" />
+    </mat-form-field>
+    -
+    <!-- maxDateValue -->
+    <mat-form-field class="short-field">
+      <mat-label>max</mat-label>
+      <input matInput type="number" [formControl]="maxDateValue" />
+    </mat-form-field>
+  </div>
+  }
+
+  <!-- time -->
+  @if (!hiddenFilters?.modified) {
+  <h3 i18n>modified</h3>
+  <div class="form-row">
+    <!-- minTimeModified -->
+    <mat-form-field class="time-field">
+      <mat-label>min</mat-label>
+      <input
+        matInput
+        [matDatepicker]="pickerMin"
+        [formControl]="minTimeModified"
+      />
+      <mat-datepicker-toggle
+        matSuffix
+        [for]="pickerMin"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #pickerMin></mat-datepicker>
+    </mat-form-field>
+    -
+    <!-- maxTimeModified -->
+    <mat-form-field class="time-field">
+      <mat-label>max</mat-label>
+      <input
+        matInput
+        [matDatepicker]="pickerMax"
+        [formControl]="maxTimeModified"
+      />
+      <mat-datepicker-toggle
+        matSuffix
+        [for]="pickerMax"
+      ></mat-datepicker-toggle>
+      <mat-datepicker #pickerMax></mat-datepicker>
+    </mat-form-field>
+  </div>
+  }
+
+  <!-- attributes -->
+  @if (attributes?.length && !hiddenFilters?.attributes) {
+  <div>
+    <h3>
+      <ng-container i18n>attributes</ng-container>
+      <button
+        type="button"
+        mat-icon-button
+        class="mat-primary"
+        i18n-matTooltip
+        matTooltip="Add an attribute filter"
+        (click)="addAttribute()"
+      >
+        <mat-icon class="mat-primary">add_circle</mat-icon>
+      </button>
+    </h3>
+    <div formArrayName="attrs">
+      @for ( item of attrs.controls; track item; let i = $index; let first =
+      $first; let last = $last) {
+      <div>
+        <!-- child form -->
+        <div [formGroupName]="i">
+          <!-- child actions -->
+          {{ i + 1 }}.
+          <button
+            mat-icon-button
+            type="button"
+            i18n-matTooltip
+            matTooltip="Remove this attribute"
+            class="mat-warn"
+            (click)="removeAttribute(i)"
+          >
+            <mat-icon class="mat-warn">remove_circle</mat-icon>
+          </button>
+          <!-- child controls -->
+          <!-- name -->
+          <mat-form-field class="short-field">
+            <mat-label i18n>name</mat-label>
+            <mat-select formControlName="name">
+              @for (n of attributes; track n) {
+              <mat-option [value]="n">{{ n }}</mat-option>
+              }
+            </mat-select>
+            @if ( $any(item)['controls'].name.errors?.required &&
+            ($any(item)['controls'].name.dirty ||
+            $any(item)['controls'].name.touched) ) {
+            <mat-error i18n>name required</mat-error>
+            }
+          </mat-form-field>
+          <!-- value -->
+          &nbsp;
+          <mat-form-field class="short-field">
+            <mat-label i18n>value</mat-label>
+            <input matInput formControlName="value" />
+            @if ( $any(item)['controls'].value.errors?.maxLength &&
+            ($any(item)['controls'].value.dirty ||
+            $any(item)['controls'].value.touched) ) {
+            <mat-error i18n>too long</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- sort -->
+  @if (sortable) {
+  <div>
+    <h3 i18n>sort order</h3>
+    <div>
+      <mat-form-field>
+        <mat-label>sort</mat-label>
+        <mat-select [formControl]="sortOrder">
+          <mat-option [value]="0" i18n>default</mat-option>
+          <mat-option [value]="1" i18n>author</mat-option>
+          <mat-option [value]="2" i18n>title</mat-option>
+          <mat-option [value]="3" i18n>date</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <!-- sort descending -->
+      &nbsp;
+      <mat-checkbox [formControl]="descending" i18n>descending</mat-checkbox>
+    </div>
+  </div>
+  }
+
+  <div id="toolbar" class="btn-group" role="group" aria-label="toolbar">
+    <button
+      mat-icon-button
+      type="button"
+      (click)="reset()"
+      class="mat-warn"
+      i18n-matTooltip
+      matTooltip="Reset filters"
+      [disabled]="disabled"
+    >
+      <mat-icon class="mat-warn">clear</mat-icon>
+    </button>
+    <button
+      type="submit"
+      mat-icon-button
+      class="mat-primary"
+      [disabled]="disabled"
+      i18n-matmatTooltip
+      matTooltip="Apply filters"
+    >
+      <mat-icon class="mat-primary">check_circle</mat-icon>
+    </button>
+  </div>
+</form>

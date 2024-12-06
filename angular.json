@@ -20,9 +20,7 @@
             "outputPath": "dist/pythia-shell",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js", "@angular/localize/init"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -31,9 +29,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ],
+            "styles": ["src/styles.scss"],
             "scripts": []
           },
           "configurations": {
@@ -41,8 +37,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "3MB",
+                  "maximumError": "5MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -80,7 +76,8 @@
           "options": {
             "polyfills": [
               "zone.js",
-              "zone.js/testing"
+              "zone.js/testing",
+              "@angular/localize/init"
             ],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
@@ -90,10 +87,308 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ],
+            "styles": ["src/styles.scss"],
             "scripts": []
+          }
+        }
+      }
+    },
+    "@myrmidon/pythia-api": {
+      "projectType": "library",
+      "root": "projects/myrmidon/pythia-api",
+      "sourceRoot": "projects/myrmidon/pythia-api/src",
+      "prefix": "pythia",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/myrmidon/pythia-api/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/myrmidon/pythia-api/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/myrmidon/pythia-api/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/myrmidon/pythia-api/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
+        }
+      }
+    },
+    "@myrmidon/pythia-core": {
+      "projectType": "library",
+      "root": "projects/myrmidon/pythia-core",
+      "sourceRoot": "projects/myrmidon/pythia-core/src",
+      "prefix": "pythia",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/myrmidon/pythia-core/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/myrmidon/pythia-core/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/myrmidon/pythia-core/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/myrmidon/pythia-core/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
+        }
+      }
+    },
+    "@myrmidon/pythia-corpus-list": {
+      "projectType": "library",
+      "root": "projects/myrmidon/pythia-corpus-list",
+      "sourceRoot": "projects/myrmidon/pythia-corpus-list/src",
+      "prefix": "pythia",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/myrmidon/pythia-corpus-list/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/myrmidon/pythia-corpus-list/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/myrmidon/pythia-corpus-list/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/myrmidon/pythia-corpus-list/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
+        }
+      }
+    },
+    "@myrmidon/pythia-document-list": {
+      "projectType": "library",
+      "root": "projects/myrmidon/pythia-document-list",
+      "sourceRoot": "projects/myrmidon/pythia-document-list/src",
+      "prefix": "pythia",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/myrmidon/pythia-document-list/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/myrmidon/pythia-document-list/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/myrmidon/pythia-document-list/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/myrmidon/pythia-document-list/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
+        }
+      }
+    },
+    "@myrmidon/pythia-document-reader": {
+      "projectType": "library",
+      "root": "projects/myrmidon/pythia-document-reader",
+      "sourceRoot": "projects/myrmidon/pythia-document-reader/src",
+      "prefix": "pythia",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/myrmidon/pythia-document-reader/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/myrmidon/pythia-document-reader/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/myrmidon/pythia-document-reader/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/myrmidon/pythia-document-reader/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
+        }
+      }
+    },
+    "@myrmidon/pythia-query-builder": {
+      "projectType": "library",
+      "root": "projects/myrmidon/pythia-query-builder",
+      "sourceRoot": "projects/myrmidon/pythia-query-builder/src",
+      "prefix": "pythia",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/myrmidon/pythia-query-builder/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/myrmidon/pythia-query-builder/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/myrmidon/pythia-query-builder/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/myrmidon/pythia-query-builder/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
+        }
+      }
+    },
+    "@myrmidon/pythia-search": {
+      "projectType": "library",
+      "root": "projects/myrmidon/pythia-search",
+      "sourceRoot": "projects/myrmidon/pythia-search/src",
+      "prefix": "pythia",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/myrmidon/pythia-search/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/myrmidon/pythia-search/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/myrmidon/pythia-search/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/myrmidon/pythia-search/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
+        }
+      }
+    },
+    "@myrmidon/pythia-stats": {
+      "projectType": "library",
+      "root": "projects/myrmidon/pythia-stats",
+      "sourceRoot": "projects/myrmidon/pythia-stats/src",
+      "prefix": "pythia",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/myrmidon/pythia-stats/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/myrmidon/pythia-stats/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/myrmidon/pythia-stats/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/myrmidon/pythia-stats/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
+        }
+      }
+    },
+    "@myrmidon/pythia-ui": {
+      "projectType": "library",
+      "root": "projects/myrmidon/pythia-ui",
+      "sourceRoot": "projects/myrmidon/pythia-ui/src",
+      "prefix": "pythia",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/myrmidon/pythia-ui/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/myrmidon/pythia-ui/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/myrmidon/pythia-ui/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/myrmidon/pythia-ui/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
+        }
+      }
+    },
+    "@myrmidon/pythia-word-index": {
+      "projectType": "library",
+      "root": "projects/myrmidon/pythia-word-index",
+      "sourceRoot": "projects/myrmidon/pythia-word-index/src",
+      "prefix": "pythia",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/myrmidon/pythia-word-index/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/myrmidon/pythia-word-index/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/myrmidon/pythia-word-index/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/myrmidon/pythia-word-index/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         }
       }

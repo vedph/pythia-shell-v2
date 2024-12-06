@@ -1,0 +1,128 @@
+.error {
+  color: red;
+  margin: 4px 0;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th {
+  font-weight: normal;
+  color: #a0a0a0;
+  background-color: #dedede;
+}
+th,
+td {
+  border: 1px solid #ddd;
+}
+td.fit-width {
+  width: 1px;
+  white-space: nowrap;
+}
+th:nth-child(1),
+th:nth-child(2) {
+  border: none;
+}
+tr:nth-child(even) {
+  background-color: #e8e8e8;
+}
+tr:hover {
+  background-color: #eee;
+}
+tbody td {
+  padding-left: 4px;
+  padding-right: 4px;
+  border-left: 1px solid silver;
+  border-right: 1px solid silver;
+}
+tbody td.command {
+  padding: 0px;
+  border: none;
+  width: 32px;
+}
+tbody > tr > td > a {
+  cursor: pointer;
+  text-decoration: underline;
+}
+td.nr {
+  color: silver;
+  text-align: center;
+}
+td.author {
+  font-variant: small-caps;
+}
+td.title {
+  font-size: 0.9em;
+}
+td.context {
+  color: #404040;
+  text-align: center;
+}
+td.value {
+  cursor: pointer;
+  text-align: center;
+  background-color: #dedede;
+}code {
+  color: #c04f05;
+}
+.form-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.form-row * {
+  flex: 0 0 auto;
+}
+div#no-results {
+  margin: 8px;
+  text-align: center;
+  color: silver;
+}
+div#total {
+  background-color: #ffffe0;
+  border: 1px solid #707040;
+  border-radius: 6px;
+  padding: 4px;
+  font-weight: bold;
+  text-align: center;
+}
+div#container {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "query"
+    "results"
+    "reader";
+  gap: 8px;
+}
+div#query {
+  grid-area: query;
+}
+div#results {
+  grid-area: results;
+}
+div#reader {
+  grid-area: reader;
+}
+
+/* lt-md */
+@media only screen and (max-width: 959px) {
+  div#container {
+    grid-template-columns: 1fr;
+  }
+  .noif-lt-md {
+    display: none;
+  }
+}
+/* gt-lg */
+@media only screen and (min-width: 1920px) {
+  div#container {
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "query query"
+      "results reader";
+  }
+}

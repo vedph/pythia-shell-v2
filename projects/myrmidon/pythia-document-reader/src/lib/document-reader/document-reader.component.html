@@ -1,0 +1,31 @@
+@if (document$ | async; as doc) {
+<div id="container">
+  <!-- progress -->
+  @if (loading$ | async) {
+  <div id="progress">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+  }
+  <!-- map -->
+  @if (!hideMap) { @if (map$ | async; as map) {
+  <div id="map">
+    <pythia-map-paged-tree-browser
+      [map]="map"
+      [debug]="debug"
+      (mapNodeClick)="onMapNodeClick($event)"
+    />
+  </div>
+  } }
+  <!-- text -->
+  <div id="text">
+    <h3 class="doc-head">
+      @if (doc.author) {
+      <span>{{ doc.author }} - </span>
+      }{{ doc.title }}
+    </h3>
+    @if (text$ | async; as text) {
+    <div id="body" [innerHtml]="text"></div>
+    }
+  </div>
+</div>
+}

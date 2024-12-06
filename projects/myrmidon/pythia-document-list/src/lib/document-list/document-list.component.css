@@ -1,0 +1,65 @@
+tbody tr:nth-child(odd) {
+  background-color: #eaeaea;
+}
+th {
+  text-align: left;
+  font-weight: normal;
+  color: silver;
+}
+td.fit-width {
+  width: 1px;
+  white-space: nowrap;
+}
+table {
+  width: 100%;
+}
+div#container {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr auto auto;
+  grid-template-areas:
+    "filters list"
+    "info info"
+    "corpus corpus";
+  gap: 8px;
+}
+div#filters {
+  grid-area: filters;
+}
+div#list {
+  grid-area: list;
+}
+div#info {
+  grid-area: info;
+}
+div#corpus {
+  grid-area: corpus;
+}
+
+/* lt-md */
+@media only screen and (max-width: 959px) {
+  div#container {
+    grid-template-rows: 1fr auto auto auto;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "list"
+      "filters"
+      "info"
+      "corpus";
+  }
+  th.noif-lt-md {
+    display: none;
+  }
+  td.noif-lt-md {
+    display: none;
+  }
+}
+.form-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.form-row * {
+  flex: 0 0 auto;
+}

@@ -1,0 +1,24 @@
+<div>
+  <button
+    type="button"
+    (click)="exportCsv()"
+    class="mat-primary"
+    mat-flat-button
+    [disabled]="isExporting || disabled"
+  >
+    <mat-icon>file_download</mat-icon>
+    <span i18n>export</span>
+  </button>
+  @if (isExporting) {
+  <button
+    type="button"
+    (click)="cancelExport()"
+    class="mat-warn"
+    mat-flat-button
+  >
+    <mat-icon>cancel</mat-icon>
+    <span i18n>cancel</span>
+  </button>
+  <mat-progress-bar mode="indeterminate" />
+  }
+</div>

@@ -1,0 +1,201 @@
+<div id="container">
+  <!-- query -->
+  <div id="query">
+    <mat-tab-group [(selectedIndex)]="queryTabIndex">
+      <!-- query - advanced -->
+      <mat-tab i18n-label label="advanced">
+        <form [formGroup]="form" (submit)="search()">
+          <mat-form-field style="width: 100%">
+            <mat-label i18n>query</mat-label>
+            <textarea
+              #queryCtl
+              rows="3"
+              matInput
+              [formControl]="query"
+              (keyup.control.enter)="searchByEnter($any($event))"
+            ></textarea>
+            <mat-hint i18n>ctrl+Enter to submit</mat-hint>
+            @if ( $any(query).errors?.required && (query.dirty || query.touched)
+            ) {
+            <mat-error i18n>query required</mat-error>
+            } @if ( $any(query).errors?.maxLength && (query.dirty ||
+            query.touched) ) {
+            <mat-error i18n>query too long</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="form-row">
+            <!-- submit -->
+            <button
+              style="margin-top: -24px"
+              type="submit"
+              class="mat-primary"
+              mat-flat-button
+              [disabled]="form.invalid || (loading$ | async)"
+            >
+              <mat-icon>search</mat-icon>
+              <ng-container i18n>search</ng-container>
+            </button>
+
+            <!-- history -->
+            @if (lastQueries$ | async; as queries) {
+            <mat-form-field>
+              <mat-label>history</mat-label>
+              <mat-select [formControl]="history">
+                @for (q of queries; track q) {
+                <mat-option [value]="q">{{ q }}</mat-option>
+                }
+              </mat-select>
+              <button
+                type="button"
+                mat-icon-button
+                matSuffix
+                i18n-matTooltip
+                matTooltip="Pick the selected query"
+                (click)="pickHistory()"
+              >
+                <mat-icon>check_circle</mat-icon>
+              </button>
+            </mat-form-field>
+            }
+          </div>
+        </form>
+      </mat-tab>
+      <!-- query - builder -->
+      <mat-tab i18n-label label="builder">
+        <pythia-query-builder
+          (queryChange)="onQueryChange($event)"
+          (queryPeek)="onQueryPeek($event)"
+        ></pythia-query-builder>
+      </mat-tab>
+    </mat-tab-group>
+    <!-- query progress -->
+    @if (loading$ | async) {
+    <div>
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+    }
+    <!-- query error -->
+    @if (error$ | async; as error) {
+    <div class="error">{{ error }}</div>
+    }
+  </div>
+
+  <!-- results -->
+  @if (page$ | async; as page) {
+  <div id="results">
+    @if (page.total && !(loading$ | async)) {
+    <div id="total">
+      {{ page.total }}
+    </div>
+    } @if (page.items.length) {
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th class="noif-lt-md"></th>
+          @if (!hideAuthor) {
+          <th i18n>author</th>
+          } @if (!hideTitle) {
+          <th i18n>title</th>
+          } @for (l of leftContextLabels; track l) {
+          <th>{{ l }}</th>
+          }
+          <th i18n>value</th>
+          @for (l of rightContextLabels; track l) {
+          <th>{{ l }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of page.items; track r; let index=$index) {
+        <tr>
+          <td class="fit-width">
+            <!-- read -->
+            <button
+              mat-icon-button
+              type="button"
+              i18n-matTooltip
+              matTooltip="Read in context"
+              [disabled]="loading$ | async"
+              (click)="readDocumentPiece(r.documentId, r.index, r.length)"
+            >
+              <mat-icon class="mat-primary">find_in_page</mat-icon>
+            </button>
+            <!-- read-doc -->
+            <button
+              mat-icon-button
+              type="button"
+              i18n-matTooltip
+              matTooltip="Read document"
+              [disabled]="loading$ | async"
+              (click)="readDocument(r.documentId)"
+            >
+              <mat-icon>description</mat-icon>
+            </button>
+          </td>
+          <td class="nr noif-lt-md">{{ index + 1 }}.</td>
+          <!-- author -->
+          @if (!hideAuthor) {
+          <td class="author">{{ r.author }}</td>
+          }
+          <!-- title -->
+          @if (!hideTitle) {
+          <td class="title">{{ r.title }}</td>
+          }
+          <!-- left -->
+          @for (l of leftContextLabels; track l; let i = $index) {
+          <td class="context">
+            {{ r.leftContext[i] }}
+          </td>
+          }
+          <!-- value -->
+          <td
+            class="value"
+            [matTooltip]="r.value"
+            (click)="readDocumentPiece(r.documentId, r.index, r.length)"
+          >
+            {{ r.text }}
+          </td>
+          <!-- right -->
+          @for (l of rightContextLabels; track l; let i = $index) {
+          <td class="context">
+            {{ r.rightContext[i] }}
+          </td>
+          }
+        </tr>
+        }
+      </tbody>
+    </table>
+    <!-- pagination -->
+    <mat-paginator
+      [length]="page.total"
+      [pageIndex]="page.pageNumber - 1"
+      [pageSize]="page.pageSize"
+      [pageSizeOptions]="[5, 10, 20, 50, 100]"
+      (page)="onPageChange($event)"
+      [showFirstLastButtons]="true"
+    />
+    } @else {
+    <div id="no-results" i18n>(no results)</div>
+    }
+  </div>
+
+  <!-- export -->
+  @if (query$ | async) {
+  <div>
+    <pythia-search-export [query]="query$ | async" />
+  </div>
+  } }
+
+  <!-- reader -->
+  <div id="reader">
+    <mat-card>
+      <mat-card-content>
+        <pythia-document-reader
+          [request]="$any(readRequest$ | async)"
+        ></pythia-document-reader>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

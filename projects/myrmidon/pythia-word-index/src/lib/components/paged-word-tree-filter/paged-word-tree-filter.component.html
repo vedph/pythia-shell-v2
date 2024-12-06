@@ -1,0 +1,86 @@
+<form
+  [formGroup]="form"
+  [style.margin.px]="wrapped ? 16 : 0"
+  (submit)="apply()"
+>
+  <!-- language -->
+  @if (!hideLanguage) {
+  <div>
+    <mat-form-field>
+      <mat-label i18n>language</mat-label>
+      <input matInput [formControl]="language" maxlength="50" />
+    </mat-form-field>
+  </div>
+  }
+
+  <!-- value pattern -->
+  <div>
+    <mat-form-field>
+      <mat-label i18n>value pattern</mat-label>
+      <input matInput [formControl]="valuePattern" maxlength="500" />
+      <mat-hint i18n>Wildcards * and ?</mat-hint>
+    </mat-form-field>
+  </div>
+
+  <!-- value length -->
+  <div class="form-row">
+    <mat-form-field class="nr">
+      <mat-label i18n>min.len.</mat-label>
+      <input matInput type="number" [formControl]="minValueLength" min="0" />
+    </mat-form-field>
+    -
+    <mat-form-field class="nr">
+      <mat-label i18n>max.len.</mat-label>
+      <input matInput type="number" [formControl]="maxValueLength" min="0" />
+    </mat-form-field>
+  </div>
+
+  <!-- count -->
+  <div class="form-row">
+    <mat-form-field class="nr">
+      <mat-label i18n>min.freq.</mat-label>
+      <input matInput type="number" [formControl]="minCount" min="0" />
+    </mat-form-field>
+    -
+    <mat-form-field class="nr">
+      <mat-label i18n>max.freq.</mat-label>
+      <input matInput type="number" [formControl]="maxCount" min="0" />
+    </mat-form-field>
+  </div>
+
+  <!-- sort order -->
+  <div>
+    <mat-form-field>
+      <mat-label i18n>sort order</mat-label>
+      <mat-select [formControl]="sortOrder">
+        @for (e of sortOrderEntries; track e.key) {
+        <mat-option [value]="e">{{ e.key }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- buttons -->
+  <div class="form-row">
+    <button
+      type="button"
+      class="mat-warn"
+      mat-icon-button
+      matTooltip="Reset"
+      i18n-matTooltip
+      (click)="reset()"
+    >
+      <mat-icon>clear</mat-icon>
+    </button>
+    <button
+      type="submit"
+      class="mat-primary"
+      mat-icon-button
+      matTooltip="Apply"
+      i18n-matTooltip
+      [disabled]="form.invalid"
+    >
+      <mat-icon>check_circle</mat-icon>
+    </button>
+  </div>
+</form>

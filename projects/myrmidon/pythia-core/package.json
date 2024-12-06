@@ -1,0 +1,24 @@
+{
+  "name": "@myrmidon/pythia-core",
+  "version": "6.0.0",
+  "description": "Pythia - core.",
+  "keywords": [
+    "Pythia"
+  ],
+  "homepage": "https://github.com/vedph/pythia-shell",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vedph/pythia-shell"
+  },
+  "author": {
+    "name": "Daniele Fusi"
+  },
+  "peerDependencies": {
+    "@angular/common": "^19.0.0",
+    "@angular/core": "^19.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}
