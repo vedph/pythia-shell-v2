@@ -1,0 +1,43 @@
+services:
+  pythia-pgsql:
+    image: postgres
+    container_name: pythia-pgsql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+    networks:
+      - pythia-network
+
+  pythia-api:
+    image: vedph2020/pythia-api:5.0.5
+    ports:
+        - 5000:8080
+    depends_on:
+        - pythia-pgsql
+    environment:
+        - ASPNETCORE_URLS=http://+:8080
+        - CONNECTIONSTRINGS__DEFAULT=User ID=postgres;Password=postgres;Host=pythia-pgsql;Port=5432;Database={0};
+        # - ALLOWED__ORIGINS__3=http://www.something.com
+        - SEEDDELAY=30
+        - STOCKUSERS__0__PASSWORD=P4ss-W0rd!
+        - MESSAGING__APIROOTURL=https://simpleblob.azurewebsites.net/api/
+        - MESSAGING__APPROOTURL=https://fusisoft.it/apps/blob/
+        - MESSAGING__SUPPORTEMAIL=webmaster@fusisoft.net
+    networks:
+        - pythia-network
+
+  pythia-app:
+    image: vedph2020/pythia-shell:6.0.0
+    ports:
+      - 4200:80
+    depends_on:
+      - pythia-api
+    networks:
+      - pythia-network
+
+networks:
+  pythia-network:
+    driver: bridge
