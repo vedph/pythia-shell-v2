@@ -2,14 +2,14 @@
   <!-- top bar -->
   <div class="form-row">
     <div class="token">
-      @if (token.language) {
-      <span class="tl">{{ token.language }}</span>
+      @if (token()?.language) {
+      <span class="tl">{{ token()!.language }}</span>
       }
       <span class="tv">
-        {{ token.value }}
+        {{ token()?.value }}
       </span>
       <span class="tc">
-        {{ token.count }}
+        {{ token()?.count }}
       </span>
     </div>
 
@@ -17,7 +17,7 @@
       <mat-form-field>
         <mat-label i18n>attributes</mat-label>
         <mat-select [formControl]="selectedAttributes" multiple>
-          @for (a of attributes; track a.name) {
+          @for (a of attributes(); track a.name) {
           <mat-option [value]="a"
             >{{ a.name }}{{ a.type === 1 ? "\u207f" : "" }}</mat-option
           >
@@ -52,7 +52,7 @@
     <pythia-token-counts
       [counts]="counts[a.name]"
       [attribute]="a"
-      [noToolbar]="noToolbar"
+      [hideToolbar]="hideToolbar()"
     />
   </div>
   } }

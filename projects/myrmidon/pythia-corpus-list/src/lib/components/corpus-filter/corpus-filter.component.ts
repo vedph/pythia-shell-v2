@@ -1,5 +1,10 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, effect, input, model, output } from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+} from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -23,28 +28,14 @@ import { CorpusFilter } from '@myrmidon/pythia-api';
   styleUrls: ['./corpus-filter.component.css'],
 })
 export class CorpusFilterComponent {
-  private _filter?: CorpusFilter;
+  public readonly filter = model<CorpusFilter | null | undefined>();
 
-  @Input()
-  public get filter(): CorpusFilter | null | undefined {
-    return this._filter;
-  }
-  public set filter(value: CorpusFilter | null | undefined) {
-    if (this._filter === value) {
-      return;
-    }
-    this._filter = value || undefined;
-    this.updateForm(this._filter);
-  }
-
-  @Input()
-  public disabled: boolean | undefined;
+  public readonly disabled = input<boolean | undefined>();
 
   /**
    * Event emitted when the filter changes.
    */
-  @Output()
-  public filterChange: EventEmitter<CorpusFilter>;
+  public readonly filterChange = output<CorpusFilter>();
 
   public id: FormControl<string | null>;
   public title: FormControl<string | null>;
@@ -58,8 +49,9 @@ export class CorpusFilterComponent {
       id: this.id,
       title: this.title,
     });
-    // event
-    this.filterChange = new EventEmitter<CorpusFilter>();
+    effect(() => {
+      this.updateForm(this.filter());
+    });
   }
 
   private updateForm(filter?: CorpusFilter | null): void {
@@ -81,12 +73,12 @@ export class CorpusFilterComponent {
 
   public reset(): void {
     this.form.reset();
-    this._filter = {};
-    this.filterChange.emit(this._filter);
+    this.filter.set({});
+    this.filterChange.emit(this.filter()!);
   }
 
   public apply(): void {
-    this._filter = this.getFilter();
-    this.filterChange.emit(this._filter);
+    this.filter.set(this.getFilter());
+    this.filterChange.emit(this.filter()!);
   }
 }

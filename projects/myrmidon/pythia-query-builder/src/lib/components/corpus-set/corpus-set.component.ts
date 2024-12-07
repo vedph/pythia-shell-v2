@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -26,64 +26,51 @@ import { CorpusRefLookupService } from '@myrmidon/pythia-ui';
     MatIconModule,
     MatInputModule,
     MatTooltipModule,
-    RefLookupComponent
+    RefLookupComponent,
   ],
   templateUrl: './corpus-set.component.html',
   styleUrls: ['./corpus-set.component.css'],
 })
 export class CorpusSetComponent {
-  private _corpora: Corpus[];
-
   /**
    * The preset user ID filter to apply to corpora lookup.
    */
-  @Input()
-  public userId?: string;
+  public readonly userId = input<string | undefined>();
 
-  @Input()
-  public get corpora(): Corpus[] {
-    return this._corpora;
-  }
-  public set corpora(value: Corpus[]) {
-    if (this._corpora === value) {
-      return;
-    }
-    this._corpora = value;
-  }
+  /**
+   * The corpora to select from.
+   */
+  public readonly corpora = model<Corpus[]>([]);
 
   /**
    * Emitted whenever the set of corpora changes.
    */
-  @Output()
-  public corporaChange: EventEmitter<Corpus[]>;
+  public readonly corporaChange = output<Corpus[]>();
 
-  constructor(public corpusLookupService: CorpusRefLookupService) {
-    this._corpora = [];
-    this.corporaChange = new EventEmitter<Corpus[]>();
-  }
+  constructor(public corpusLookupService: CorpusRefLookupService) {}
 
   public onCorpusChange(corpus: Corpus | null): void {
     if (!corpus) {
       return;
     }
-    const corpora = [...this.corpora];
+    const corpora = [...this.corpora()];
     if (corpora.find((c) => c.id === corpus.id)) {
       return;
     }
     corpora.push(corpus);
-    this.corpora = corpora;
-    this.corporaChange.emit(this.corpora);
+    this.corpora.set(corpora);
+    this.corporaChange.emit(this.corpora());
   }
 
   public deleteCorpus(index: number): void {
-    const corpora = [...this.corpora];
+    const corpora = [...this.corpora()];
     corpora.splice(index, 1);
-    this.corpora = corpora;
-    this.corporaChange.emit(this.corpora);
+    this.corpora.set(corpora);
+    this.corporaChange.emit(this.corpora());
   }
 
   public clear(): void {
-    this.corpora = [];
-    this.corporaChange.emit(this.corpora);
+    this.corpora.set([]);
+    this.corporaChange.emit(this.corpora());
   }
 }

@@ -21,7 +21,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (c of counts; track c) {
+          @for (c of counts(); track c) {
           <tr>
             <td>{{ c.attributeValue }}</td>
             <td>{{ c.value }}</td>
@@ -34,7 +34,7 @@
   </div>
 
   <!-- toolbar -->
-  @if (!noToolbar && counts) {
+  @if (!hideToolbar() && counts()) {
   <div id="toolbar" class="button-row">
     <button
       type="button"

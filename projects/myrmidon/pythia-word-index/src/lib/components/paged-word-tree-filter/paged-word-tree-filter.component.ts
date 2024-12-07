@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import {
   Component,
-  EventEmitter,
+  effect,
   Inject,
-  Input,
+  input,
+  model,
   Optional,
-  Output,
+  output,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -73,63 +74,27 @@ const DEFAULT_SORT_ORDER_ENTRIES: WordTreeFilterSortOrderEntry[] = [
   styleUrl: './paged-word-tree-filter.component.scss',
 })
 export class PagedWordTreeFilterComponent {
-  private _filter?: WordFilter;
-  private _sortOrderEntries: WordTreeFilterSortOrderEntry[] =
-    DEFAULT_SORT_ORDER_ENTRIES;
-
   /**
    * The sort order entries to display in the sort order dropdown.
    */
-  @Input()
-  public get sortOrderEntries(): WordTreeFilterSortOrderEntry[] {
-    return this._sortOrderEntries;
-  }
-  public set sortOrderEntries(
-    value: WordTreeFilterSortOrderEntry[] | undefined | null
-  ) {
-    if (this._sortOrderEntries === value) {
-      return;
-    }
-    this._sortOrderEntries = value || DEFAULT_SORT_ORDER_ENTRIES;
-
-    // update sort order value if it is not in the new entries
-    if (
-      !this._sortOrderEntries.some(
-        (e) =>
-          e.value === this.sortOrder.value.value &&
-          e.descending === this.sortOrder.value.descending
-      )
-    ) {
-      this.sortOrder.setValue(this._sortOrderEntries[0]);
-    }
-  }
+  public readonly sortOrderEntries = input<WordTreeFilterSortOrderEntry[]>(
+    DEFAULT_SORT_ORDER_ENTRIES
+  );
 
   /**
    * Whether to hide the language filter.
    */
-  @Input()
-  public hideLanguage?: boolean;
+  public readonly hideLanguage = input<boolean | undefined>();
 
   /**
    * The filter.
    */
-  @Input()
-  public get filter(): WordFilter | null | undefined {
-    return this._filter;
-  }
-  public set filter(value: WordFilter | null | undefined) {
-    if (this._filter === value) {
-      return;
-    }
-    this._filter = value || undefined;
-    this.updateForm(this._filter);
-  }
+  public readonly filter = model<WordFilter | null | undefined>();
 
   /**
    * Event emitted when the filter changes.
    */
-  @Output()
-  public filterChange: EventEmitter<WordFilter>;
+  public readonly filterChange = output<WordFilter>();
 
   public language: FormControl<string | null>;
   public valuePattern: FormControl<string | null>;
@@ -159,7 +124,7 @@ export class PagedWordTreeFilterComponent {
     this.minCount = formBuilder.control<number>(0, { nonNullable: true });
     this.maxCount = formBuilder.control<number>(0, { nonNullable: true });
     this.sortOrder = formBuilder.control<WordTreeFilterSortOrderEntry>(
-      this.sortOrderEntries[0] || DEFAULT_SORT_ORDER_ENTRIES[0],
+      this.sortOrderEntries()[0] || DEFAULT_SORT_ORDER_ENTRIES[0],
       {
         nonNullable: true,
       }
@@ -173,14 +138,29 @@ export class PagedWordTreeFilterComponent {
       maxCount: this.maxCount,
       sortOrder: this.sortOrder,
     });
-    // events
-    this.filterChange = new EventEmitter<WordFilter>();
     // dialog
     this.wrapped = dialogRef ? true : false;
     // bind dialog data if any
     if (data) {
-      this.filter = data.filter;
+      this.filter.set(data.filter);
     }
+
+    effect(() => {
+      // update sort order value if it is not in the new entries
+      if (
+        !this.sortOrderEntries().some(
+          (e) =>
+            e.value === this.sortOrder.value.value &&
+            e.descending === this.sortOrder.value.descending
+        )
+      ) {
+        this.sortOrder.setValue(this.sortOrderEntries()[0]);
+      }
+    });
+
+    effect(() => {
+      this.updateForm(this.filter());
+    });
   }
 
   private updateForm(filter?: WordFilter | null): void {
@@ -196,12 +176,12 @@ export class PagedWordTreeFilterComponent {
     this.minCount.setValue(filter.minCount ?? 0);
     this.maxCount.setValue(filter.maxCount ?? 0);
     this.sortOrder.setValue(
-      this.sortOrderEntries.find(
+      this.sortOrderEntries().find(
         (e) =>
           e.value === filter.sortOrder &&
           e.descending === filter.isSortDescending
       ) ??
-        this.sortOrderEntries[0] ??
+        this.sortOrderEntries()[0] ??
         DEFAULT_SORT_ORDER_ENTRIES[0]
     );
     this.form.markAsPristine();
@@ -209,8 +189,8 @@ export class PagedWordTreeFilterComponent {
 
   private getFilter(): WordFilter {
     const sortOrderEntry =
-      this.sortOrderEntries.find((e) => e.key === this.sortOrder.value.key) ||
-      this.sortOrderEntries[0];
+      this.sortOrderEntries().find((e) => e.key === this.sortOrder.value.key) ||
+      this.sortOrderEntries()[0];
 
     return {
       language: this.language.value ?? undefined,
@@ -228,14 +208,14 @@ export class PagedWordTreeFilterComponent {
 
   public reset(): void {
     this.form.reset();
-    this._filter = {};
-    this.filterChange.emit(this._filter);
+    this.filter.set({});
+    this.filterChange.emit(this.filter()!);
     this.dialogRef?.close(null);
   }
 
   public apply(): void {
-    this._filter = this.getFilter();
-    this.filterChange.emit(this._filter);
-    this.dialogRef?.close(this._filter);
+    this.filter.set(this.getFilter());
+    this.filterChange.emit(this.filter()!);
+    this.dialogRef?.close(this.filter());
   }
 }

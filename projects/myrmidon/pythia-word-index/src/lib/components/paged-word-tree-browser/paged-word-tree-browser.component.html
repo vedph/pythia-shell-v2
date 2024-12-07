@@ -2,8 +2,8 @@
   <!-- filters -->
   <div id="filters">
     <pythia-paged-word-tree-filter
-      [hideLanguage]="hideLanguage"
-      [sortOrderEntries]="sortOrderEntries"
+      [hideLanguage]="hideLanguage()"
+      [sortOrderEntries]="sortOrderEntries() || []"
       [filter]="filter$ | async"
       (filterChange)="onFilterChange($event)"
     />
@@ -33,9 +33,9 @@
               ? nodes[i + 1].paging
               : undefined
           "
-          [hideLoc]="hideLoc"
-          [hideFilter]="hideFilter"
-          [debug]="debug"
+          [hideLoc]="hideLoc()"
+          [hideFilter]="hideFilter()"
+          [debug]="debug()"
           (toggleExpandedRequest)="onToggleExpanded($any($event))"
           (changePageRequest)="onPageChangeRequest($event)"
           (editNodeFilterRequest)="onEditFilterRequest($any($event))"

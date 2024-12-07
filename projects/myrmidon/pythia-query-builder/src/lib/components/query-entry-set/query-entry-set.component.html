@@ -112,8 +112,8 @@
     >#{{ editedIndex + 1 }}</mat-expansion-panel-header
   >
   <pythia-query-entry
-    [attrDefinitions]="attrDefinitions"
-    [isDocument]="isDocument"
+    [attrDefinitions]="attrDefinitions()"
+    [isDocument]="isDocument()"
     [entry]="editedEntry"
     (entryChange)="saveEntry($event)"
     (editorClose)="closeEntry()"

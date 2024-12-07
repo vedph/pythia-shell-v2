@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, input, OnInit, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -56,13 +56,20 @@ import { SearchExportComponent } from '../search-export/search-export.component'
 export class SearchComponent implements OnInit {
   @ViewChild('queryCtl') queryElementRef: ElementRef | undefined;
 
-  @Input()
-  public initialQueryTerm: string | undefined;
+  /**
+   * Initial query term to be set in the search input.
+   */
+  public readonly initialQueryTerm = input<string | undefined>();
 
-  @Input()
-  public hideAuthor?: boolean;
-  @Input()
-  public hideTitle?: boolean;
+  /**
+   * Whether to hide the author column.
+   */
+  public readonly hideAuthor = input<boolean | undefined>();
+
+  /**
+   * Whether to hide the title column.
+   */
+  public readonly hideTitle = input<boolean | undefined>();
 
   public query$: Observable<string | undefined>;
   public lastQueries$: Observable<string[]>;
@@ -102,11 +109,12 @@ export class SearchComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    if (this.initialQueryTerm) {
-      if (this.initialQueryTerm.startsWith('^')) {
-        this.query.setValue(`[lemma="${this.initialQueryTerm.substring(1)}"]`);
+    const term = this.initialQueryTerm();
+    if (term) {
+      if (term.startsWith('^')) {
+        this.query.setValue(`[lemma="${term.substring(1)}"]`);
       } else {
-        this.query.setValue(`[value="${this.initialQueryTerm}"]`);
+        this.query.setValue(`[value="${term}"]`);
       }
       setTimeout(() => this.search(), 0);
     }

@@ -94,9 +94,9 @@
         <tr>
           <th></th>
           <th class="noif-lt-md"></th>
-          @if (!hideAuthor) {
+          @if (!hideAuthor()) {
           <th i18n>author</th>
-          } @if (!hideTitle) {
+          } @if (!hideTitle()) {
           <th i18n>title</th>
           } @for (l of leftContextLabels; track l) {
           <th>{{ l }}</th>
@@ -136,11 +136,11 @@
           </td>
           <td class="nr noif-lt-md">{{ index + 1 }}.</td>
           <!-- author -->
-          @if (!hideAuthor) {
+          @if (!hideAuthor()) {
           <td class="author">{{ r.author }}</td>
           }
           <!-- title -->
-          @if (!hideTitle) {
+          @if (!hideTitle()) {
           <td class="title">{{ r.title }}</td>
           }
           <!-- left -->

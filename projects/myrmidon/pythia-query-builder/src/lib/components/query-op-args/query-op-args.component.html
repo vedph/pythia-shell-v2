@@ -1,9 +1,9 @@
 <form [formGroup]="form" (submit)="save()">
-  @if (args) {
+  @if (args()) {
   <fieldset>
     <legend i18n>arguments</legend>
     <div formArrayName="arguments" class="form-row">
-      @for ( g of arguments.controls; track g; let i = $index; let first =
+      @for (g of arguments.controls; track g; let i = $index; let first =
       $first; let last = $last) {
       <div>
         <!-- child form -->

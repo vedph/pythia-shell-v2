@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { Component, input, OnDestroy, OnInit, output } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 
@@ -63,34 +56,29 @@ export class QueryEntrySetComponent implements OnInit, OnDestroy {
    * True if the set refers to a document query. This is meant to be set
    * only once.
    */
-  @Input()
-  public isDocument?: boolean;
+  public readonly isDocument = input<boolean | undefined>();
 
   /**
    * The attributes definitions to use. This is meant to be set only once.
    */
-  @Input()
-  public attrDefinitions: QueryBuilderTermDef[];
+  public readonly attrDefinitions = input<QueryBuilderTermDef[]>([]);
 
-  @Input()
-  public get entries(): QueryBuilderEntry[] {
-    return this._builder.getEntries() || [];
-  }
-  public set entries(value: QueryBuilderEntry[]) {
-    this._builder.setEntries(value);
-  }
+  /**
+   * The entries to edit.
+   */
+  public readonly entries = input<QueryBuilderEntry[]>([]);
 
-  @Output()
-  public entrySetChange: EventEmitter<QueryEntrySet>;
+  /**
+   * Emitted when the entries set is changed.
+   */
+  public entrySetChange = output<QueryEntrySet>();
 
   constructor() {
     this._builder = new QueryBuilder();
     this.editedIndex = -1;
     this._editedInsertIndex = -1;
-    this.attrDefinitions = [];
     this.entries$ = this._builder.selectEntries();
     this.errors$ = this._builder.selectErrors();
-    this.entrySetChange = new EventEmitter<QueryEntrySet>();
   }
 
   public ngOnInit(): void {
@@ -105,7 +93,7 @@ export class QueryEntrySetComponent implements OnInit, OnDestroy {
     });
 
     // ensure that observables are emitted so combineLatest is happy
-    this._builder.forDocument(this.isDocument);
+    this._builder.forDocument(this.isDocument());
     this._builder.reset();
   }
 
@@ -123,7 +111,10 @@ export class QueryEntrySetComponent implements OnInit, OnDestroy {
     this.editedIndex = index;
   }
 
-  public saveEntry(entry: QueryBuilderEntry): void {
+  public saveEntry(entry?: QueryBuilderEntry | null): void {
+    if (!entry) {
+      return;
+    }
     if (this._editedInsertIndex > -1) {
       // insert
       this._builder.addEntry(entry, this._editedInsertIndex, true);

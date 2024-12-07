@@ -7,11 +7,12 @@
   </div>
   }
   <!-- map -->
-  @if (!hideMap) { @if (map$ | async; as map) {
+  @if (!hideMap()) { @if (map$ | async; as map) {
   <div id="map">
     <pythia-map-paged-tree-browser
       [map]="map"
-      [debug]="debug"
+      [debug]="debug()"
+      [filterTreshold]="filterTreshold()"
       (mapNodeClick)="onMapNodeClick($event)"
     />
   </div>

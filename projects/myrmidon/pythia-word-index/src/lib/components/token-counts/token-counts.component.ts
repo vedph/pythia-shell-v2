@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, effect, input, Input } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -21,51 +21,50 @@ import { PercentagePipe } from '../../pipes/percentage.pipe';
  * A component to display the counts for a specific token in a pie chart.
  */
 @Component({
-    selector: 'pythia-token-counts',
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        MatButtonModule,
-        MatExpansionModule,
-        MatIconModule,
-        MatSelectModule,
-        MatTooltipModule,
-        NgxEchartsModule,
-        PercentagePipe,
-    ],
-    templateUrl: './token-counts.component.html',
-    styleUrl: './token-counts.component.scss'
+  selector: 'pythia-token-counts',
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatExpansionModule,
+    MatIconModule,
+    MatSelectModule,
+    MatTooltipModule,
+    NgxEchartsModule,
+    PercentagePipe,
+  ],
+  templateUrl: './token-counts.component.html',
+  styleUrl: './token-counts.component.scss',
 })
 export class TokenCountsComponent {
-  private _counts: TokenCount[] = [];
+  /**
+   * The attribute for which the counts are displayed.
+   */
+  public readonly attribute = input<AttributeInfo | undefined>();
 
-  @Input()
-  public attribute?: AttributeInfo;
+  /**
+   * The counts for the attribute.
+   */
+  public readonly counts = input<TokenCount[]>([]);
 
-  @Input()
-  public get counts(): TokenCount[] {
-    return this._counts;
-  }
-  public set counts(value: TokenCount[]) {
-    if (this._counts === value) {
-      return;
-    }
-    this._counts = value;
-    this.updateChart();
-  }
-
-  @Input()
-  public noToolbar?: boolean;
+  /**
+   * Whether to hide the toolbar.
+   */
+  public readonly hideToolbar = input<boolean | undefined>();
 
   public chartOptions: EChartsOption | null = null;
   public total = 0;
   public downloading?: boolean;
 
-  constructor(private _clipboard: Clipboard, private _snackbar: MatSnackBar) {}
+  constructor(private _clipboard: Clipboard, private _snackbar: MatSnackBar) {
+    effect(() => {
+      this.updateChart(this.counts());
+    });
+  }
 
-  private updateChart() {
+  private updateChart(counts: TokenCount[]): void {
     // calculate total count
-    this.total = this._counts.reduce((acc, c) => acc + c.value, 0);
+    this.total = counts.reduce((acc, c) => acc + c.value, 0);
 
     // create pie chart from counts
     // https://www.npmjs.com/package/ngx-echarts
@@ -77,7 +76,7 @@ export class TokenCountsComponent {
       legend: {
         orient: 'vertical',
         left: 10,
-        data: this._counts.map((c) => c.attributeValue),
+        data: counts.map((c) => c.attributeValue),
       },
       series: [
         {
@@ -85,7 +84,7 @@ export class TokenCountsComponent {
           type: 'pie',
           radius: '50%',
           center: ['50%', '60%'],
-          data: this._counts.map((c) => ({
+          data: counts.map((c) => ({
             name: c.attributeValue,
             value: c.value,
           })),
@@ -104,7 +103,7 @@ export class TokenCountsComponent {
   private getCSV(): string {
     // get a CSV representation of the counts
     let csv = 'attr_name,attr_value,nr,percent\n';
-    for (const count of this._counts) {
+    for (const count of this.counts()) {
       csv += `${this.attribute?.name},${count.attributeValue},${count.value},${
         count.value / this.total
       }\n`;
@@ -113,7 +112,7 @@ export class TokenCountsComponent {
   }
 
   public copy(): void {
-    if (!this._counts.length) {
+    if (!this.counts().length) {
       return;
     }
 
@@ -125,7 +124,7 @@ export class TokenCountsComponent {
   }
 
   public download(): void {
-    if (this.downloading || !this._counts.length) {
+    if (this.downloading || !this.counts().length) {
       return;
     }
     this.downloading = true;

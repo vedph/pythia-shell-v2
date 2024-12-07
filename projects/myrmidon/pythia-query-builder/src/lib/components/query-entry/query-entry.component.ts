@@ -1,10 +1,11 @@
 import {
   Component,
-  EventEmitter,
-  Input,
+  effect,
+  input,
+  model,
   OnDestroy,
   OnInit,
-  Output,
+  output,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -65,7 +66,6 @@ interface GroupedQueryBuilderTermDefs {
 })
 export class QueryEntryComponent implements OnInit, OnDestroy {
   private readonly _subs: Subscription[];
-  private _attrDefinitions: QueryBuilderTermDef[];
   private _entry?: QueryBuilderEntry;
   // clause form
   public attribute: FormControl<QueryBuilderTermDef | null>;
@@ -97,57 +97,30 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
    * True if this entry editor should target a document rather than text.
    * This property is meant to set only once.
    */
-  @Input()
-  public isDocument?: boolean;
+  public readonly isDocument = input<boolean | undefined>();
 
   /**
    * The attributes definitions to use. This is meant to be set only once.
    */
-  @Input()
-  public get attrDefinitions(): QueryBuilderTermDef[] {
-    return this._attrDefinitions;
-  }
-  public set attrDefinitions(value: QueryBuilderTermDef[]) {
-    if (this._attrDefinitions === value) {
-      return;
-    }
-    this._attrDefinitions = value;
-    this.attrGroups = this.groupByKey(
-      value.filter((d) => !d.hidden),
-      'group'
-    );
-  }
+  public readonly attrDefinitions = input<QueryBuilderTermDef[]>([]);
 
   /**
    * The entry being edited.
    */
-  @Input()
-  public get entry(): QueryBuilderEntry | undefined | null {
-    return this._entry;
-  }
-  public set entry(value: QueryBuilderEntry | undefined | null) {
-    if (this._entry === value) {
-      return;
-    }
-    this._entry = value || undefined;
-    this.updateForm(this._entry);
-  }
+  public readonly entry = model<QueryBuilderEntry | undefined | null>();
 
   /**
    * Emitted when the entry is saved.
    */
-  @Output()
-  public entryChange: EventEmitter<QueryBuilderEntry>;
+  public readonly entryChange = output<QueryBuilderEntry>();
 
   /**
    * Emitted when the user requests to close the editor.
    */
-  @Output()
-  public editorClose: EventEmitter<any>;
+  public readonly editorClose = output();
 
   constructor(formBuilder: FormBuilder) {
     this._subs = [];
-    this._attrDefinitions = [];
     this.opGroups = this.groupByKey(
       QUERY_PAIR_OP_DEFS.filter((d) => !d.hidden),
       'group'
@@ -176,9 +149,17 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
       args: this.args,
       clause: this.pairForm,
     });
-    // events
-    this.entryChange = new EventEmitter<QueryBuilderEntry>();
-    this.editorClose = new EventEmitter<any>();
+
+    effect(() => {
+      this.attrGroups = this.groupByKey(
+        this.attrDefinitions().filter((d) => !d.hidden),
+        'group'
+      );
+    });
+
+    effect(() => {
+      this.updateForm(this.entry() || undefined);
+    });
   }
 
   private groupByKey(array: Array<any>, key: string): { [key: string]: any[] } {
@@ -193,7 +174,7 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     // configure according to target
-    if (!this.isDocument) {
+    if (!this.isDocument()) {
       // if not a document, add location operators
       this.entryTypes = [...this.entryTypes, ...QUERY_LOCATION_OP_DEFS].filter(
         (d) => !d.hidden && d.type !== QueryBuilderTermType.Document
@@ -268,14 +249,14 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
     });
   }
 
-  public onArgsChange(args: QueryBuilderTermDefArg[]): void {
-    this.args.setValue(args);
+  public onArgsChange(args?: QueryBuilderTermDefArg[] | null): void {
+    this.args.setValue(args || []);
     this.args.updateValueAndValidity();
     this.args.markAsDirty();
   }
 
-  public onPairArgsChange(args: QueryBuilderTermDefArg[]): void {
-    this.pairArgs.setValue(args);
+  public onPairArgsChange(args?: QueryBuilderTermDefArg[] | null): void {
+    this.pairArgs.setValue(args || []);
     this.pairArgs.updateValueAndValidity();
     this.pairArgs.markAsDirty();
   }
@@ -306,7 +287,7 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
     if (this.form.invalid) {
       return;
     }
-    const entry = this.getEntry();
-    this.entryChange.emit(entry);
+    this.entry.set(this.getEntry());
+    this.entryChange.emit(this.entry()!);
   }
 }

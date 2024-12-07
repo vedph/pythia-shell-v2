@@ -93,7 +93,7 @@ export class CorpusListComponent {
     }
   }
 
-  public onFilterChange(filter: CorpusFilter): void {
+  public onFilterChange(filter?: CorpusFilter | null): void {
     this.loading = true;
     if (!this.admin) {
       filter = {
@@ -101,7 +101,7 @@ export class CorpusListComponent {
         userId: this._authService.currentUserValue?.userName,
       };
     }
-    this._store.setFilter(filter).finally(() => {
+    this._store.setFilter(filter || {}).finally(() => {
       this.loading = false;
     });
   }
@@ -153,7 +153,10 @@ export class CorpusListComponent {
       });
   }
 
-  public onCorpusChange(corpus: EditedCorpus): void {
+  public onCorpusChange(corpus?: EditedCorpus | null): void {
+    if (!corpus) {
+      return;
+    }
     this._corpusService.addCorpus(corpus, corpus.sourceId).subscribe({
       next: () => {
         this.reset();

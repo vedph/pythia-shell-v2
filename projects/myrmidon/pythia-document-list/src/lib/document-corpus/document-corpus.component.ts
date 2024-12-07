@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnInit, output } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -50,8 +50,7 @@ export class DocumentCorpusComponent implements OnInit {
 
   public baseFilter?: CorpusFilter;
 
-  @Output()
-  public corpusAction: EventEmitter<CorpusActionRequest>;
+  public readonly corpusAction = output<CorpusActionRequest>();
 
   constructor(
     formBuilder: FormBuilder,
@@ -59,7 +58,6 @@ export class DocumentCorpusComponent implements OnInit {
     private _editableCheckService: EditableCheckService,
     authService: AuthJwtService
   ) {
-    this.corpusAction = new EventEmitter<CorpusActionRequest>();
     // form
     this.corpusId = formBuilder.control(null, [
       Validators.required,

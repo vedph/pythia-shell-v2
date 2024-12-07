@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, input, OnInit, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -56,38 +56,40 @@ export class PagedWordTreeBrowserComponent implements OnInit {
   /**
    * Whether to hide the language filter.
    */
-  @Input()
-  public hideLanguage?: boolean;
+  public readonly hideLanguage = input<boolean | undefined>();
 
   /**
    * Whether to hide the node y,x location.
    */
-  @Input()
-  public hideLoc?: boolean;
+  public readonly hideLoc = input<boolean | undefined>();
 
   /**
    * Whether to hide the node filter.
    */
-  @Input()
-  public hideFilter?: boolean;
+  public readonly hideFilter = input<boolean | undefined>();
 
   /**
    * Whether to enable debug node view.
    */
-  @Input()
-  public debug?: boolean;
+  public readonly debug = input<boolean | undefined>();
 
   /**
    * The sort order entries to display in the sort order dropdown.
    * If not set, the sort order dropdown will use the default entries.
    */
-  @Input()
-  public sortOrderEntries?: WordTreeFilterSortOrderEntry[];
+  public readonly sortOrderEntries = input<
+    WordTreeFilterSortOrderEntry[] | undefined
+  >();
 
-  @Output()
-  public readonly searchRequest = new EventEmitter<Word | Lemma>();
-  @Output()
-  public readonly countsRequest = new EventEmitter<Word | Lemma>();
+  /**
+   * Emitted when a search request is made.
+   */
+  public readonly searchRequest = output<Word | Lemma>();
+
+  /**
+   * Emitted when a counts request is made.
+   */
+  public readonly countsRequest = output<Word | Lemma>();
 
   constructor(
     service: PagedWordTreeBrowserService,
@@ -143,9 +145,9 @@ export class PagedWordTreeBrowserComponent implements OnInit {
       });
   }
 
-  public onFilterChange(filter: WordFilter): void {
+  public onFilterChange(filter?: WordFilter | null): void {
     this.loading = true;
-    this._store.setFilter(filter).finally(() => {
+    this._store.setFilter(filter || {}).finally(() => {
       this.loading = false;
       const root = this._store.getRootNode();
       if (root && !root.expanded) {

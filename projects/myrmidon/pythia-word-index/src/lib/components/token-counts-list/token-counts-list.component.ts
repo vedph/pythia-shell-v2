@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, effect, input, Input, model } from '@angular/core';
 import { take } from 'rxjs';
 
 import { CommonModule } from '@angular/common';
@@ -24,43 +24,35 @@ import { TokenCountsComponent } from '../token-counts/token-counts.component';
  * a set of document attributes.
  */
 @Component({
-    selector: 'pythia-token-counts-list',
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        MatButtonModule,
-        MatIconModule,
-        MatProgressBarModule,
-        MatSelectModule,
-        MatTooltipModule,
-        TokenCountsComponent,
-    ],
-    templateUrl: './token-counts-list.component.html',
-    styleUrl: './token-counts-list.component.scss'
+  selector: 'pythia-token-counts-list',
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressBarModule,
+    MatSelectModule,
+    MatTooltipModule,
+    TokenCountsComponent,
+  ],
+  templateUrl: './token-counts-list.component.html',
+  styleUrl: './token-counts-list.component.scss',
 })
 export class TokenCountsListComponent {
-  private _token?: Word | Lemma;
+  /**
+   * The token for which to display the counts.
+   */
+  public readonly token = input<Word | Lemma | undefined>();
 
-  @Input()
-  public get token(): Word | Lemma | undefined {
-    return this._token;
-  }
-  public set token(value: Word | Lemma | undefined) {
-    if (value === this._token) {
-      return;
-    }
-    this._token = value;
-    this.loadCounts();
-  }
+  /**
+   * Whether to display the toolbar with the attribute selection.
+   */
+  public readonly hideToolbar = input<boolean | undefined>();
 
-  @Input()
-  public maxCounts = 5;
-
-  @Input()
-  public noToolbar?: boolean;
-
-  @Input()
-  public attributes?: AttributeInfo[];
+  /**
+   * The list of available attributes.
+   */
+  public readonly attributes = model<AttributeInfo[] | undefined>();
 
   public busy?: boolean;
   public readonly selectedAttributes: FormControl<AttributeInfo[]>;
@@ -69,6 +61,9 @@ export class TokenCountsListComponent {
   constructor(formBuilder: FormBuilder, private _wordService: WordService) {
     this.selectedAttributes = formBuilder.control<AttributeInfo[]>([], {
       nonNullable: true,
+    });
+    effect(() => {
+      this.loadCounts(this.token());
     });
   }
 
@@ -80,13 +75,13 @@ export class TokenCountsListComponent {
         .pipe(take(1))
         .subscribe((attributes) => {
           this.selectedAttributes.reset();
-          this.attributes = attributes;
+          this.attributes.set(attributes);
         });
     }
   }
 
-  public loadCounts(): void {
-    if (this.busy || !this.token) {
+  public loadCounts(token?: Word | Lemma | undefined): void {
+    if (this.busy || !token) {
       return;
     }
 
@@ -97,10 +92,10 @@ export class TokenCountsListComponent {
 
     this.busy = true;
 
-    if (this.token!.type === 'lemma') {
+    if (token.type === 'lemma') {
       this._wordService
         .getLemmaCounts(
-          this.token!.id,
+          token!.id,
           this.selectedAttributes.value.map((i) => i.name)
         )
         .pipe(take(1))
@@ -115,7 +110,7 @@ export class TokenCountsListComponent {
     } else {
       this._wordService
         .getWordCounts(
-          this.token!.id,
+          token!.id,
           this.selectedAttributes.value.map((i) => i.name)
         )
         .pipe(take(1))

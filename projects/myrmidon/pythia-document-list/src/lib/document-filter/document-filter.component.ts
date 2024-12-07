@@ -1,4 +1,4 @@
-import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { Component, model, effect, input, output } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -67,52 +67,35 @@ export interface DocumentFilters {
   styleUrls: ['./document-filter.component.css'],
 })
 export class DocumentFilterComponent {
-  private _filter?: DocumentFilter;
-
   /**
    * The filter.
    */
-  @Input()
-  public get filter(): DocumentFilter | null | undefined {
-    return this._filter;
-  }
-  public set filter(value: DocumentFilter | null | undefined) {
-    if (this._filter === value) {
-      return;
-    }
-    this._filter = value || undefined;
-    this.updateForm(this._filter);
-  }
+  public readonly filter = model<DocumentFilter | null | undefined>();
 
   /**
    * The list of available document attributes.
    */
-  @Input()
-  public attributes: string[] | undefined;
+  public readonly attributes = input<string[] | undefined>();
 
   /**
    * Event emitted when the filter changes.
    */
-  @Output()
-  public filterChange: EventEmitter<DocumentFilter>;
+  public readonly filterChange = output<DocumentFilter>();
 
   /**
    * The list of document filters to be hidden.
    */
-  @Input()
-  public hiddenFilters?: DocumentFilters;
+  public readonly hiddenFilters = input<DocumentFilters | undefined>();
 
   /**
    * Whether the filter is disabled.
    */
-  @Input()
-  public disabled?: boolean;
+  public readonly disabled = input<boolean | undefined>();
 
   /**
    * Whether the filter is sortable.
    */
-  @Input()
-  public sortable?: boolean;
+  public readonly sortable = input<boolean | undefined>(true);
 
   public corpus: FormControl<Corpus | null>;
   public author: FormControl<string | null>;
@@ -135,8 +118,6 @@ export class DocumentFilterComponent {
     private _profileService: ProfileService,
     private _formBuilder: FormBuilder
   ) {
-    this.sortable = true;
-
     // form
     this.corpus = _formBuilder.control(null);
     this.author = _formBuilder.control(null);
@@ -164,8 +145,10 @@ export class DocumentFilterComponent {
       sortOrder: this.sortOrder,
       descending: this.descending,
     });
-    // events
-    this.filterChange = new EventEmitter<DocumentFilter>();
+
+    effect(() => {
+      this.updateForm(this.filter());
+    });
   }
 
   private parseAttributes(csv?: string): Attribute[] {
@@ -287,12 +270,12 @@ export class DocumentFilterComponent {
   public reset(): void {
     this.attrs.clear({ emitEvent: false });
     this.form.reset();
-    this._filter = {};
-    this.filterChange.emit(this._filter);
+    this.filter.set({});
+    this.filterChange.emit(this.filter()!);
   }
 
   public apply(): void {
-    this._filter = this.getFilter();
-    this.filterChange.emit(this._filter);
+    this.filter.set(this.getFilter());
+    this.filterChange.emit(this.filter()!);
   }
 }

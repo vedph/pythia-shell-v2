@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, input, Input, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -27,11 +27,15 @@ import { SearchService } from '@myrmidon/pythia-api';
 export class SearchExportComponent implements OnDestroy {
   private _sub?: Subscription;
 
-  @Input()
-  public query: string | null | undefined;
+  /**
+   * The query to export results for.
+   */
+  public readonly query = input<string | null | undefined>();
 
-  @Input()
-  public disabled?: boolean;
+  /**
+   * Whether the export button is disabled.
+   */
+  public readonly disabled = input<boolean | undefined>();
 
   public isExporting = false;
 
@@ -56,26 +60,28 @@ export class SearchExportComponent implements OnDestroy {
   }
 
   public exportCsv() {
-    if (!this.query || this.isExporting) {
+    if (!this.query() || this.isExporting) {
       return;
     }
     this.isExporting = true;
 
-    this._sub = this._searchService.exportSearchResults(this.query).subscribe({
-      next: (csvData: string) => {
-        this.downloadCsv(csvData);
-        this.isExporting = false;
-        this._snackbar.open('Results exported', 'OK', { duration: 2000 });
-      },
-      error: (error) => {
-        console.error('Error exporting CSV:', error);
-        this.isExporting = false;
-        this._snackbar.open('Error exporting results', 'Error');
-      },
-      complete: () => {
-        this.isExporting = false;
-      },
-    });
+    this._sub = this._searchService
+      .exportSearchResults(this.query()!)
+      .subscribe({
+        next: (csvData: string) => {
+          this.downloadCsv(csvData);
+          this.isExporting = false;
+          this._snackbar.open('Results exported', 'OK', { duration: 2000 });
+        },
+        error: (error) => {
+          console.error('Error exporting CSV:', error);
+          this.isExporting = false;
+          this._snackbar.open('Error exporting results', 'Error');
+        },
+        complete: () => {
+          this.isExporting = false;
+        },
+      });
   }
 
   public cancelExport() {

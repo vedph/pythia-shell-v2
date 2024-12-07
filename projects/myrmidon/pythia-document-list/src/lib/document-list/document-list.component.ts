@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  input,
+  Input,
+  output,
+  Output,
+} from '@angular/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import '@angular/localize/init';
 import { CommonModule } from '@angular/common';
@@ -61,11 +68,12 @@ export class DocumentListComponent {
   /**
    * The list of document filters to be hidden.
    */
-  @Input()
-  public hiddenFilters?: DocumentFilters;
+  public readonly hiddenFilters = input<DocumentFilters | undefined>();
 
-  @Output()
-  public readRequest: EventEmitter<DocumentReadRequest>;
+  /**
+   * Emitted when a document is requested to be read.
+   */
+  public readonly readRequest = output<DocumentReadRequest>();
 
   constructor(
     private _repository: DocumentRepository,
@@ -76,11 +84,10 @@ export class DocumentListComponent {
     this.activeDocument$ = _repository.activeDocument$;
     this.filter$ = _repository.filter$;
     this.page$ = _repository.page$;
-    this.readRequest = new EventEmitter<DocumentReadRequest>();
   }
 
-  public onFilterChange(filter: DocumentFilter): void {
-    this._repository.setFilter(filter);
+  public onFilterChange(filter?: DocumentFilter | null): void {
+    this._repository.setFilter(filter || {});
   }
 
   public onPageChange(event: PageEvent): void {

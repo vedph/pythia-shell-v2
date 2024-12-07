@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -39,42 +39,43 @@ import { WordTreeFilterSortOrderEntry } from '../paged-word-tree-filter/paged-wo
 export class WordIndexComponent {
   public token?: Word | Lemma;
 
-  @Input()
-  public attributes?: AttributeInfo[];
+  /**
+   * The list of attributes to display in the attribute filter.
+   */
+  public readonly attributes = input<AttributeInfo[] | undefined>();
 
   /**
    * Whether to hide the language filter.
    */
-  @Input()
-  public hideLanguage?: boolean;
+  public readonly hideLanguage = input<boolean | undefined>();
 
   /**
    * Whether to hide the node filter.
    */
-  @Input()
-  public hideFilter?: boolean;
+  public readonly hideFilter = input<boolean | undefined>();
 
   /**
    * Whether to hide the node y,x location.
    */
-  @Input()
-  public hideLoc?: boolean;
+  public readonly hideLoc = input<boolean | undefined>();
 
   /**
    * Whether to enable debug node view.
    */
-  @Input()
-  public debug?: boolean;
+  public readonly debug = input<boolean | undefined>();
 
   /**
    * The sort order entries to display in the sort order dropdown.
    * If not set, the sort order dropdown will use the default entries.
    */
-  @Input()
-  public sortOrderEntries?: WordTreeFilterSortOrderEntry[];
+  public readonly sortOrderEntries = input<
+    WordTreeFilterSortOrderEntry[] | undefined
+  >();
 
-  @Output()
-  public readonly searchRequest = new EventEmitter<Word | Lemma>();
+  /**
+   * Emitted when requests a search for a word or lemma.
+   */
+  public readonly searchRequest = output<Word | Lemma>();
 
   public onSearchRequest(token: Word | Lemma): void {
     this.searchRequest.emit(token);

@@ -4,7 +4,7 @@
     <mat-card>
       <mat-card-content>
         <pythia-document-filter
-          [hiddenFilters]="hiddenFilters"
+          [hiddenFilters]="hiddenFilters()"
           (filterChange)="onFilterChange($event)"
         />
       </mat-card-content>

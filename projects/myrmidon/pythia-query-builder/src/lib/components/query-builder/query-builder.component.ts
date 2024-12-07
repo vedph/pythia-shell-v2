@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
+import { Component, Inject, input, output } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -61,32 +61,27 @@ export class QueryBuilderComponent {
   /**
    * True to enable the peek button.
    */
-  @Input()
-  public canPeek?: boolean;
+  public readonly canPeek = input<boolean | undefined>();
 
   /**
    * True to hide the corpora section.
    */
-  @Input()
-  public hideCorpora?: boolean;
+  public readonly hideCorpora = input<boolean | undefined>();
 
   /**
    * True to hide the documents section.
    */
-  @Input()
-  public hideDocuments?: boolean;
+  public hideDocuments = input<boolean | undefined>();
 
   /**
    * Emitted whenever user wants to peek the query's text.
    */
-  @Output()
-  public queryPeek: EventEmitter<string>;
+  public readonly queryPeek = output<string>();
 
   /**
    * Emitted whenever a query is built.
    */
-  @Output()
-  public queryChange: EventEmitter<string>;
+  public readonly queryChange = output<string>();
 
   constructor(
     @Inject(QUERY_BUILDER_ATTR_DEFS_KEY)
@@ -103,9 +98,6 @@ export class QueryBuilderComponent {
     this.docAttrDefinitions = attrDefinitions.filter(
       (d) => d.type === QueryBuilderTermType.Document
     );
-    // events
-    this.queryPeek = new EventEmitter<string>();
-    this.queryChange = new EventEmitter<string>();
   }
 
   public onCorporaChange(corpora: Corpus[]): void {

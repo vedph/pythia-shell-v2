@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, effect, model, output } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -50,30 +50,23 @@ export interface EditedCorpus extends Corpus {
   styleUrls: ['./corpus-editor.component.css'],
 })
 export class CorpusEditorComponent {
-  private _corpus: EditedCorpus | undefined;
   private _sourceId?: string;
   public readonly idPrefix: string;
 
   /**
    * The corpus to edit.
    */
-  @Input()
-  public get corpus(): EditedCorpus | undefined | null {
-    return this._corpus;
-  }
-  public set corpus(value: EditedCorpus | undefined | null) {
-    if (this._corpus === value) {
-      return;
-    }
-    this._corpus = value || undefined;
-    this.updateForm(this._corpus);
-  }
+  public readonly corpus = model<EditedCorpus | undefined | null>();
 
-  @Output()
-  public corpusChange: EventEmitter<EditedCorpus>;
+  /**
+   * Emitted when the corpus is changed.
+   */
+  public readonly corpusChange = output<EditedCorpus>();
 
-  @Output()
-  public editorClose: EventEmitter<any>;
+  /**
+   * Emitted when the editor is closed.
+   */
+  public readonly editorClose = output();
 
   public id: FormControl<string>;
   public title: FormControl<string | null>;
@@ -88,8 +81,6 @@ export class CorpusEditorComponent {
     authService: AuthJwtService,
     public corpusRefLookupService: CorpusRefLookupService
   ) {
-    this.corpusChange = new EventEmitter<EditedCorpus>();
-    this.editorClose = new EventEmitter<any>();
     // ID prefix for new IDs
     this.idPrefix = authService.currentUserValue?.userName || '';
     if (this.idPrefix) {
@@ -122,6 +113,10 @@ export class CorpusEditorComponent {
         ? undefined
         : authService.currentUserValue?.userName,
     };
+
+    effect(() => {
+      this.updateForm(this.corpus() || undefined);
+    });
   }
 
   /**
@@ -161,9 +156,9 @@ export class CorpusEditorComponent {
     // patch the original corpus, because non-editable properties
     // like userId must be preserved
     return {
-      ...this._corpus!,
+      ...this.corpus()!,
       id: this.idPrefix + this.id.value.trim(),
-      title: this.title.value?.trim() || this._corpus!.title,
+      title: this.title.value?.trim() || this.corpus()!.title,
       description: this.description.value?.trim() || '',
       sourceId: this.clone.value ? this._sourceId : undefined,
     };
@@ -174,10 +169,10 @@ export class CorpusEditorComponent {
   }
 
   public save(): void {
-    if (this.form.invalid || !this._corpus) {
+    if (this.form.invalid || !this.corpus()) {
       return;
     }
-    this._corpus = this.getCorpus();
-    this.corpusChange.emit(this._corpus);
+    this.corpus.set(this.getCorpus());
+    this.corpusChange.emit(this.corpus()!);
   }
 }

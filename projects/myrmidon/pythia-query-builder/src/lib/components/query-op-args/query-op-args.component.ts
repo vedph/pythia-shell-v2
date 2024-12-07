@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, effect, model, output } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -32,8 +32,6 @@ import { QueryBuilderTermDefArg } from '../../query-builder';
   styleUrls: ['./query-op-args.component.css'],
 })
 export class QueryOpArgsComponent {
-  private _args?: QueryBuilderTermDefArg[];
-
   public arguments: FormArray;
   public form: FormGroup;
 
@@ -41,26 +39,20 @@ export class QueryOpArgsComponent {
    * The arguments definitions and their values. Values are edited
    * by this component.
    */
-  @Input()
-  public get args(): QueryBuilderTermDefArg[] | undefined | null {
-    return this._args;
-  }
-  public set args(value: QueryBuilderTermDefArg[] | undefined | null) {
-    if (this._args === value) {
-      return;
-    }
-    this._args = value || undefined;
-    this.updateForm(this._args);
-  }
+  public readonly args = model<QueryBuilderTermDefArg[] | undefined | null>();
 
-  @Output()
-  public argsChange: EventEmitter<QueryBuilderTermDefArg[]>;
+  /**
+   * Emitted when the arguments are changed.
+   */
+  public readonly argsChange = output<QueryBuilderTermDefArg[]>();
 
   constructor(private _formBuilder: FormBuilder) {
     this.arguments = _formBuilder.array([]);
     this.form = _formBuilder.group({ arguments: this.arguments });
-    // events
-    this.argsChange = new EventEmitter<QueryBuilderTermDefArg[]>();
+
+    effect(() => {
+      this.updateForm(this.args() || undefined);
+    });
   }
 
   private updateForm(args?: QueryBuilderTermDefArg[]): void {
@@ -119,8 +111,8 @@ export class QueryOpArgsComponent {
   }
 
   public save(): void {
-    this._args = this.getArgs();
-    this.argsChange.emit(this._args);
+    this.args.set(this.getArgs());
+    this.argsChange.emit(this.args()!);
     this.form.markAsPristine();
   }
 }

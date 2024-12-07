@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, effect, input, ViewEncapsulation } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ReaderService } from '@myrmidon/pythia-api';
@@ -36,47 +36,23 @@ import { MapPagedTreeBrowserComponent } from '../map-paged-tree-browser/map-page
 })
 export class DocumentReaderComponent {
   private _busy: boolean | undefined;
-  private _request: DocumentReadRequest | undefined;
 
-  @Input()
-  public get request(): DocumentReadRequest | undefined {
-    return this._request;
-  }
-  public set request(value: DocumentReadRequest | undefined) {
-    if (
-      this._request &&
-      value &&
-      this._request.documentId === value.documentId &&
-      this._request.start === value.start &&
-      this._request.end === value.end
-    ) {
-      return;
-    }
-    this._request = value;
-    if (value) {
-      this._repository.load(value, value.initialPath);
-    } else {
-      this._repository.reset();
-    }
-  }
+  public readonly request = input<DocumentReadRequest | undefined>();
 
   /**
    * Whether to show debug information.
    */
-  @Input()
-  public debug?: boolean;
+  public readonly debug = input<boolean | undefined>();
 
   /**
    * Whether to hide the map.
    */
-  @Input()
-  public hideMap?: boolean;
+  public readonly hideMap = input<boolean | undefined>();
 
   /**
    * The minimum map nodes count treshold for showing the filter.
    */
-  @Input()
-  public filterTreshold = 0;
+  public readonly filterTreshold = input<number>(0);
 
   public loading$: Observable<boolean>;
   public document$: Observable<Document | undefined>;
@@ -91,6 +67,15 @@ export class DocumentReaderComponent {
     this.document$ = _repository.document$;
     this.map$ = _repository.map$;
     this.text$ = _repository.text$;
+
+    effect(() => {
+      const request = this.request();
+      if (request) {
+        this._repository.load(request, request.initialPath);
+      } else {
+        this._repository.reset();
+      }
+    });
   }
 
   public onMapNodeClick(node: TextMapNode): void {
