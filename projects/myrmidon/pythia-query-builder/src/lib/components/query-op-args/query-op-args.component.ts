@@ -41,11 +41,6 @@ export class QueryOpArgsComponent {
    */
   public readonly args = model<QueryBuilderTermDefArg[] | undefined | null>();
 
-  /**
-   * Emitted when the arguments are changed.
-   */
-  public readonly argsChange = output<QueryBuilderTermDefArg[]>();
-
   constructor(private _formBuilder: FormBuilder) {
     this.arguments = _formBuilder.array([]);
     this.form = _formBuilder.group({ arguments: this.arguments });
@@ -112,7 +107,6 @@ export class QueryOpArgsComponent {
 
   public save(): void {
     this.args.set(this.getArgs());
-    this.argsChange.emit(this.args()!);
     this.form.markAsPristine();
   }
 }

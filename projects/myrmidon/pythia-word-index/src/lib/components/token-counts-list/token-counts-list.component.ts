@@ -69,7 +69,7 @@ export class TokenCountsListComponent {
 
   public ngOnInit(): void {
     // on first load, get the list of available attributes if not provided
-    if (!this.attributes) {
+    if (!this.attributes()) {
       this._wordService
         .getDocAttributeInfo()
         .pipe(take(1))

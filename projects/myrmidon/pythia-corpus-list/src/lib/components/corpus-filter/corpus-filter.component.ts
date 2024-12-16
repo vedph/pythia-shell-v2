@@ -32,11 +32,6 @@ export class CorpusFilterComponent {
 
   public readonly disabled = input<boolean | undefined>();
 
-  /**
-   * Event emitted when the filter changes.
-   */
-  public readonly filterChange = output<CorpusFilter>();
-
   public id: FormControl<string | null>;
   public title: FormControl<string | null>;
   public form: FormGroup;
@@ -74,11 +69,9 @@ export class CorpusFilterComponent {
   public reset(): void {
     this.form.reset();
     this.filter.set({});
-    this.filterChange.emit(this.filter()!);
   }
 
   public apply(): void {
     this.filter.set(this.getFilter());
-    this.filterChange.emit(this.filter()!);
   }
 }

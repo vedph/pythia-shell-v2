@@ -59,11 +59,6 @@ export class CorpusEditorComponent {
   public readonly corpus = model<EditedCorpus | undefined | null>();
 
   /**
-   * Emitted when the corpus is changed.
-   */
-  public readonly corpusChange = output<EditedCorpus>();
-
-  /**
    * Emitted when the editor is closed.
    */
   public readonly editorClose = output();
@@ -173,6 +168,5 @@ export class CorpusEditorComponent {
       return;
     }
     this.corpus.set(this.getCorpus());
-    this.corpusChange.emit(this.corpus()!);
   }
 }

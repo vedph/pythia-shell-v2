@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, input, Input } from '@angular/core';
+import { Component, effect, input } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -10,9 +10,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { NgxEchartsModule } from 'ngx-echarts';
+// https://github.com/xieziyu/ngx-echarts
+import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
+// import * as echarts from 'echarts/core';
+import { echarts } from './custom-echarts';
 import { EChartsOption } from 'echarts';
-
 import { AttributeInfo, TokenCount } from '@myrmidon/pythia-api';
 
 import { PercentagePipe } from '../../pipes/percentage.pipe';
@@ -30,9 +32,10 @@ import { PercentagePipe } from '../../pipes/percentage.pipe';
     MatIconModule,
     MatSelectModule,
     MatTooltipModule,
-    NgxEchartsModule,
     PercentagePipe,
+    NgxEchartsDirective,
   ],
+  providers: [provideEchartsCore({ echarts })],
   templateUrl: './token-counts.component.html',
   styleUrl: './token-counts.component.scss',
 })

@@ -91,11 +91,6 @@ export class PagedWordTreeFilterComponent {
    */
   public readonly filter = model<WordFilter | null | undefined>();
 
-  /**
-   * Event emitted when the filter changes.
-   */
-  public readonly filterChange = output<WordFilter>();
-
   public language: FormControl<string | null>;
   public valuePattern: FormControl<string | null>;
   public minValueLength: FormControl<number>;
@@ -209,13 +204,11 @@ export class PagedWordTreeFilterComponent {
   public reset(): void {
     this.form.reset();
     this.filter.set({});
-    this.filterChange.emit(this.filter()!);
     this.dialogRef?.close(null);
   }
 
   public apply(): void {
     this.filter.set(this.getFilter());
-    this.filterChange.emit(this.filter()!);
     this.dialogRef?.close(this.filter());
   }
 }

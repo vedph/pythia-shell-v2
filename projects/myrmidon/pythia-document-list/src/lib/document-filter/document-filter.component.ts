@@ -78,11 +78,6 @@ export class DocumentFilterComponent {
   public readonly attributes = input<string[] | undefined>();
 
   /**
-   * Event emitted when the filter changes.
-   */
-  public readonly filterChange = output<DocumentFilter>();
-
-  /**
    * The list of document filters to be hidden.
    */
   public readonly hiddenFilters = input<DocumentFilters | undefined>();
@@ -271,11 +266,9 @@ export class DocumentFilterComponent {
     this.attrs.clear({ emitEvent: false });
     this.form.reset();
     this.filter.set({});
-    this.filterChange.emit(this.filter()!);
   }
 
   public apply(): void {
     this.filter.set(this.getFilter());
-    this.filterChange.emit(this.filter()!);
   }
 }

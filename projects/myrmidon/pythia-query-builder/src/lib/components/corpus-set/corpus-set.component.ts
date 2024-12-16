@@ -42,11 +42,6 @@ export class CorpusSetComponent {
    */
   public readonly corpora = model<Corpus[]>([]);
 
-  /**
-   * Emitted whenever the set of corpora changes.
-   */
-  public readonly corporaChange = output<Corpus[]>();
-
   constructor(public corpusLookupService: CorpusRefLookupService) {}
 
   public onCorpusChange(corpus: Corpus | null): void {
@@ -59,18 +54,15 @@ export class CorpusSetComponent {
     }
     corpora.push(corpus);
     this.corpora.set(corpora);
-    this.corporaChange.emit(this.corpora());
   }
 
   public deleteCorpus(index: number): void {
     const corpora = [...this.corpora()];
     corpora.splice(index, 1);
     this.corpora.set(corpora);
-    this.corporaChange.emit(this.corpora());
   }
 
   public clear(): void {
     this.corpora.set([]);
-    this.corporaChange.emit(this.corpora());
   }
 }

@@ -110,11 +110,6 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
   public readonly entry = model<QueryBuilderEntry | undefined | null>();
 
   /**
-   * Emitted when the entry is saved.
-   */
-  public readonly entryChange = output<QueryBuilderEntry>();
-
-  /**
    * Emitted when the user requests to close the editor.
    */
   public readonly editorClose = output();
@@ -288,6 +283,5 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
       return;
     }
     this.entry.set(this.getEntry());
-    this.entryChange.emit(this.entry()!);
   }
 }
