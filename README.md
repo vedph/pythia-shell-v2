@@ -33,7 +33,7 @@ ng g library @myrmidon/pythia-stats --prefix pythia
 ng g library @myrmidon/pythia-ui --prefix pythia
 ng g library @myrmidon/pythia-word-index --prefix pythia
 
-npm i @myrmidon/auth-jwt-admin @myrmidon/auth-jwt-login @myrmidon/cadmus-refs-lookup @myrmidon/ngx-tools @myrmidon/ngx-mat-tools @myrmidon/paged-data-browsers ngx-echarts ts-md5 --force
+npm i @myrmidon/auth-jwt-admin @myrenvmidon/auth-jwt-login @myrmidon/cadmus-refs-lookup @myrmidon/ngx-tools @myrmidon/ngx-mat-tools @myrmidon/paged-data-browsers ngx-echarts ts-md5 --force
 
 npm i --save-dev ngx-i18nsupport
 ```

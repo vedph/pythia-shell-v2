@@ -1,8 +1,4 @@
-import {
-  ApplicationConfig,
-  importProvidersFrom,
-  provideZoneChangeDetection,
-} from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -10,7 +6,6 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 
-import { EnvServiceProvider } from '@myrmidon/ngx-tools';
 import { authJwtInterceptor } from '@myrmidon/auth-jwt-login';
 
 import { QUERY_BUILDER_ATTR_DEFS_KEY } from '../../projects/myrmidon/pythia-query-builder/src/public-api';
@@ -26,7 +21,6 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(withInterceptors([authJwtInterceptor])),
     provideNativeDateAdapter(),
-    EnvServiceProvider,
     // query builder
     {
       provide: QUERY_BUILDER_ATTR_DEFS_KEY,
