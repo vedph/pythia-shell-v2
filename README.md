@@ -42,6 +42,9 @@ Then the old code has been progressively imported and refactored for standalone.
 
 ## History
 
+- 2024-12-19:
+  - updated Angular and packages.
+  - removed `EnvServiceProvider`.
 - 2024-12-16:
   - fixes to [ngx-echarts](https://github.com/xieziyu/ngx-echarts) usage for Angular 19. See sample code at <https://github.com/xieziyu/ngx-echarts-starter/blob/master/src/app/app.component.ts> for correctly importing dependencies in standalone with Angular 19.
   - updated Angular and packages.
