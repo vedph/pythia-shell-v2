@@ -2,7 +2,11 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.3.
 
-This is version 2 of the Pythia UI development shell. Version 2 has been refactored into a standalone app and all its library versions have bumped to 6. The old version is being preserved in its [original repository](https://github.com/vedph/pythia-shell).
+This is version 2 of the Pythia UI development shell. Version 2 has been refactored into a standalone app, all its input/output endpoints have been refactored with signals, and all its library versions have bumped to 6.
+
+>The old version (4) is being preserved in its [original repository](https://github.com/vedph/pythia-shell). An intermediate major version 5 is a deprecated intermediate version.
+
+This shell is used to develop and test the basic UI components for building Pythia-based frontends like Minerva.
 
 ## Docker
 
@@ -42,9 +46,13 @@ Then the old code has been progressively imported and refactored for standalone.
 
 ## History
 
+### 6.0.0
+
 - 2024-12-19:
   - updated Angular and packages.
   - removed `EnvServiceProvider`.
 - 2024-12-16:
   - fixes to [ngx-echarts](https://github.com/xieziyu/ngx-echarts) usage for Angular 19. See sample code at <https://github.com/xieziyu/ngx-echarts-starter/blob/master/src/app/app.component.ts> for correctly importing dependencies in standalone with Angular 19.
   - updated Angular and packages.
+
+📆 [previous history](https://github.com/vedph/pythia-shell)
