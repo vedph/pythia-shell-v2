@@ -143,8 +143,8 @@ export class CorpusEditorComponent {
     this.form.markAsPristine();
   }
 
-  public onCorpusChange(corpus: Corpus | null): void {
-    this._sourceId = corpus?.id || undefined;
+  public onCorpusChange(corpus: unknown): void {
+    this._sourceId = (corpus as Corpus | undefined)?.id || undefined;
   }
 
   private getCorpus(): EditedCorpus {

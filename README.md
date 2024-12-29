@@ -44,7 +44,56 @@ npm i --save-dev ngx-i18nsupport
 
 Then the old code has been progressively imported and refactored for standalone. Then, on a second refactoring pass all the decorator-based properties and events have been refactored to use signals.
 
+## Dependencies
+
+```mermaid
+graph LR;
+  pythia-corpus-list --> cadmus-refs-lookup
+  pythia-corpus-list --> auth-jwt-login
+  pythia-corpus-list --> ngx-tools
+  pythia-corpus-list --> ngx-mat-tools
+  pythia-corpus-list --> paged-data-browsers
+  pythia-corpus-list --> pythia-core
+  pythia-corpus-list --> pythia-api
+  pythia-corpus-list --> pythia-ui
+  pythia-document-list --> ngx-tools
+  pythia-document-list --> auth-jwt-login
+  pythia-document-list --> cadmus-refs-lookup
+  pythia-document-list --> paged-data-browsers
+  pythia-document-list --> pythia-api
+  pythia-document-list --> pythia-core
+  pythia-document-list --> pythia-ui
+  pythia-document-reader --> ngx-tools
+  pythia-document-reader --> paged-data-browsers
+  pythia-document-reader --> pythia-api
+  pythia-document-reader --> pythia-core
+  pythia-query-builder --> ngx-tools
+  pythia-query-builder --> cadmus-refs-lookup
+  pythia-query-builder --> pythia-api
+  pythia-query-builder --> pythia-core
+  pythia-query-builder --> pythia-document-reader
+  pythia-query-builder --> pythia-ui
+  pythia-search --> ngx-tools
+  pythia-search --> pythia-api
+  pythia-search --> pythia-core
+  pythia-search --> pythia-document-reader
+  pythia-search --> pythia-ui
+  pythia-search --> pythia-query-builder
+  pythia-stats --> ngx-tools
+  pythia-stats --> pythia-api
+  pythia-ui --> ngx-tools
+  pythia-ui --> pythia-api
+  pythia-word-index --> ngx-tools
+  pythia-word-index --> pythia-api
+  pythia-word-index --> pythia-core
+  pythia-word-index --> paged-data-browsers
+```
+
 ## History
+
+### 6.0.1
+
+- 2024-12-29: updated packages.
 
 ### 6.0.0
 

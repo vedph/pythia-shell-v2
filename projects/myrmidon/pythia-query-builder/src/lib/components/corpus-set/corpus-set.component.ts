@@ -44,15 +44,19 @@ export class CorpusSetComponent {
 
   constructor(public corpusLookupService: CorpusRefLookupService) {}
 
-  public onCorpusChange(corpus: Corpus | null): void {
+  public onCorpusChange(corpus: unknown): void {
     if (!corpus) {
       return;
     }
-    const corpora = [...this.corpora()];
-    if (corpora.find((c) => c.id === corpus.id)) {
+    const c = (corpus as Corpus | undefined) || null;
+    if (!c) {
       return;
     }
-    corpora.push(corpus);
+    const corpora = [...this.corpora()];
+    if (corpora.find((c) => c.id === c.id)) {
+      return;
+    }
+    corpora.push(c);
     this.corpora.set(corpora);
   }
 

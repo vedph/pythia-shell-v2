@@ -195,16 +195,16 @@ export class DocumentFilterComponent {
     });
   }
 
-  public onCorpusChange(corpus: Corpus | null): void {
-    this.corpus.setValue(corpus || null);
+  public onCorpusChange(corpus: unknown): void {
+    this.corpus.setValue((corpus as Corpus) || undefined || null);
   }
 
   public removeCorpus(): void {
     this.corpus.reset();
   }
 
-  public onProfileChange(profile: Profile | null): void {
-    this.profile.setValue(profile);
+  public onProfileChange(profile: unknown): void {
+    this.profile.setValue((profile as Profile | undefined) || null);
   }
 
   public onProfileRemoved(): void {

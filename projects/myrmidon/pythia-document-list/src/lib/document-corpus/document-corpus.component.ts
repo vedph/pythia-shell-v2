@@ -1,4 +1,4 @@
-import { Component, OnInit, output } from '@angular/core';
+import { Component, output } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -42,7 +42,7 @@ export interface CorpusActionRequest {
   templateUrl: './document-corpus.component.html',
   styleUrls: ['./document-corpus.component.css'],
 })
-export class DocumentCorpusComponent implements OnInit {
+export class DocumentCorpusComponent {
   public corpusId: FormControl<string | null>;
   public action: FormControl<string | null>;
   public form: FormGroup;
@@ -76,11 +76,11 @@ export class DocumentCorpusComponent implements OnInit {
     };
   }
 
-  ngOnInit(): void {}
-
-  public onCorpusChange(corpus: Corpus | null): void {
-    this.corpusId.setValue(corpus?.id || null);
-    this.editable = this._editableCheckService.isEditable(corpus);
+  public onCorpusChange(corpus: unknown): void {
+    this.corpusId.setValue((corpus as Corpus | undefined)?.id || null);
+    this.editable = this._editableCheckService.isEditable(
+      corpus as Corpus | undefined
+    );
   }
 
   public apply(): void {
