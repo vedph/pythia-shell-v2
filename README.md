@@ -91,6 +91,8 @@ graph LR;
 
 ## History
 
+- 2024-12-30: updated packages.
+
 ### 6.0.1
 
 - 2024-12-29: updated packages.
