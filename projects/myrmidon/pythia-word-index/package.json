@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/pythia-word-index",
-  "version": "6.0.0",
+  "version": "6.0.2",
   "description": "Pythia - word and lemmata index.",
   "keywords": [
     "Pythia"
@@ -19,7 +19,7 @@
     "@myrmidon/ngx-tools": "^1.0.0",
     "@myrmidon/pythia-api": "^6.0.0",
     "@myrmidon/pythia-core": "^6.0.0",
-    "@myrmidon/paged-data-browsers": "^4.0.1"
+    "@myrmidon/paged-data-browsers": "^4.0.2"
   },
   "dependencies": {
     "tslib": "^2.3.0"

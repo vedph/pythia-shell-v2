@@ -1,13 +1,5 @@
-import {
-  Component,
-  EventEmitter,
-  input,
-  Input,
-  output,
-  Output,
-} from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import '@angular/localize/init';
 import { CommonModule } from '@angular/common';
 import { Observable, take } from 'rxjs';
 

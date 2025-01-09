@@ -91,6 +91,11 @@ graph LR;
 
 ## History
 
+### 6.0.2
+
+- 2025-01-09:
+  - updated Angular and packages.
+  - 👉 removed direct import `import '@angular/localize/init';` and added `"types": ["@angular/localize"]` to the tsconfig file of each library using it. Note that to correctly work the localize package must be added to the `main.ts` as `/// <reference types="@angular/localize" />` and added to each consumer into its tsconfig types. The former is usually done by the `ng add @angular/localize` schematics.
 - 2024-12-30: updated packages.
 
 ### 6.0.1
