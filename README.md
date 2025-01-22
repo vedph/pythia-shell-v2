@@ -91,6 +91,7 @@ graph LR;
 
 ## History
 
+- 2025-01-22: updated Angular.
 - 2025-01-20: updated Angular.
 
 ### 6.0.2
