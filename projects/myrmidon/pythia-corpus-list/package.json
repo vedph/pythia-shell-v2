@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/pythia-corpus-list",
-  "version": "6.0.2",
+  "version": "6.0.3",
   "description": "Pythia - corpus list.",
   "keywords": [
     "Pythia"
@@ -16,7 +16,7 @@
   "peerDependencies": {
     "@angular/common": "^19.0.0",
     "@angular/core": "^19.0.0",
-    "@myrmidon/cadmus-refs-lookup": "^8.0.0",
+    "@myrmidon/cadmus-refs-lookup": "^8.0.1",
     "@myrmidon/auth-jwt-login": "^7.1.1",
     "@myrmidon/ngx-tools": "^1.0.0",
     "@myrmidon/ngx-mat-tools": "^0.0.1",

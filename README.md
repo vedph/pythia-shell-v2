@@ -91,6 +91,10 @@ graph LR;
 
 ## History
 
+- 2025-01-29:
+  - updated Angular and packages.
+  - updated peer dependencies in libraries.
+  - added view transitions.
 - 2025-01-22: updated Angular.
 - 2025-01-20: updated Angular.
 
@@ -98,7 +102,7 @@ graph LR;
 
 - 2025-01-09:
   - updated Angular and packages.
-  - 👉 removed direct import `import '@angular/localize/init';` and added `"types": ["@angular/localize"]` to the tsconfig file of each library using it. Note that to correctly work the localize package must be added to the `main.ts` as `/// <reference types="@angular/localize" />` and added to each consumer into its tsconfig types. The former is usually done by the `ng add @angular/localize` schematics.
+  - 👉 removed direct import `import '@angular/localize/init';` and added `"types": ["@angular/localize"]` to the `tsconfig` file of each library using it. Note that to correctly work the localize package must be added to the `main.ts` as `/// <reference types="@angular/localize" />` and added to each consumer into its `tsconfig` types. The former is usually done by the `ng add @angular/localize` schematics.
 - 2024-12-30: updated packages.
 
 ### 6.0.1
