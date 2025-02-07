@@ -91,7 +91,9 @@ graph LR;
 
 ## History
 
-- 2025-02-07: added POS filter to word index (`@myrmidon/pythia-api`, `@myrmidon/pythia-word-index`).
+- 2025-02-07:
+  - added POS filter to word index (`@myrmidon/pythia-api`, `@myrmidon/pythia-word-index`).
+  - updated Angular.
 - 2025-01-29:
   - updated Angular and packages.
   - updated peer dependencies in libraries.
