@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import {
   Component,
+  computed,
   effect,
   Inject,
   input,
   model,
   Optional,
-  output,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -80,6 +80,11 @@ export class PagedWordTreeFilterComponent {
   public readonly sortOrderEntries = input<WordTreeFilterSortOrderEntry[]>(
     DEFAULT_SORT_ORDER_ENTRIES
   );
+  public readonly sortEntries = computed(() => {
+    return this.sortOrderEntries()?.length
+      ? this.sortOrderEntries()
+      : DEFAULT_SORT_ORDER_ENTRIES;
+  });
 
   /**
    * Whether to hide the language filter.
@@ -87,11 +92,17 @@ export class PagedWordTreeFilterComponent {
   public readonly hideLanguage = input<boolean | undefined>();
 
   /**
+   * Whether to hide the part of speech filter.
+   */
+  public readonly hidePos = input<boolean | undefined>();
+
+  /**
    * The filter.
    */
   public readonly filter = model<WordFilter | null | undefined>();
 
   public language: FormControl<string | null>;
+  public pos: FormControl<string | null>;
   public valuePattern: FormControl<string | null>;
   public minValueLength: FormControl<number>;
   public maxValueLength: FormControl<number>;
@@ -113,19 +124,21 @@ export class PagedWordTreeFilterComponent {
   ) {
     // form
     this.language = formBuilder.control<string | null>(null);
+    this.pos = formBuilder.control<string | null>(null);
     this.valuePattern = formBuilder.control<string | null>(null);
     this.minValueLength = formBuilder.control<number>(0, { nonNullable: true });
     this.maxValueLength = formBuilder.control<number>(0, { nonNullable: true });
     this.minCount = formBuilder.control<number>(0, { nonNullable: true });
     this.maxCount = formBuilder.control<number>(0, { nonNullable: true });
     this.sortOrder = formBuilder.control<WordTreeFilterSortOrderEntry>(
-      this.sortOrderEntries()[0] || DEFAULT_SORT_ORDER_ENTRIES[0],
+      this.sortEntries()[0],
       {
         nonNullable: true,
       }
     );
     this.form = formBuilder.group({
       language: this.language,
+      pos: this.pos,
       valuePattern: this.valuePattern,
       minValueLength: this.minValueLength,
       maxValueLength: this.maxValueLength,
@@ -143,13 +156,13 @@ export class PagedWordTreeFilterComponent {
     effect(() => {
       // update sort order value if it is not in the new entries
       if (
-        !this.sortOrderEntries().some(
+        !this.sortEntries().some(
           (e) =>
             e.value === this.sortOrder.value.value &&
             e.descending === this.sortOrder.value.descending
         )
       ) {
-        this.sortOrder.setValue(this.sortOrderEntries()[0]);
+        this.sortOrder.setValue(this.sortEntries()[0]);
       }
     });
 
@@ -165,18 +178,19 @@ export class PagedWordTreeFilterComponent {
     }
 
     this.language.setValue(filter.language ?? null);
+    this.pos.setValue(filter.pos ?? null);
     this.valuePattern.setValue(filter.valuePattern ?? null);
     this.minValueLength.setValue(filter.minValueLength ?? 0);
     this.maxValueLength.setValue(filter.maxValueLength ?? 0);
     this.minCount.setValue(filter.minCount ?? 0);
     this.maxCount.setValue(filter.maxCount ?? 0);
     this.sortOrder.setValue(
-      this.sortOrderEntries().find(
+      this.sortEntries().find(
         (e) =>
           e.value === filter.sortOrder &&
           e.descending === filter.isSortDescending
       ) ??
-        this.sortOrderEntries()[0] ??
+        this.sortEntries()[0] ??
         DEFAULT_SORT_ORDER_ENTRIES[0]
     );
     this.form.markAsPristine();
@@ -184,11 +198,12 @@ export class PagedWordTreeFilterComponent {
 
   private getFilter(): WordFilter {
     const sortOrderEntry =
-      this.sortOrderEntries().find((e) => e.key === this.sortOrder.value.key) ||
-      this.sortOrderEntries()[0];
+      this.sortEntries().find((e) => e.key === this.sortOrder.value.key) ||
+      this.sortEntries()[0];
 
     return {
       language: this.language.value ?? undefined,
+      pos: this.pos.value ?? undefined,
       valuePattern: this.valuePattern.value
         ? this.valuePattern.value!.replace('*', '%').replace('?', '_')
         : undefined,

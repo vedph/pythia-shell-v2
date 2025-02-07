@@ -33,6 +33,7 @@ export interface Lemma {
   value: string;
   reversedValue: string;
   language?: string;
+  pos?: string;
   count: number;
 }
 
@@ -42,7 +43,6 @@ export interface Lemma {
 export interface Word extends Lemma {
   lemmaId?: number;
   lemma?: string;
-  pos?: string;
 }
 
 /**
@@ -50,6 +50,7 @@ export interface Word extends Lemma {
  */
 export interface LemmaFilter extends TreeNodeFilter {
   language?: string;
+  pos?: string;
   valuePattern?: string;
   minValueLength?: number;
   maxValueLength?: number;
@@ -64,7 +65,6 @@ export interface LemmaFilter extends TreeNodeFilter {
  */
 export interface WordFilter extends LemmaFilter {
   lemmaId?: number;
-  pos?: string;
 }
 
 /**
@@ -115,6 +115,9 @@ export class WordService {
 
     if (filter.language) {
       httpParams = httpParams.set('language', filter.language);
+    }
+    if (filter.pos) {
+      httpParams = httpParams.set('pos', filter.pos);
     }
     if (filter.valuePattern) {
       httpParams = httpParams.set('valuePattern', filter.valuePattern);
@@ -173,9 +176,6 @@ export class WordService {
     // add word-specific parameters
     if (filter.lemmaId) {
       httpParams = httpParams.set('lemmaId', filter.lemmaId.toString());
-    }
-    if (filter.pos) {
-      httpParams = httpParams.set('pos', filter.pos);
     }
 
     return this._http
