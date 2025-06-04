@@ -6,26 +6,29 @@
       [sortOrderEntries]="sortOrderEntries() || []"
       [filter]="filter$ | async"
       (filterChange)="onFilterChange($event)"
-    />
-  </div>
-
-  <!-- list -->
-  <div id="list">
-    <!-- progress -->
-    <div>
-      <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+      />
     </div>
-    <div *ngIf="nodes$ | async as nodes">
-      @for (node of nodes; track node.id; let i = $index) {
-      <div
+
+    <!-- list -->
+    <div id="list">
+      <!-- progress -->
+      <div>
+        @if (loading) {
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+      </div>
+      @if (nodes$ | async; as nodes) {
+        <div>
+          @for (node of nodes; track node.id; let i = $index) {
+            <div
         [style.border-top]="
           node.expanded
             ? '1px solid rgb(137 181 203)'
             : '1 px solid transparent'
         "
-      >
-        <pdb-browser-tree-node
-          [node]="node"
+              >
+              <pdb-browser-tree-node
+                [node]="node"
           [paging]="
             node.expanded &&
             i + 1 < nodes.length &&
@@ -33,45 +36,46 @@
               ? nodes[i + 1].paging
               : undefined
           "
-          [hideLoc]="hideLoc()"
-          [hideFilter]="hideFilter()"
-          [debug]="debug()"
-          (toggleExpandedRequest)="onToggleExpanded($any($event))"
-          (changePageRequest)="onPageChangeRequest($event)"
-          (editNodeFilterRequest)="onEditFilterRequest($any($event))"
-        >
-          <!--
-          If you want to replace node's loc and label, set [hideLabel]="true"
-          for pdb-browser-tree-node and provide your content here.
-           -->
-          @if (node?.token?.count) {
-          <div class="button-row">
-            <div class="nr">
-              {{ node?.token?.count }}
+                [hideLoc]="hideLoc()"
+                [hideFilter]="hideFilter()"
+                [debug]="debug()"
+                (toggleExpandedRequest)="onToggleExpanded($any($event))"
+                (changePageRequest)="onPageChangeRequest($event)"
+                (editNodeFilterRequest)="onEditFilterRequest($any($event))"
+                >
+                <!--
+                If you want to replace node's loc and label, set [hideLabel]="true"
+                for pdb-browser-tree-node and provide your content here.
+                -->
+                @if (node?.token?.count) {
+                  <div class="button-row">
+                    <div class="nr">
+                      {{ node?.token?.count }}
+                    </div>
+                    <button
+                      type="button"
+                      mat-icon-button
+                      matTooltip="Search this form"
+                      i18n-matTooltip
+                      (click)="requestSearch(node.token)"
+                      >
+                      <mat-icon class="mat-warn">search</mat-icon>
+                    </button>
+                    <button
+                      type="button"
+                      mat-icon-button
+                      matTooltip="See this form distribution"
+                      i18n-matTooltip
+                      (click)="requestCounts(node.token)"
+                      >
+                      <mat-icon class="mat-primary">pie_chart</mat-icon>
+                    </button>
+                  </div>
+                }
+              </pdb-browser-tree-node>
             </div>
-            <button
-              type="button"
-              mat-icon-button
-              matTooltip="Search this form"
-              i18n-matTooltip
-              (click)="requestSearch(node.token)"
-            >
-              <mat-icon class="mat-warn">search</mat-icon>
-            </button>
-            <button
-              type="button"
-              mat-icon-button
-              matTooltip="See this form distribution"
-              i18n-matTooltip
-              (click)="requestCounts(node.token)"
-            >
-              <mat-icon class="mat-primary">pie_chart</mat-icon>
-            </button>
-          </div>
           }
-        </pdb-browser-tree-node>
-      </div>
+        </div>
       }
     </div>
   </div>
-</div>

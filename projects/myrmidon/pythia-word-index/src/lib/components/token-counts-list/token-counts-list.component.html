@@ -1,59 +1,57 @@
-<div *ngIf="token">
-  <!-- top bar -->
-  <div class="form-row">
-    <div class="token">
-      @if (token()?.language) {
-      <span class="tl">{{ token()!.language }}</span>
-      }
-      <span class="tv">
-        {{ token()?.value }}
-      </span>
-      <span class="tc">
-        {{ token()?.count }}
-      </span>
-    </div>
-
-    <div>
-      <mat-form-field>
-        <mat-label i18n>attributes</mat-label>
-        <mat-select [formControl]="selectedAttributes" multiple>
-          @for (a of attributes(); track a.name) {
-          <mat-option [value]="a"
-            >{{ a.name }}{{ a.type === 1 ? "\u207f" : "" }}</mat-option
-          >
-          }
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-    <button
-      type="button"
-      mat-icon-button
-      matTooltip="Set selected attributes"
-      i18n-matTooltip
-      (click)="loadCounts(token())"
-      [disabled]="busy"
-    >
-      <mat-icon class="mat-primary">check_circle</mat-icon>
-    </button>
-  </div>
-
-  <!-- progress -->
-  @if (busy) {
+@if (token()) {
   <div>
-    <mat-progress-bar mode="indeterminate" />
-  </div>
-  }
-
-  <!-- counts -->
-  @for (a of selectedAttributes.value; track a.name) { @if (counts[a.name]) {
-  <div class="counts">
-    <h3>{{ a.name }}</h3>
-    <pythia-token-counts
-      [counts]="counts[a.name]"
-      [attribute]="a"
-      [hideToolbar]="hideToolbar()"
-    />
-  </div>
-  } }
-</div>
+    <!-- top bar -->
+    <div class="form-row">
+      <div class="token">
+        @if (token()?.language) {
+          <span class="tl">{{ token()!.language }}</span>
+        }
+        <span class="tv">
+          {{ token()?.value }}
+        </span>
+        <span class="tc">
+          {{ token()?.count }}
+        </span>
+      </div>
+      <div>
+        <mat-form-field>
+          <mat-label i18n>attributes</mat-label>
+          <mat-select [formControl]="selectedAttributes" multiple>
+            @for (a of attributes(); track a.name) {
+              <mat-option [value]="a"
+                >{{ a.name }}{{ a.type === 1 ? "\u207f" : "" }}</mat-option
+                >
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <button
+          type="button"
+          mat-icon-button
+          matTooltip="Set selected attributes"
+          i18n-matTooltip
+          (click)="loadCounts(token())"
+          [disabled]="busy"
+          >
+          <mat-icon class="mat-primary">check_circle</mat-icon>
+        </button>
+      </div>
+      <!-- progress -->
+      @if (busy) {
+        <div>
+          <mat-progress-bar mode="indeterminate" />
+        </div>
+      }
+      <!-- counts -->
+      @for (a of selectedAttributes.value; track a.name) { @if (counts[a.name]) {
+        <div class="counts">
+          <h3>{{ a.name }}</h3>
+          <pythia-token-counts
+            [counts]="counts[a.name]"
+            [attribute]="a"
+            [hideToolbar]="hideToolbar()"
+            />
+          </div>
+          } }
+        </div>
+      }

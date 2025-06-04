@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, input, output } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
@@ -20,7 +20,6 @@ import { WordTreeFilterSortOrderEntry } from '../paged-word-tree-filter/paged-wo
 @Component({
   selector: 'pythia-word-index',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -31,8 +30,8 @@ import { WordTreeFilterSortOrderEntry } from '../paged-word-tree-filter/paged-wo
     MatSelectModule,
     MatTooltipModule,
     PagedWordTreeBrowserComponent,
-    TokenCountsListComponent,
-  ],
+    TokenCountsListComponent
+],
   templateUrl: './word-index.component.html',
   styleUrl: './word-index.component.scss',
 })

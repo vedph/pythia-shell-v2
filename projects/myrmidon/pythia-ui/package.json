@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/pythia-ui",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "description": "Pythia - UI.",
   "keywords": [
     "Pythia"
@@ -14,10 +14,10 @@
     "name": "Daniele Fusi"
   },
   "peerDependencies": {
-    "@angular/common": "^19.0.0",
-    "@angular/core": "^19.0.0",
-    "@myrmidon/ngx-tools": "^1.0.0",
-    "@myrmidon/pythia-api": "^6.0.0"
+    "@angular/common": "^20.0.0",
+    "@angular/core": "^20.0.0",
+    "@myrmidon/ngx-tools": "^2.0.0",
+    "@myrmidon/pythia-api": "^7.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

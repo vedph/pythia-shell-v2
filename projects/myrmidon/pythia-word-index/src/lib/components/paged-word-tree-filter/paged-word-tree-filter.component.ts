@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import {
   Component,
   computed,
@@ -60,7 +60,6 @@ const DEFAULT_SORT_ORDER_ENTRIES: WordTreeFilterSortOrderEntry[] = [
 @Component({
   selector: 'pythia-paged-word-tree-filter',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -68,8 +67,8 @@ const DEFAULT_SORT_ORDER_ENTRIES: WordTreeFilterSortOrderEntry[] = [
     MatIconModule,
     MatInputModule,
     MatSelectModule,
-    MatTooltipModule,
-  ],
+    MatTooltipModule
+],
   templateUrl: './paged-word-tree-filter.component.html',
   styleUrl: './paged-word-tree-filter.component.scss',
 })

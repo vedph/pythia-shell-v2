@@ -1,7 +1,7 @@
 import { Component, effect, input, Input, model } from '@angular/core';
 import { take } from 'rxjs';
 
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -26,15 +26,14 @@ import { TokenCountsComponent } from '../token-counts/token-counts.component';
 @Component({
   selector: 'pythia-token-counts-list',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
     MatSelectModule,
     MatTooltipModule,
-    TokenCountsComponent,
-  ],
+    TokenCountsComponent
+],
   templateUrl: './token-counts-list.component.html',
   styleUrl: './token-counts-list.component.scss',
 })

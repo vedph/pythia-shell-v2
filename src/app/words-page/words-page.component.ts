@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -11,11 +11,10 @@ import { WordIndexComponent } from '../../../projects/myrmidon/pythia-word-index
 @Component({
   selector: 'app-words',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatCardModule,
-    WordIndexComponent,
-  ],
+    WordIndexComponent
+],
   templateUrl: './words-page.component.html',
   styleUrl: './words-page.component.scss',
 })
