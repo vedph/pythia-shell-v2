@@ -104,7 +104,9 @@ graph LR;
 
 ## History
 
-- 2025-07-29: updated Angular and packages.
+- 2025-07-29:
+  - updated Angular and packages.
+  - fixed disabled export button in search.
 
 ### 7.0.0
 

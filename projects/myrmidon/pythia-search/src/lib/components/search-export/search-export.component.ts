@@ -1,4 +1,4 @@
-import { Component, input, Input, OnDestroy } from '@angular/core';
+import { Component, input, Input, OnDestroy, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -37,7 +37,7 @@ export class SearchExportComponent implements OnDestroy {
    */
   public readonly disabled = input<boolean | undefined>();
 
-  public isExporting = false;
+  public readonly isExporting = signal(false);
 
   constructor(
     private _searchService: SearchService,
@@ -60,26 +60,26 @@ export class SearchExportComponent implements OnDestroy {
   }
 
   public exportCsv() {
-    if (!this.query() || this.isExporting) {
+    if (!this.query() || this.isExporting()) {
       return;
     }
-    this.isExporting = true;
+    this.isExporting.set(true);
 
     this._sub = this._searchService
       .exportSearchResults(this.query()!)
       .subscribe({
         next: (csvData: string) => {
           this.downloadCsv(csvData);
-          this.isExporting = false;
+          this.isExporting.set(false);
           this._snackbar.open('Results exported', 'OK', { duration: 2000 });
         },
         error: (error) => {
           console.error('Error exporting CSV:', error);
-          this.isExporting = false;
+          this.isExporting.set(false);
           this._snackbar.open('Error exporting results', 'Error');
         },
         complete: () => {
-          this.isExporting = false;
+          this.isExporting.set(false);
         },
       });
   }
@@ -88,7 +88,7 @@ export class SearchExportComponent implements OnDestroy {
     if (this._sub) {
       this._sub.unsubscribe();
       this._sub = undefined;
-      this.isExporting = false;
+      this.isExporting.set(false);
     }
   }
 }

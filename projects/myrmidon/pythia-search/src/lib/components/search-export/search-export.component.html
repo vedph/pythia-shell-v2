@@ -4,12 +4,12 @@
     (click)="exportCsv()"
     class="mat-primary"
     mat-flat-button
-    [disabled]="isExporting || disabled"
+    [disabled]="isExporting() || disabled()"
   >
     <mat-icon>file_download</mat-icon>
     <span i18n>export</span>
   </button>
-  @if (isExporting) {
+  @if (isExporting()) {
   <button
     type="button"
     (click)="cancelExport()"
