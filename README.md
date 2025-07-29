@@ -89,6 +89,19 @@ graph LR;
   pythia-word-index --> paged-data-browsers
 ```
 
+## Versions
+
+- `@myrmidon/pythia-api`: 7.0.0
+- `@myrmidon/pythia-core`: 7.0.0
+- `@myrmidon/pythia-corpus-list`: 8.0.0
+- `@myrmidon/pythia-document-list`: 8.0.0
+- `@myrmidon/pythia-document-reader`: 7.0.1
+- `@myrmidon/pythia-query-builder`: 8.0.0
+- `@myrmidon/pythia-search`: 8.0.0
+- `@myrmidon/pythia-stats`: 7.0.0
+- `@myrmidon/pythia-ui`: 7.0.0
+- `@myrmidon/pythia-word-index`: 7.0.1
+
 ## History
 
 - 2025-07-29: updated Angular and packages.
