@@ -91,6 +91,8 @@ graph LR;
 
 ## History
 
+- 2025-07-29: updated Angular and packages.
+
 ### 7.0.0
 
 - 2025-06-03: ⚠️ upgraded to Angular 20.

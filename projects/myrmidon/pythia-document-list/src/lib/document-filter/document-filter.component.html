@@ -2,12 +2,12 @@
   <!-- corpus -->
   @if (!hiddenFilters()?.corpus) {
   <div class="form-row" style="margin-bottom: 8px">
-    <cadmus-ref-lookup
+    <cadmus-refs-lookup
       [service]="corpusLookupService"
       [item]="corpus.value"
       label="corpus"
       (itemChange)="onCorpusChange($event)"
-    ></cadmus-ref-lookup>
+    />
     <button
       type="button"
       mat-icon-button
@@ -52,13 +52,13 @@
   <!-- profile -->
   @if (!hiddenFilters()?.profile) {
   <div>
-    <cadmus-ref-lookup
+    <cadmus-refs-lookup
       [service]="profileLookupService"
       [item]="profile.value"
       i18n-label
       label="profile"
       (itemChange)="onProfileChange($event)"
-    ></cadmus-ref-lookup>
+    />
     @if (profile.value) {
     <mat-chip removable="true" (removed)="onProfileRemoved()">
       {{ profile.value.id }}

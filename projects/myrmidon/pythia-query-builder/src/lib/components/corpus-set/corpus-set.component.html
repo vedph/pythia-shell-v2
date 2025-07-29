@@ -1,12 +1,12 @@
 <div>
   <!-- corpus picker -->
   <div class="form-row">
-    <cadmus-ref-lookup
+    <cadmus-refs-lookup
       [service]="corpusLookupService"
       [baseFilter]="{ userId: userId }"
       label="corpus"
       (itemChange)="onCorpusChange($event)"
-    ></cadmus-ref-lookup>
+    />
     <button type="button" mat-icon-button class="mat-warn" (click)="clear()">
       <mat-icon class="mat-warn">clear</mat-icon>
     </button>

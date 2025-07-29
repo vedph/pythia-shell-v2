@@ -13,12 +13,12 @@
       <mat-hint i18n>action for matching docs</mat-hint>
     </mat-form-field>
 
-    <cadmus-ref-lookup
+    <cadmus-refs-lookup
       [service]="corpusRefLookupService"
       [baseFilter]="baseFilter"
       label="corpus"
       (itemChange)="onCorpusChange($event)"
-    ></cadmus-ref-lookup>
+    />
 
     <button
       type="submit"
