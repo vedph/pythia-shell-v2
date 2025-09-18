@@ -18,7 +18,8 @@
     "@angular/core": "^20.0.0",
     "@angular/material": "^20.0.0",
     "@myrmidon/ngx-tools": "^2.0.0",
-    "@myrmidon/pythia-api": "^7.0.0"
+    "@myrmidon/pythia-api": "^8.0.0",
+    "@myrmidon/pythia-core": "^8.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

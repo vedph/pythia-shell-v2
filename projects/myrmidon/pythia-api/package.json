@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/pythia-api",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "description": "Pythia - API services.",
   "keywords": [
     "Pythia"
@@ -15,7 +15,8 @@
   },
   "peerDependencies": {
     "@angular/common": "^20.0.0",
-    "@angular/core": "^20.0.0"
+    "@angular/core": "^20.0.0",
+    "@myrmidon/pythia-core": "^8.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

@@ -17,7 +17,20 @@ This shell is used to develop and test the basic UI components for building Pyth
 3. `ng build --configuration production`;
 4. `docker build . -t vedph2020/pythia-shell:6.0.0 -t vedph2020/pythia-shell:latest`.
 
-## Creation
+## Current Versions
+
+- `@myrmidon/pythia-api`: 8.0.0
+- `@myrmidon/pythia-core`: 8.0.0
+- `@myrmidon/pythia-corpus-list`: 9.0.0
+- `@myrmidon/pythia-document-list`: 9.0.0
+- `@myrmidon/pythia-document-reader`: 8.0.0
+- `@myrmidon/pythia-query-builder`: 9.0.0
+- `@myrmidon/pythia-search`: 9.0.0
+- `@myrmidon/pythia-stats`: 8.0.0
+- `@myrmidon/pythia-ui`: 8.0.0
+- `@myrmidon/pythia-word-index`: 8.0.0
+
+## Workspace Setup
 
 The app has been created with these commands:
 
@@ -104,6 +117,10 @@ graph LR;
 
 ## History
 
+- 2025-09-18:
+  - ⚠️ refactored components for full reactivity. All the libraries major versions have been increased (including those which had no changes, as anyway peer dependencies were updated).
+  - updated Angular and packages.
+  - in app, import NPM packages rather than from projects relative paths.
 - 2025-07-29:
   - updated Angular and packages.
   - fixed disabled export button in search.

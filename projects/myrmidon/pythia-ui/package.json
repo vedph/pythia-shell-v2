@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/pythia-ui",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "description": "Pythia - UI.",
   "keywords": [
     "Pythia"
@@ -17,7 +17,8 @@
     "@angular/common": "^20.0.0",
     "@angular/core": "^20.0.0",
     "@myrmidon/ngx-tools": "^2.0.0",
-    "@myrmidon/pythia-api": "^7.0.0"
+    "@myrmidon/pythia-api": "^8.0.0",
+    "@myrmidon/pythia-core": "^8.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

@@ -1,7 +1,7 @@
-import { HttpClient, HttpEventType, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, map, retry } from 'rxjs/operators';
+import { catchError, retry } from 'rxjs/operators';
 
 import {
   ErrorService,

@@ -19,10 +19,10 @@
     "@angular/material": "^20.0.0",
     "@myrmidon/ngx-tools": "^2.0.0",
     "@myrmidon/cadmus-refs-lookup": "^10.0.3",
-    "@myrmidon/pythia-api": "^7.0.0",
-    "@myrmidon/pythia-core": "^7.0.0",
-    "@myrmidon/pythia-document-reader": "^7.0.1",
-    "@myrmidon/pythia-ui": "^7.0.0"
+    "@myrmidon/pythia-api": "^8.0.0",
+    "@myrmidon/pythia-core": "^8.0.0",
+    "@myrmidon/pythia-document-reader": "^8.0.0",
+    "@myrmidon/pythia-ui": "^8.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
