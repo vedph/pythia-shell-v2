@@ -37,6 +37,8 @@ import { TokenCountsComponent } from '../token-counts/token-counts.component';
   styleUrl: './token-counts-list.component.scss',
 })
 export class TokenCountsListComponent {
+  private _previousToken?: Word | Lemma;
+
   /**
    * The token for which to display the counts.
    */
@@ -54,6 +56,7 @@ export class TokenCountsListComponent {
 
   public readonly busy = signal<boolean>(false);
   public readonly counts = signal<{ [key: string]: TokenCount[] }>({});
+  private readonly _emptyCounts = {}; // reuse the same empty object reference
 
   public readonly selectedAttributes: FormControl<AttributeInfo[]>;
 
@@ -63,9 +66,40 @@ export class TokenCountsListComponent {
     });
     effect(() => {
       const token = this.token();
+      if (this.isWordOrLemmaEqual(token, this._previousToken)) {
+        return;
+      }
+      this._previousToken = token;
       console.log('input token', token);
       this.loadCounts(token);
     });
+  }
+
+  private isWordOrLemmaEqual(a?: Word | Lemma, b?: Word | Lemma): boolean {
+    if (!a && !b) {
+      return true;
+    }
+    if (!a || !b) {
+      return false;
+    }
+    if (a.type !== b.type) {
+      return false;
+    }
+    if (
+      a.type === 'lemma' &&
+      (a.type !== b.type ||
+        a.id !== b.id ||
+        a.value !== b.value ||
+        a.language !== b.language ||
+        a.pos !== b.pos ||
+        a.count !== b.count)
+    ) {
+      return false;
+    }
+
+    const wa = a as Word;
+    const wb = b as Word;
+    return wa.lemmaId === wb.lemmaId && wa.lemma === wb.lemma;
   }
 
   public ngOnInit(): void {
@@ -87,7 +121,11 @@ export class TokenCountsListComponent {
     }
 
     if (!this.selectedAttributes.value?.length) {
-      this.counts.set({});
+      // only set counts to empty if it's not already empty
+      // (use the same empty object reference to avoid unnecessary updates)
+      if (Object.keys(this.counts()).length > 0) {
+        this.counts.set(this._emptyCounts);
+      }
       return;
     }
 

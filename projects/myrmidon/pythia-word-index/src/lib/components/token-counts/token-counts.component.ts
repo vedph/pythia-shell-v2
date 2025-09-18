@@ -62,49 +62,60 @@ export class TokenCountsComponent {
   public readonly downloading = signal<boolean>(false);
 
   constructor(private _clipboard: Clipboard, private _snackbar: MatSnackBar) {
-    effect(() => {
-      const counts = this.counts();
-      console.log('input counts', counts);
-      this.updateChart(counts);
-    });
+    effect(
+      () => {
+        const counts = this.counts();
+        if (counts && counts.length > 0) {
+          console.log('input counts', counts);
+          this.updateChart(counts);
+        } else {
+          // reset chart when no counts
+          this.chartOptions.set(null);
+          this.total.set(0);
+        }
+      }
+    );
   }
 
   private updateChart(counts: TokenCount[]): void {
     // calculate total count
-    this.total.set(counts.reduce((acc, c) => acc + c.value, 0));
+    const totalCount = counts.reduce((acc, c) => acc + c.value, 0);
+    this.total.set(totalCount);
 
-    // create pie chart from counts
-    // https://www.npmjs.com/package/ngx-echarts
-    this.chartOptions.set({
-      tooltip: {
-        trigger: 'item',
-        formatter: '{a} <br/>{b}: {c} ({d}%)',
-      },
-      legend: {
-        orient: 'vertical',
-        left: 10,
-        data: counts.map((c) => c.attributeValue),
-      },
-      series: [
-        {
-          name: 'count',
-          type: 'pie',
-          radius: '50%',
-          center: ['50%', '60%'],
-          data: counts.map((c) => ({
-            name: c.attributeValue,
-            value: c.value,
-          })),
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: 'rgba(0, 0, 0, 0.5)',
+    // create pie chart from counts only if we have data
+    if (totalCount > 0) {
+      // https://www.npmjs.com/package/ngx-echarts
+      this.chartOptions.set({
+        tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b}: {c} ({d}%)',
+        },
+        legend: {
+          orient: 'vertical',
+          left: 10,
+          data: counts.map((c) => c.attributeValue),
+        },
+        series: [
+          {
+            name: 'count',
+            type: 'pie',
+            radius: '50%',
+            center: ['50%', '60%'],
+            data: counts.map((c) => ({
+              name: c.attributeValue,
+              value: c.value,
+            })),
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)',
+              },
             },
           },
-        },
-      ],
-    });
+        ],
+      });
+    }
   }
 
   private getCSV(): string {
