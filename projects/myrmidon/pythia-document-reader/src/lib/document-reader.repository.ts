@@ -149,10 +149,7 @@ export class DocumentReaderRepository {
         },
         error: (error) => {
           this._loading$.next(false);
-          console.error(
-            'Error loading text: ' +
-              (error ? console.error(JSON.stringify(error)) : '')
-          );
+          console.error('Error loading text: ', error);
           reject('Error loading text from path ' + JSON.stringify(path));
         },
       });
@@ -184,8 +181,8 @@ export class DocumentReaderRepository {
           error: (error) => {
             this._loading$.next(false);
             console.error(
-              `Unable to load text ${this._document$.value?.id} at ${start}-${end}: ` +
-                (error ? console.error(JSON.stringify(error)) : '')
+              `Unable to load text ${this._document$.value?.id} at ${start}-${end}: `,
+              error
             );
             reject(`Error loading text from ${start}-${end}`);
           },

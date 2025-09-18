@@ -1,4 +1,4 @@
-import { Component, ElementRef, input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, input, OnInit, signal, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -82,9 +82,9 @@ export class SearchComponent implements OnInit {
   public history: FormControl<string | null>;
   public form: FormGroup;
 
-  public leftContextLabels: string[];
-  public rightContextLabels: string[];
-  public queryTabIndex: number;
+  public readonly leftContextLabels = signal<string[]>(['5', '4', '3', '2', '1']);
+  public readonly rightContextLabels = signal<string[]>(['1', '2', '3', '4', '5']);
+  public readonly queryTabIndex = signal<number>(0);
 
   constructor(private _repository: SearchRepository, formBuilder: FormBuilder) {
     this.query = formBuilder.control(null, [
@@ -96,10 +96,6 @@ export class SearchComponent implements OnInit {
       query: this.query,
       history: this.history,
     });
-    this.leftContextLabels = ['5', '4', '3', '2', '1'];
-    this.rightContextLabels = ['1', '2', '3', '4', '5'];
-    this.queryTabIndex = 0;
-
     this.page$ = _repository.page$;
     this.query$ = _repository.query$;
     this.lastQueries$ = _repository.lastQueries$;
@@ -154,7 +150,7 @@ export class SearchComponent implements OnInit {
   public onQueryPeek(query: string): void {
     this.query.setValue(query);
     setTimeout(() => {
-      this.queryTabIndex = 0;
+      this.queryTabIndex.set(0);
       this.queryElementRef?.nativeElement.focus();
     }, 0);
   }

@@ -156,10 +156,7 @@ export class DocumentRepository
         },
         error: (error) => {
           this._loading$.next(false);
-          console.error(
-            'Error loading document list lookup: ' +
-              (error ? JSON.stringify(error) : '')
-          );
+          console.error('Error loading document list lookup: ', error);
         },
       });
   }
@@ -176,9 +173,7 @@ export class DocumentRepository
         this._loading$.next(false);
       },
       error: (error) => {
-        console.error(
-          'Error loading document: ' + (error ? JSON.stringify(error) : '')
-        );
+        console.error('Error loading document: ', error);
         this._loading$.next(false);
       },
     });

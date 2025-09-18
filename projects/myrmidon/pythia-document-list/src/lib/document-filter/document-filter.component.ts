@@ -1,4 +1,4 @@
-import { Component, model, effect, input, output } from '@angular/core';
+import { Component, model, effect, input } from '@angular/core';
 import {
   FormArray,
   FormBuilder,

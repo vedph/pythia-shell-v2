@@ -5,8 +5,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 
 import { DocumentReadRequest } from '@myrmidon/pythia-core';
 
-import { DocumentListComponent } from '../../../projects/myrmidon/pythia-document-list/src/public-api';
-import { DocumentReaderComponent } from '../../../projects/myrmidon/pythia-document-reader/src/public-api';
+import { DocumentListComponent } from '@myrmidon/pythia-document-list';
+import { DocumentReaderComponent } from '@myrmidon/pythia-document-reader';
 
 @Component({
   selector: 'app-documents',

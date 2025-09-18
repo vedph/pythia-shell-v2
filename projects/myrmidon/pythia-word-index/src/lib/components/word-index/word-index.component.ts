@@ -1,5 +1,5 @@
 
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -36,7 +36,7 @@ import { WordTreeFilterSortOrderEntry } from '../paged-word-tree-filter/paged-wo
   styleUrl: './word-index.component.scss',
 })
 export class WordIndexComponent {
-  public token?: Word | Lemma;
+  public readonly token = signal<Word | Lemma | undefined>(undefined);
 
   /**
    * The list of attributes to display in the attribute filter.
@@ -81,6 +81,6 @@ export class WordIndexComponent {
   }
 
   public onCountsRequest(token: Word | Lemma): void {
-    this.token = token;
+    this.token.set(token);
   }
 }

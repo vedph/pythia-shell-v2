@@ -1,13 +1,13 @@
 <div>
-  @if (loading) {
+  @if (loading()) {
   <div>
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
-  } @if (entries.length) {
+  } @if (entries().length) {
   <div>
     <table>
       <tbody>
-        @for (e of entries; track e) {
+        @for (e of entries(); track e) {
         <tr>
           <td>{{ e.name }}</td>
           <td>{{ e.value | number }}</td>

@@ -1,8 +1,8 @@
 <div>
-  @if (!hideCorpora || !hideDocuments) {
+  @if (!hideCorpora() || !hideDocuments()) {
   <fieldset>
     <legend i18n>scope</legend>
-    @if (!hideCorpora) {
+    @if (!hideCorpora()) {
     <!-- corpora -->
     <mat-expansion-panel>
       <mat-expansion-panel-header>
@@ -11,15 +11,15 @@
           corpora</mat-panel-title
         >
         <mat-panel-description>
-          {{ corpora.length }}
+          {{ corpora().length }}
         </mat-panel-description>
       </mat-expansion-panel-header>
       <pythia-corpus-set
-        [corpora]="corpora"
+        [corpora]="corpora()"
         (corporaChange)="onCorporaChange($event)"
-      ></pythia-corpus-set>
+      />
     </mat-expansion-panel>
-    } @if (!hideDocuments) {
+    } @if (!hideDocuments()) {
     <!-- documents -->
     <mat-expansion-panel id="doc-panel">
       <mat-expansion-panel-header>
@@ -28,15 +28,15 @@
           <ng-container i18n>documents</ng-container>
         </mat-panel-title>
         <mat-panel-description>
-          {{ docSet.entries.length }}
+          {{ docSet().entries.length }}
         </mat-panel-description>
       </mat-expansion-panel-header>
       <pythia-query-entry-set
-        [attrDefinitions]="docAttrDefinitions"
+        [attrDefinitions]="docAttrDefinitions()"
         [isDocument]="true"
-        [entries]="docSet.entries"
+        [entries]="docSet().entries"
         (entrySetChange)="onDocEntrySetChange($event)"
-      ></pythia-query-entry-set>
+      />
     </mat-expansion-panel>
     }
   </fieldset>
@@ -44,15 +44,15 @@
 
   <!-- query clauses -->
   <pythia-query-entry-set
-    [attrDefinitions]="attrDefinitions"
-    [entries]="set.entries"
+    [attrDefinitions]="attrDefinitions()"
+    [entries]="set().entries"
     (entrySetChange)="onEntrySetChange($event)"
   ></pythia-query-entry-set>
 
   <div style="margin-top: 8px">
     <button
       type="button"
-      [disabled]="hasErrors"
+      [disabled]="hasErrors()"
       mat-flat-button
       (click)="peek()"
     >
@@ -60,7 +60,7 @@
     </button>
     <button
       type="submit"
-      [disabled]="hasErrors"
+      [disabled]="hasErrors()"
       class="mat-primary"
       mat-flat-button
       (click)="build()"

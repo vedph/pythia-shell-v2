@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 
 import { Lemma, Word } from '@myrmidon/pythia-api';
 
-import { WordIndexComponent } from '../../../projects/myrmidon/pythia-word-index/src/public-api';
+import { WordIndexComponent } from '@myrmidon/pythia-word-index';
 
 @Component({
   selector: 'app-words',

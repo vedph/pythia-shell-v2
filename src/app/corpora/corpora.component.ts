@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { CorpusListComponent } from '../../../projects/myrmidon/pythia-corpus-list/src/public-api';
+import { CorpusListComponent } from '@myrmidon/pythia-corpus-list';
 
 @Component({
   selector: 'app-corpora',

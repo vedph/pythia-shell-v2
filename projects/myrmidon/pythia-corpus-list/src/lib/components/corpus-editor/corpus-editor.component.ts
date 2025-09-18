@@ -1,4 +1,4 @@
-import { Component, effect, model, output } from '@angular/core';
+import { Component, effect, model, output, signal } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -63,13 +63,13 @@ export class CorpusEditorComponent {
    */
   public readonly editorClose = output();
 
+  public readonly baseFilter = signal<CorpusFilter | undefined>(undefined);
+
   public id: FormControl<string>;
   public title: FormControl<string | null>;
   public description: FormControl<string | null>;
   public clone: FormControl<boolean>;
   public form: FormGroup;
-
-  public baseFilter?: CorpusFilter;
 
   constructor(
     formBuilder: FormBuilder,
@@ -103,11 +103,11 @@ export class CorpusEditorComponent {
       clone: this.clone,
     });
     // preset userId filter for corpus lookup (used in cloner)
-    this.baseFilter = {
+    this.baseFilter.set({
       userId: authService.isCurrentUserInRole('admin')
         ? undefined
         : authService.currentUserValue?.userName,
-    };
+    });
 
     effect(() => {
       this.updateForm(this.corpus() || undefined);

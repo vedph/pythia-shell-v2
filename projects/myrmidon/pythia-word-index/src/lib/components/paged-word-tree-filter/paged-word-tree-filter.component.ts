@@ -1,4 +1,3 @@
-
 import {
   Component,
   computed,
@@ -7,6 +6,7 @@ import {
   input,
   model,
   Optional,
+  signal,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -67,8 +67,8 @@ const DEFAULT_SORT_ORDER_ENTRIES: WordTreeFilterSortOrderEntry[] = [
     MatIconModule,
     MatInputModule,
     MatSelectModule,
-    MatTooltipModule
-],
+    MatTooltipModule,
+  ],
   templateUrl: './paged-word-tree-filter.component.html',
   styleUrl: './paged-word-tree-filter.component.scss',
 })
@@ -110,7 +110,7 @@ export class PagedWordTreeFilterComponent {
   public sortOrder: FormControl<WordTreeFilterSortOrderEntry>;
   public form: FormGroup;
 
-  public wrapped?: boolean;
+  public readonly wrapped = signal<boolean>(false);
 
   constructor(
     formBuilder: FormBuilder,
@@ -146,7 +146,7 @@ export class PagedWordTreeFilterComponent {
       sortOrder: this.sortOrder,
     });
     // dialog
-    this.wrapped = dialogRef ? true : false;
+    this.wrapped.set(dialogRef ? true : false);
     // bind dialog data if any
     if (data) {
       this.filter.set(data.filter);

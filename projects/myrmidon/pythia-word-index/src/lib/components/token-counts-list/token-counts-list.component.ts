@@ -1,6 +1,5 @@
-import { Component, effect, input, Input, model } from '@angular/core';
+import { Component, effect, input, Input, model, signal } from '@angular/core';
 import { take } from 'rxjs';
-
 
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -32,8 +31,8 @@ import { TokenCountsComponent } from '../token-counts/token-counts.component';
     MatProgressBarModule,
     MatSelectModule,
     MatTooltipModule,
-    TokenCountsComponent
-],
+    TokenCountsComponent,
+  ],
   templateUrl: './token-counts-list.component.html',
   styleUrl: './token-counts-list.component.scss',
 })
@@ -53,16 +52,19 @@ export class TokenCountsListComponent {
    */
   public readonly attributes = model<AttributeInfo[] | undefined>();
 
-  public busy?: boolean;
+  public readonly busy = signal<boolean>(false);
+  public readonly counts = signal<{ [key: string]: TokenCount[] }>({});
+
   public readonly selectedAttributes: FormControl<AttributeInfo[]>;
-  public counts: { [key: string]: TokenCount[] } = {};
 
   constructor(formBuilder: FormBuilder, private _wordService: WordService) {
     this.selectedAttributes = formBuilder.control<AttributeInfo[]>([], {
       nonNullable: true,
     });
     effect(() => {
-      this.loadCounts(this.token());
+      const token = this.token();
+      console.log('input token', token);
+      this.loadCounts(token);
     });
   }
 
@@ -80,16 +82,16 @@ export class TokenCountsListComponent {
   }
 
   public loadCounts(token?: Word | Lemma | undefined): void {
-    if (this.busy || !token) {
+    if (this.busy() || !token) {
       return;
     }
 
     if (!this.selectedAttributes.value?.length) {
-      this.counts = {};
+      this.counts.set({});
       return;
     }
 
-    this.busy = true;
+    this.busy.set(true);
 
     if (token.type === 'lemma') {
       this._wordService
@@ -100,10 +102,10 @@ export class TokenCountsListComponent {
         .pipe(take(1))
         .subscribe({
           next: (map) => {
-            this.counts = map;
+            this.counts.set(map);
           },
           complete: () => {
-            this.busy = false;
+            this.busy.set(false);
           },
         });
     } else {
@@ -115,10 +117,10 @@ export class TokenCountsListComponent {
         .pipe(take(1))
         .subscribe({
           next: (map) => {
-            this.counts = map;
+            this.counts.set(map);
           },
           complete: () => {
-            this.busy = false;
+            this.busy.set(false);
           },
         });
     }

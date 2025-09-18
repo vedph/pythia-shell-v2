@@ -1,6 +1,6 @@
 <form [formGroup]="form" (submit)="apply()">
   <div class="form-row">
-    <mat-form-field style="width: 14em">
+    <mat-form-field>
       <mat-label i18n>action</mat-label>
       <mat-select [formControl]="action">
         <mat-option value="add-filtered" i18n>add to corpus</mat-option>
@@ -15,14 +15,14 @@
 
     <cadmus-refs-lookup
       [service]="corpusRefLookupService"
-      [baseFilter]="baseFilter"
+      [baseFilter]="baseFilter()"
       label="corpus"
       (itemChange)="onCorpusChange($event)"
     />
 
     <button
       type="submit"
-      [disabled]="form.invalid || !editable"
+      [disabled]="form.invalid || !editable()"
       mat-flat-button
       class="mat-primary"
       i18n-matTooltip

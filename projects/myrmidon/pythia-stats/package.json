@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/pythia-stats",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "description": "Pythia - stats.",
   "keywords": [
     "Pythia"
@@ -16,6 +16,7 @@
   "peerDependencies": {
     "@angular/common": "^20.0.0",
     "@angular/core": "^20.0.0",
+    "@angular/material": "^20.0.0",
     "@myrmidon/ngx-tools": "^2.0.0",
     "@myrmidon/pythia-api": "^7.0.0"
   },

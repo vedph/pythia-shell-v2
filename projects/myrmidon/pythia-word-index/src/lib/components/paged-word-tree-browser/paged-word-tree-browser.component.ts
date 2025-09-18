@@ -1,4 +1,4 @@
-import { Component, input, OnInit, output } from '@angular/core';
+import { Component, input, OnInit, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -49,7 +49,8 @@ import {
 export class PagedWordTreeBrowserComponent implements OnInit {
   private readonly _store: PagedTreeStore<PagedWordTreeNode, WordFilter>;
 
-  public loading?: boolean;
+  public readonly loading = signal<boolean>(false);
+
   public filter$: Observable<Readonly<WordFilter>>;
   public nodes$: Observable<Readonly<PagedWordTreeNode[]>>;
 
@@ -107,48 +108,48 @@ export class PagedWordTreeBrowserComponent implements OnInit {
 
   public ngOnInit(): void {
     if (!this._store.getNodes().length) {
-      this.loading = true;
+      this.loading.set(true);
       this._store.setFilter({}).finally(() => {
-        this.loading = false;
+        this.loading.set(false);
         this._store.expand(this._store.getRootNode()!.id);
       });
     }
   }
 
   public reset(): void {
-    this.loading = true;
+    this.loading.set(true);
     this._store.reset().finally(() => {
-      this.loading = false;
+      this.loading.set(false);
       this._store.expand(this._store.getRootNode()!.id);
     });
   }
 
   public onToggleExpanded(node: PagedWordTreeNode): void {
-    this.loading = true;
+    this.loading.set(true);
     if (node.expanded) {
       this._store.collapse(node.id).finally(() => {
-        this.loading = false;
+        this.loading.set(false);
       });
     } else {
       this._store.expand(node.id).finally(() => {
-        this.loading = false;
+        this.loading.set(false);
       });
     }
   }
 
   public onPageChangeRequest(request: PageChangeRequest): void {
-    this.loading = true;
+    this.loading.set(true);
     this._store
       .changePage(request.node.id, request.paging.pageNumber)
       .finally(() => {
-        this.loading = false;
+        this.loading.set(false);
       });
   }
 
   public onFilterChange(filter?: WordFilter | null): void {
-    this.loading = true;
+    this.loading.set(true);
     this._store.setFilter(filter || {}).finally(() => {
-      this.loading = false;
+      this.loading.set(false);
       const root = this._store.getRootNode();
       if (root && !root.expanded) {
         this._store.expand(root.id);
@@ -173,16 +174,12 @@ export class PagedWordTreeBrowserComponent implements OnInit {
   }
 
   public requestSearch(term: Word | Lemma): void {
-    if (term.id < 0) {
-      term.id = Math.abs(term.id);
-    }
-    this.searchRequest.emit(term);
+    const newTerm = { ...term, id: Math.abs(term.id) };
+    this.searchRequest.emit(newTerm);
   }
 
   public requestCounts(term: Word | Lemma): void {
-    if (term.id < 0) {
-      term.id = Math.abs(term.id);
-    }
-    this.countsRequest.emit(term);
+    const newTerm = { ...term, id: Math.abs(term.id) };
+    this.countsRequest.emit(newTerm);
   }
 }

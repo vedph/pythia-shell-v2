@@ -4,7 +4,7 @@ import {
   QueryBuilderTermType,
   QUERY_STRUCT_ATTR_DEFS,
   QUERY_TOK_ATTR_DEFS,
-} from '../../projects/myrmidon/pythia-query-builder/src/public-api';
+} from '@myrmidon/pythia-query-builder';
 
 /**
  * List of non-privileged attributes come from:

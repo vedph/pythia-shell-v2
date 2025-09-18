@@ -44,7 +44,7 @@
     <legend i18n>clone from</legend>
     <cadmus-refs-lookup
       [required]="true"
-      [baseFilter]="baseFilter"
+      [baseFilter]="baseFilter()"
       [service]="corpusRefLookupService"
       label="corpus"
       (itemChange)="onCorpusChange($event)"

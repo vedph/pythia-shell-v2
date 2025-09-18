@@ -1,7 +1,10 @@
 <div id="container">
   <!-- query -->
   <div id="query">
-    <mat-tab-group [(selectedIndex)]="queryTabIndex">
+    <mat-tab-group
+      [selectedIndex]="queryTabIndex()"
+      (selectedIndexChange)="queryTabIndex.set($event)"
+    >
       <!-- query - advanced -->
       <mat-tab i18n-label label="advanced">
         <form [formGroup]="form" (submit)="search()">
@@ -98,11 +101,11 @@
           <th i18n>author</th>
           } @if (!hideTitle()) {
           <th i18n>title</th>
-          } @for (l of leftContextLabels; track l) {
+          } @for (l of leftContextLabels(); track l) {
           <th>{{ l }}</th>
           }
           <th i18n>value</th>
-          @for (l of rightContextLabels; track l) {
+          @for (l of rightContextLabels(); track l) {
           <th>{{ l }}</th>
           }
         </tr>
@@ -144,7 +147,7 @@
           <td class="title">{{ r.title }}</td>
           }
           <!-- left -->
-          @for (l of leftContextLabels; track l; let i = $index) {
+          @for (l of leftContextLabels(); track l; let i = $index) {
           <td class="context">
             {{ r.leftContext[i] }}
           </td>
@@ -158,7 +161,7 @@
             {{ r.text }}
           </td>
           <!-- right -->
-          @for (l of rightContextLabels; track l; let i = $index) {
+          @for (l of rightContextLabels(); track l; let i = $index) {
           <td class="context">
             {{ r.rightContext[i] }}
           </td>

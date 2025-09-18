@@ -1,4 +1,11 @@
-import { Component, input, OnDestroy, OnInit, output } from '@angular/core';
+import {
+  Component,
+  input,
+  OnDestroy,
+  OnInit,
+  output,
+  signal,
+} from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 
@@ -16,6 +23,7 @@ import {
   QueryBuilderTermDef,
 } from '../../query-builder';
 import { QueryEntryComponent } from '../query-entry/query-entry.component';
+import { deepCopy } from '@myrmidon/ngx-tools';
 
 export interface QueryEntrySet {
   entries: QueryBuilderEntry[];
@@ -44,11 +52,15 @@ export interface QueryEntrySet {
 export class QueryEntrySetComponent implements OnInit, OnDestroy {
   private readonly _builder: QueryBuilder;
   private _sub?: Subscription;
-  private _editedInsertIndex: number;
 
-  public TYPES = ['clause', 'AND', 'OR', 'AND NOT', '(', ')'];
-  public editedIndex: number;
-  public editedEntry?: QueryBuilderEntry;
+  public readonly TYPES = ['clause', 'AND', 'OR', 'AND NOT', '(', ')'];
+
+  public readonly editedIndex = signal<number>(-1);
+  public readonly editedInsertIndex = signal<number>(-1);
+  public readonly editedEntry = signal<QueryBuilderEntry | undefined>(
+    undefined
+  );
+
   public entries$: Observable<QueryBuilderEntry[]>;
   public errors$: Observable<string[]>;
 
@@ -75,8 +87,6 @@ export class QueryEntrySetComponent implements OnInit, OnDestroy {
 
   constructor() {
     this._builder = new QueryBuilder();
-    this.editedIndex = -1;
-    this._editedInsertIndex = -1;
     this.entries$ = this._builder.selectEntries();
     this.errors$ = this._builder.selectErrors();
   }
@@ -102,33 +112,33 @@ export class QueryEntrySetComponent implements OnInit, OnDestroy {
   }
 
   public addEntry(insertAt?: number): void {
-    this._editedInsertIndex = insertAt !== undefined ? insertAt : -1;
+    this.editedInsertIndex.set(insertAt !== undefined ? insertAt : -1);
     this.editEntry({}, -1);
   }
 
   public editEntry(entry: QueryBuilderEntry, index: number): void {
-    this.editedEntry = entry;
-    this.editedIndex = index;
+    this.editedEntry.set(deepCopy(entry));
+    this.editedIndex.set(index);
   }
 
   public saveEntry(entry?: QueryBuilderEntry | null): void {
     if (!entry) {
       return;
     }
-    if (this._editedInsertIndex > -1) {
+    if (this.editedInsertIndex() > -1) {
       // insert
-      this._builder.addEntry(entry, this._editedInsertIndex, true);
+      this._builder.addEntry(entry, this.editedInsertIndex(), true);
     } else {
       // append or replace
-      this._builder.addEntry(entry, this.editedIndex);
+      this._builder.addEntry(entry, this.editedIndex());
     }
     this.closeEntry();
   }
 
   public closeEntry(): void {
-    this.editedEntry = undefined;
-    this.editedIndex = -1;
-    this._editedInsertIndex = -1;
+    this.editedEntry.set(undefined);
+    this.editedIndex.set(-1);
+    this.editedInsertIndex.set(-1);
   }
 
   public deleteEntry(index: number): void {

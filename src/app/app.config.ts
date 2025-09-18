@@ -8,7 +8,7 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
 
 import { authJwtInterceptor } from '@myrmidon/auth-jwt-login';
 
-import { QUERY_BUILDER_ATTR_DEFS_KEY } from '../../projects/myrmidon/pythia-query-builder/src/public-api';
+import { QUERY_BUILDER_ATTR_DEFS_KEY } from '@myrmidon/pythia-query-builder';
 
 import { routes } from './app.routes';
 import { ATTR_DEFS } from './attr-defs';

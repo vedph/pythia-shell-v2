@@ -1,7 +1,7 @@
 <div id="container">
   <!-- chart -->
   <div id="chart">
-    <div echarts [options]="chartOptions!" class="chart"></div>
+    <div echarts [options]="chartOptions()!" class="chart"></div>
   </div>
 
   <!-- table -->
@@ -9,7 +9,7 @@
     <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title>
-          {{ total }}
+          {{ total() }}
         </mat-panel-title>
       </mat-expansion-panel-header>
       <table>
@@ -25,7 +25,7 @@
           <tr>
             <td>{{ c.attributeValue }}</td>
             <td>{{ c.value }}</td>
-            <td>{{ c.value | percentage : total }}</td>
+            <td>{{ c.value | percentage : total() }}</td>
           </tr>
           }
         </tbody>
@@ -55,6 +55,13 @@
     >
       <mat-icon class="mat-primary">download</mat-icon>
     </button>
+  </div>
+  }
+
+  <!-- progress bar -->
+  @if (downloading()) {
+  <div>
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
   }
 </div>

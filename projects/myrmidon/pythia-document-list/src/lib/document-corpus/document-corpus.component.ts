@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+import { Component, output, signal } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -46,11 +46,10 @@ export class DocumentCorpusComponent {
   public corpusId: FormControl<string | null>;
   public action: FormControl<string | null>;
   public form: FormGroup;
-  public editable?: boolean;
-
-  public baseFilter?: CorpusFilter;
 
   public readonly corpusAction = output<CorpusActionRequest>();
+  public readonly baseFilter = signal<CorpusFilter | undefined>(undefined);
+  public readonly editable = signal<boolean>(false);
 
   constructor(
     formBuilder: FormBuilder,
@@ -69,18 +68,18 @@ export class DocumentCorpusComponent {
       action: this.action,
     });
     // preset userId filter for corpus lookup (used in cloner)
-    this.baseFilter = {
+    this.baseFilter.set({
       userId: authService.isCurrentUserInRole('admin')
         ? undefined
         : authService.currentUserValue?.userName,
-    };
+    });
   }
 
   public onCorpusChange(corpus: unknown): void {
     this.corpusId.setValue((corpus as Corpus | undefined)?.id || null);
-    this.editable = this._editableCheckService.isEditable(
+    this.editable.set(this._editableCheckService.isEditable(
       corpus as Corpus | undefined
-    );
+    ));
   }
 
   public apply(): void {

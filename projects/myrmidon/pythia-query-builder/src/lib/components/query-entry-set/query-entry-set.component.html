@@ -22,7 +22,7 @@
   <tbody>
     @for ( e of entries$ | async; track e; let i = $index; let first = $first;
     let last = $last) {
-    <tr>
+    <tr [class.selected]="i === editedIndex()">
       <td class="fit-width">
         <span class="nr">{{ i + 1 }}. </span>
         <button
@@ -107,15 +107,15 @@
   }
 </ul>
 }
-<mat-expansion-panel [expanded]="editedEntry" [disabled]="!editedEntry">
+<mat-expansion-panel [expanded]="editedEntry()" [disabled]="!editedEntry()">
   <mat-expansion-panel-header
-    >#{{ editedIndex + 1 }}</mat-expansion-panel-header
+    >#{{ editedIndex() + 1 }}</mat-expansion-panel-header
   >
   <pythia-query-entry
     [attrDefinitions]="attrDefinitions()"
     [isDocument]="isDocument()"
-    [entry]="editedEntry"
+    [entry]="editedEntry()"
     (entryChange)="saveEntry($event)"
     (editorClose)="closeEntry()"
-  ></pythia-query-entry>
+  />
 </mat-expansion-panel>

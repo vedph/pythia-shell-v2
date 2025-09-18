@@ -1,6 +1,6 @@
 <form
   [formGroup]="form"
-  [style.margin.px]="wrapped ? 16 : 0"
+  [style.margin.px]="wrapped() ? 16 : 0"
   (submit)="apply()"
 >
   <!-- language -->

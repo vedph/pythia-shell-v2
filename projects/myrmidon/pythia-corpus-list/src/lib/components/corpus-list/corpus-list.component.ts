@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -14,7 +14,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
-import { DataPage } from '@myrmidon/ngx-tools';
+import { DataPage, deepCopy } from '@myrmidon/ngx-tools';
 import { DialogService } from '@myrmidon/ngx-mat-tools';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 import { PagedListStore } from '@myrmidon/paged-data-browsers';
@@ -52,12 +52,13 @@ import { CorpusFilterComponent } from '../corpus-filter/corpus-filter.component'
 })
 export class CorpusListComponent {
   private readonly _store: PagedListStore<CorpusFilter, Corpus>;
+
   public filter$: Observable<Readonly<CorpusFilter>>;
   public page$: Observable<Readonly<DataPage<Corpus>>>;
-  public loading?: boolean;
-  public editedCorpus?: EditedCorpus;
 
-  public admin: boolean;
+  public readonly loading = signal<boolean>(false);
+  public readonly editedCorpus = signal<EditedCorpus | undefined>(undefined);
+  public readonly admin = signal<boolean>(false);
 
   constructor(
     service: CorpusListBrowserService,
@@ -69,20 +70,20 @@ export class CorpusListComponent {
     this._store = service.store;
     this.filter$ = this._store.filter$;
     this.page$ = this._store.page$;
-    this.admin = _authService.isCurrentUserInRole('admin');
+    this.admin.set(_authService.isCurrentUserInRole('admin'));
   }
 
   public reset(): void {
-    this.loading = true;
+    this.loading.set(true);
     this._store.reset();
     this._store
       .setFilter(
-        this.admin
+        this.admin()
           ? {}
           : { userId: this._authService.currentUserValue?.userName }
       )
       .finally(() => {
-        this.loading = false;
+        this.loading.set(false);
       });
   }
 
@@ -93,7 +94,7 @@ export class CorpusListComponent {
   }
 
   public onFilterChange(filter?: CorpusFilter | null): void {
-    this.loading = true;
+    this.loading.set(true);
     if (!this.admin) {
       filter = {
         ...filter,
@@ -101,14 +102,14 @@ export class CorpusListComponent {
       };
     }
     this._store.setFilter(filter || {}).finally(() => {
-      this.loading = false;
+      this.loading.set(false);
     });
   }
 
   public onPageChange(event: PageEvent): void {
-    this.loading = true;
+    this.loading.set(true);
     this._store.setPage(event.pageIndex + 1, event.pageSize).finally(() => {
-      this.loading = false;
+      this.loading.set(false);
     });
   }
 
@@ -116,19 +117,19 @@ export class CorpusListComponent {
     if (!this._authService.currentUserValue) {
       return;
     }
-    this.editedCorpus = {
+    this.editedCorpus.set({
       id: '',
       title: 'corpus',
       description: '',
       userId: this._authService.currentUserValue?.userName!,
-    };
+    });
   }
 
   public editCorpus(corpus: Corpus): void {
     if (!this._authService.currentUserValue) {
       return;
     }
-    this.editedCorpus = { ...corpus };
+    this.editedCorpus.set(deepCopy(corpus));
   }
 
   public deleteCorpus(corpus: Corpus): void {
@@ -165,10 +166,10 @@ export class CorpusListComponent {
         this._snackbar.open('Error saving corpus', 'OK');
       },
     });
-    this.editedCorpus = undefined;
+    this.editedCorpus.set(undefined);
   }
 
   public onCorpusEditorClose(): void {
-    this.editedCorpus = undefined;
+    this.editedCorpus.set(undefined);
   }
 }

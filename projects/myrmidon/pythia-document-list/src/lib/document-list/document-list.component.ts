@@ -133,10 +133,7 @@ export class DocumentListComponent {
               });
             },
             error: (error) => {
-              console.error($localize`Error adding documents by filter`);
-              if (error) {
-                console.error(JSON.stringify(error));
-              }
+              console.error('Error adding documents by filter', error);
               this._snackbar.open($localize`Error updating corpus`, 'OK');
             },
           });
@@ -152,10 +149,7 @@ export class DocumentListComponent {
               });
             },
             error: (error) => {
-              console.error($localize`Error removing documents by filter`);
-              if (error) {
-                console.error(JSON.stringify(error));
-              }
+              console.error('Error removing documents by filter', error);
               this._snackbar.open($localize`Error updating corpus`, 'OK');
             },
           });

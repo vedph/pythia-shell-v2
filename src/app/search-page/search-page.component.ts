@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { ActivatedRoute } from '@angular/router';
 
-import { SearchComponent } from '../../../projects/myrmidon/pythia-search/src/public-api';
+import { SearchComponent } from '@myrmidon/pythia-search';
 
 @Component({
   selector: 'app-search',

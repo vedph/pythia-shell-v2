@@ -1,4 +1,4 @@
-import { Component, Inject, input, output } from '@angular/core';
+import { Component, Inject, input, output, signal } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -49,14 +49,14 @@ export class QueryBuilderComponent {
   private readonly _queryBuilder: QueryBuilder;
 
   // query entries
-  public set: QueryEntrySet;
+  public readonly set = signal<QueryEntrySet>({ entries: [] });
   // query scope
-  public corpora: Corpus[];
-  public docSet: QueryEntrySet;
+  public readonly corpora = signal<Corpus[]>([]);
+  public readonly docSet = signal<QueryEntrySet>({ entries: [] });
 
-  public hasErrors: boolean;
-  public readonly attrDefinitions: QueryBuilderTermDef[];
-  public readonly docAttrDefinitions: QueryBuilderTermDef[];
+  public readonly hasErrors = signal<boolean>(true);
+  public readonly attrDefinitions = signal<QueryBuilderTermDef[]>([]);
+  public readonly docAttrDefinitions = signal<QueryBuilderTermDef[]>([]);
 
   /**
    * True to enable the peek button.
@@ -88,55 +88,52 @@ export class QueryBuilderComponent {
     attrDefinitions: QueryBuilderTermDef[]
   ) {
     this._queryBuilder = new QueryBuilder();
-    this.hasErrors = true;
-    this.set = { entries: [] };
-    this.corpora = [];
-    this.docSet = { entries: [] };
-    this.attrDefinitions = attrDefinitions.filter(
-      (d) => d.type !== QueryBuilderTermType.Document
+    this.attrDefinitions.set(
+      attrDefinitions.filter((d) => d.type !== QueryBuilderTermType.Document)
     );
-    this.docAttrDefinitions = attrDefinitions.filter(
-      (d) => d.type === QueryBuilderTermType.Document
+    this.docAttrDefinitions.set(
+      attrDefinitions.filter((d) => d.type === QueryBuilderTermType.Document)
     );
   }
 
   public onCorporaChange(corpora: Corpus[]): void {
-    this.corpora = corpora;
+    this.corpora.set(corpora);
   }
 
   private updateHasErrors(): void {
-    this.hasErrors =
-      this.set.errors?.length || this.docSet.errors?.length ? true : false;
+    this.hasErrors.set(
+      this.set().errors?.length || this.docSet().errors?.length ? true : false
+    );
   }
 
   public onEntrySetChange(set: QueryEntrySet): void {
-    this.set = set;
+    this.set.set(set);
     this.updateHasErrors();
   }
 
   public onDocEntrySetChange(set: QueryEntrySet): void {
-    this.docSet = set;
+    this.docSet.set(set);
     this.updateHasErrors();
   }
 
   private buildQuery(): string | null {
-    if (this.set.errors?.length || this.docSet.errors?.length) {
+    if (this.set().errors?.length || this.docSet().errors?.length) {
       return null;
     }
     let query = '';
 
-    if (this.corpora?.length) {
-      query += this._queryBuilder.buildCorpusSection(this.corpora);
+    if (this.corpora().length) {
+      query += this._queryBuilder.buildCorpusSection(this.corpora());
     }
 
-    if (this.docSet.entries?.length) {
+    if (this.docSet().entries?.length) {
       this._queryBuilder.forDocument(true);
-      this._queryBuilder.setEntries(this.docSet.entries);
+      this._queryBuilder.setEntries(this.docSet().entries);
       query += this._queryBuilder.build();
     }
 
     this._queryBuilder.forDocument(false);
-    this._queryBuilder.setEntries(this.set.entries);
+    this._queryBuilder.setEntries(this.set().entries);
     query += this._queryBuilder.build();
 
     return query;

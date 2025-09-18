@@ -3,6 +3,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
     "paths": {
       "@myrmidon/pythia-api": [
         "./dist/myrmidon/pythia-api"

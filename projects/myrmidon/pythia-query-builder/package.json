@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/pythia-query-builder",
-  "version": "8.0.0",
+  "version": "9.0.0",
   "description": "Pythia - query builder.",
   "keywords": [
     "Pythia"
@@ -16,8 +16,9 @@
   "peerDependencies": {
     "@angular/common": "^20.0.0",
     "@angular/core": "^20.0.0",
+    "@angular/material": "^20.0.0",
     "@myrmidon/ngx-tools": "^2.0.0",
-    "@myrmidon/cadmus-refs-lookup": "^10.0.1",
+    "@myrmidon/cadmus-refs-lookup": "^10.0.3",
     "@myrmidon/pythia-api": "^7.0.0",
     "@myrmidon/pythia-core": "^7.0.0",
     "@myrmidon/pythia-document-reader": "^7.0.1",
