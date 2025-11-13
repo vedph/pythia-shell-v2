@@ -117,6 +117,7 @@ graph LR;
 
 ## History
 
+- 2025-11-13: updated Angular and packages.
 - 2025-09-29: updated Angular and packages.
 - 2025-09-18:
   - ⚠️ refactored components for full reactivity. All the libraries major versions have been increased (including those which had no changes, as anyway peer dependencies were updated).
