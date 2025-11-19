@@ -117,6 +117,9 @@ graph LR;
 
 ## History
 
+- 2025-11-19:
+  - added optional `sortFields` parameter to search service.
+  - updated Angular and packages.
 - 2025-11-13: updated Angular and packages.
 - 2025-09-29: updated Angular and packages.
 - 2025-09-18:

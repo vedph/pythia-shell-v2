@@ -10,6 +10,9 @@ import {
   ErrorWrapper,
 } from '@myrmidon/ngx-tools';
 
+/**
+ * Search result interface.
+ */
 export interface SearchResult {
   id: string;
   documentId: number;
@@ -24,12 +27,18 @@ export interface SearchResult {
   sortKey: string;
 }
 
+/**
+ * KWIC (Key Word In Context) search result interface.
+ */
 export interface KwicSearchResult extends SearchResult {
   text: string;
   leftContext: string[];
   rightContext: string[];
 }
 
+/**
+ * Service to perform searches.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -44,6 +53,10 @@ export class SearchService {
    * Performs a search.
    *
    * @param query The query.
+   * @param contextSize The context size.
+   * @param pageNumber The page number.
+   * @param pageSize The page size.
+   * @param sortFields The sort fields.
    * @returns Observable with ResultWrapper and a page of results, or
    * an error message in case of syntax errors.
    */
@@ -51,7 +64,8 @@ export class SearchService {
     query: string,
     contextSize = 5,
     pageNumber = 1,
-    pageSize = 20
+    pageSize = 20,
+    sortFields?: string[]
   ): Observable<ErrorWrapper<DataPage<KwicSearchResult>>> {
     // empty result set for invalid search parameters
     if (pageNumber < 1 || pageSize < 1 || !query) {
@@ -67,11 +81,17 @@ export class SearchService {
       return of(w);
     }
 
+    // set parameters
     let params = new HttpParams()
       .set('query', query)
       .set('contextSize', contextSize.toString())
       .set('pageNumber', pageNumber.toString())
       .set('pageSize', pageSize.toString());
+
+    // add fields to parameters if specified
+    if (sortFields?.length) {
+      params = params.set('sort', sortFields.join(','));
+    }
 
     return this._http
       .get<ErrorWrapper<DataPage<KwicSearchResult>>>(
@@ -116,28 +136,5 @@ export class SearchService {
       responseType: 'text',
       observe: 'body',
     });
-
-    // return this._http
-    //   .get(this._env.get('apiUrl') + 'search/csv', {
-    //     params: params,
-    //     responseType: 'blob',
-    //     observe: 'events',
-    //     reportProgress: true,
-    //   })
-    //   .pipe(
-    //     map((event) => {
-    //       switch (event.type) {
-    //         case HttpEventType.DownloadProgress:
-    //           const progress = Math.round(
-    //             (100 * event.loaded) / (event.total || 1)
-    //           );
-    //           return { progress, data: null };
-    //         case HttpEventType.Response:
-    //           return { progress: 100, data: event.body as Blob };
-    //         default:
-    //           return { progress: 0, data: null };
-    //       }
-    //     })
-    //   );
   }
 }
