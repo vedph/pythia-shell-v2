@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/pythia-word-index",
-  "version": "8.0.0",
+  "version": "8.0.1",
   "description": "Pythia - word and lemmata index.",
   "keywords": [
     "Pythia"
@@ -14,12 +14,12 @@
     "name": "Daniele Fusi"
   },
   "peerDependencies": {
-    "@angular/common": "^20.0.0",
-    "@angular/core": "^20.0.0",
-    "@angular/material": "^20.0.0",
-    "@myrmidon/ngx-tools": "^2.0.0",
-    "@myrmidon/paged-data-browsers": "^5.0.2",
-    "@myrmidon/pythia-api": "^8.0.0",
+    "@angular/common": "^20.0.0 || ^21.0.0",
+    "@angular/core": "^20.0.0 || ^21.0.0",
+    "@angular/material": "^20.0.0 || ^21.0.0",
+    "@myrmidon/ngx-tools": "^2.0.2",
+    "@myrmidon/paged-data-browsers": "^5.1.2",
+    "@myrmidon/pythia-api": "^8.0.1",
     "@myrmidon/pythia-core": "^8.0.0"
   },
   "dependencies": {
