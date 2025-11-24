@@ -12,7 +12,7 @@ This shell is used to develop and test the basic UI components for building Pyth
 
 🐳 Quick **Docker image build** (non-localized):
 
-1. `npm run build-lib`;
+1. `pnpm run build-lib`;
 2. update version in `env.js` (and in Docker compose scripts);
 3. `ng build --configuration production`;
 4. `docker build . -t vedph2020/pythia-shell:6.0.0 -t vedph2020/pythia-shell:latest`.
@@ -117,6 +117,9 @@ graph LR;
 
 ## History
 
+- 2025-11-24:
+  - ⚠️ upgraded to Angular 21.
+  - migrated to `pnpm`.
 - 2025-11-19:
   - added optional `sortFields` parameter to search service.
   - updated Angular and packages.
