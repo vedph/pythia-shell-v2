@@ -104,19 +104,20 @@ graph LR;
 
 ## Versions
 
-- `@myrmidon/pythia-api`: 7.0.0
-- `@myrmidon/pythia-core`: 7.0.0
-- `@myrmidon/pythia-corpus-list`: 8.0.0
-- `@myrmidon/pythia-document-list`: 8.0.0
-- `@myrmidon/pythia-document-reader`: 7.0.1
-- `@myrmidon/pythia-query-builder`: 8.0.0
-- `@myrmidon/pythia-search`: 8.0.0
-- `@myrmidon/pythia-stats`: 7.0.0
-- `@myrmidon/pythia-ui`: 7.0.0
-- `@myrmidon/pythia-word-index`: 7.0.1
+- `@myrmidon/pythia-api`: 8.0.2
+- `@myrmidon/pythia-core`: 8.0.1
+- `@myrmidon/pythia-corpus-list`: 9.0.1
+- `@myrmidon/pythia-document-list`: 9.0.1
+- `@myrmidon/pythia-document-reader`: 8.0.1
+- `@myrmidon/pythia-query-builder`: 9.0.1
+- `@myrmidon/pythia-search`: 9.0.1
+- `@myrmidon/pythia-stats`: 8.0.1
+- `@myrmidon/pythia-ui`: 8.0.1
+- `@myrmidon/pythia-word-index`: 8.0.1
 
 ## History
 
+- 2026-01-09: updated Angular and packages.
 - 2025-11-24:
   - ⚠️ upgraded to Angular 21.
   - migrated to `pnpm`.
