@@ -20,7 +20,7 @@
             "outputPath": "dist/pythia-shell",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": ["zone.js", "@angular/localize/init"],
+            "polyfills": ["@angular/localize/init"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -75,8 +75,6 @@
           "builder": "@angular/build:karma",
           "options": {
             "polyfills": [
-              "zone.js",
-              "zone.js/testing",
               "@angular/localize/init"
             ],
             "tsConfig": "tsconfig.spec.json",
@@ -117,8 +115,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-api/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "tsConfig": "projects/myrmidon/pythia-api/tsconfig.spec.json"
           }
         }
       }
@@ -147,8 +144,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-core/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "tsConfig": "projects/myrmidon/pythia-core/tsconfig.spec.json"
           }
         }
       }
@@ -177,8 +173,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-corpus-list/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "tsConfig": "projects/myrmidon/pythia-corpus-list/tsconfig.spec.json"
           }
         }
       }
@@ -207,8 +202,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-document-list/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "tsConfig": "projects/myrmidon/pythia-document-list/tsconfig.spec.json"
           }
         }
       }
@@ -237,8 +231,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-document-reader/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "tsConfig": "projects/myrmidon/pythia-document-reader/tsconfig.spec.json"
           }
         }
       }
@@ -267,8 +260,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-query-builder/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "tsConfig": "projects/myrmidon/pythia-query-builder/tsconfig.spec.json"
           }
         }
       }
@@ -297,8 +289,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-search/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "tsConfig": "projects/myrmidon/pythia-search/tsconfig.spec.json"
           }
         }
       }
@@ -327,8 +318,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-stats/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "tsConfig": "projects/myrmidon/pythia-stats/tsconfig.spec.json"
           }
         }
       }
@@ -357,8 +347,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-ui/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "tsConfig": "projects/myrmidon/pythia-ui/tsconfig.spec.json"
           }
         }
       }
@@ -387,8 +376,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-word-index/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "tsConfig": "projects/myrmidon/pythia-word-index/tsconfig.spec.json"
           }
         }
       }

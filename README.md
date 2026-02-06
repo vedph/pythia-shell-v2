@@ -109,6 +109,7 @@ graph LR;
   - minor improvements.
   - updated library peer dependencies.
   - migrated to `OnPush`.
+  - ⚠️ migrated to zoneless.
 - 2026-01-09: updated Angular and packages.
 - 2025-11-24:
   - ⚠️ upgraded to Angular 21.
