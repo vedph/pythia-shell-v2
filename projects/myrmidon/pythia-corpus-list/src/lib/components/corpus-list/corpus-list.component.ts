@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -52,6 +52,7 @@ import { CorpusFilterComponent } from '../corpus-filter/corpus-filter.component'
   ],
   templateUrl: './corpus-list.component.html',
   styleUrls: ['./corpus-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CorpusListComponent {
   private readonly _store: PagedListStore<CorpusFilter, Corpus>;
@@ -98,7 +99,7 @@ export class CorpusListComponent {
 
   public onFilterChange(filter?: CorpusFilter | null): void {
     this.loading.set(true);
-    if (!this.admin) {
+    if (!this.admin()) {
       filter = {
         ...filter,
         userId: this._authService.currentUserValue?.userName,

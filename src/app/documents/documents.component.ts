@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -18,11 +18,14 @@ import { DocumentReaderComponent } from '@myrmidon/pythia-document-reader';
   ],
   templateUrl: './documents.component.html',
   styleUrls: ['./documents.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DocumentsComponent {
-  public readRequest?: DocumentReadRequest;
+  public readonly readRequest = signal<DocumentReadRequest | undefined>(
+    undefined
+  );
 
   public onReadRequest(readRequest: DocumentReadRequest): void {
-    this.readRequest = { ...readRequest, initialPath: '0' };
+    this.readRequest.set({ ...readRequest, initialPath: '0' });
   }
 }

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   input,
   OnDestroy,
@@ -48,6 +49,7 @@ export interface QueryEntrySet {
   ],
   templateUrl: './query-entry-set.component.html',
   styleUrls: ['./query-entry-set.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QueryEntrySetComponent implements OnInit, OnDestroy {
   private readonly _builder: QueryBuilder;

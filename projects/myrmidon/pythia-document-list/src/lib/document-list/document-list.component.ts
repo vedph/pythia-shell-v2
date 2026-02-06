@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { CommonModule } from '@angular/common';
 import { Observable, take } from 'rxjs';
@@ -53,6 +53,7 @@ import { DocumentInfoComponent } from '../document-info/document-info.component'
   templateUrl: './document-list.component.html',
   styleUrls: ['./document-list.component.css'],
   providers: [DocumentRepository],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DocumentListComponent {
   public loading$: Observable<boolean>;

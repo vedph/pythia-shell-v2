@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 
 @Component({
@@ -6,5 +6,6 @@ import { MatCardModule } from '@angular/material/card';
   imports: [MatCardModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {}

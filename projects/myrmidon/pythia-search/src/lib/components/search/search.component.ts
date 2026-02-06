@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   input,
@@ -59,6 +60,7 @@ import { SearchExportComponent } from '../search-export/search-export.component'
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchComponent implements OnInit {
   @ViewChild('queryCtl') queryElementRef: ElementRef | undefined;
@@ -149,7 +151,7 @@ export class SearchComponent implements OnInit {
       return;
     }
     this.query.setValue(this.history.value);
-    setTimeout(this.queryElementRef?.nativeElement.focus(), 0);
+    setTimeout(() => this.queryElementRef?.nativeElement.focus(), 0);
   }
 
   public search(): void {

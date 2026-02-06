@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { ReactiveFormsModule } from '@angular/forms';
@@ -28,6 +28,7 @@ import { AuthJwtRegistrationComponent } from '@myrmidon/auth-jwt-admin';
     MatTooltipModule,
     AuthJwtRegistrationComponent
 ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterUserPageComponent {
   constructor(private _router: Router) {}
