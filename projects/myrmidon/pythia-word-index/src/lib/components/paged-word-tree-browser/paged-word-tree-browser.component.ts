@@ -94,7 +94,7 @@ export class PagedWordTreeBrowserComponent implements OnInit {
 
   constructor(
     service: PagedWordTreeBrowserService,
-    private _dialog: MatDialog
+    private _dialog: MatDialog,
   ) {
     this._store = service.store;
     this.nodes$ = this._store.nodes$;

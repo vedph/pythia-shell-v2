@@ -10,6 +10,9 @@ import { DataPage } from '@myrmidon/ngx-tools';
 import { CorpusService } from '@myrmidon/pythia-api';
 import { Corpus } from '@myrmidon/pythia-core';
 
+/**
+ * Lookup service for corpora.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -23,7 +26,7 @@ export class CorpusRefLookupService implements RefLookupService {
           title: filter.text,
         },
         1,
-        filter.limit
+        filter.limit,
       )
       .pipe(map((page: DataPage<Corpus>) => page.items));
   }

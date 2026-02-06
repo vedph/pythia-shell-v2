@@ -60,7 +60,10 @@ export class TokenCountsListComponent {
 
   public readonly selectedAttributes: FormControl<AttributeInfo[]>;
 
-  constructor(formBuilder: FormBuilder, private _wordService: WordService) {
+  constructor(
+    formBuilder: FormBuilder,
+    private _wordService: WordService,
+  ) {
     this.selectedAttributes = formBuilder.control<AttributeInfo[]>([], {
       nonNullable: true,
     });
@@ -135,7 +138,7 @@ export class TokenCountsListComponent {
       this._wordService
         .getLemmaCounts(
           token!.id,
-          this.selectedAttributes.value.map((i) => i.name)
+          this.selectedAttributes.value.map((i) => i.name),
         )
         .pipe(take(1))
         .subscribe({
@@ -150,7 +153,7 @@ export class TokenCountsListComponent {
       this._wordService
         .getWordCounts(
           token!.id,
-          this.selectedAttributes.value.map((i) => i.name)
+          this.selectedAttributes.value.map((i) => i.name),
         )
         .pipe(take(1))
         .subscribe({

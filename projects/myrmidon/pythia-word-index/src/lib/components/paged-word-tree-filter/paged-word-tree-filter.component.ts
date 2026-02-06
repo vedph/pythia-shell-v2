@@ -77,7 +77,7 @@ export class PagedWordTreeFilterComponent {
    * The sort order entries to display in the sort order dropdown.
    */
   public readonly sortOrderEntries = input<WordTreeFilterSortOrderEntry[]>(
-    DEFAULT_SORT_ORDER_ENTRIES
+    DEFAULT_SORT_ORDER_ENTRIES,
   );
   public readonly sortEntries = computed(() => {
     return this.sortOrderEntries()?.length
@@ -119,7 +119,7 @@ export class PagedWordTreeFilterComponent {
     public dialogRef: MatDialogRef<PagedWordTreeFilterComponent>,
     @Optional()
     @Inject(MAT_DIALOG_DATA)
-    public data: any
+    public data: any,
   ) {
     // form
     this.language = formBuilder.control<string | null>(null);
@@ -133,7 +133,7 @@ export class PagedWordTreeFilterComponent {
       this.sortEntries()[0],
       {
         nonNullable: true,
-      }
+      },
     );
     this.form = formBuilder.group({
       language: this.language,
@@ -158,7 +158,7 @@ export class PagedWordTreeFilterComponent {
         !this.sortEntries().some(
           (e) =>
             e.value === this.sortOrder.value.value &&
-            e.descending === this.sortOrder.value.descending
+            e.descending === this.sortOrder.value.descending,
         )
       ) {
         this.sortOrder.setValue(this.sortEntries()[0]);
@@ -187,10 +187,10 @@ export class PagedWordTreeFilterComponent {
       this.sortEntries().find(
         (e) =>
           e.value === filter.sortOrder &&
-          e.descending === filter.isSortDescending
+          e.descending === filter.isSortDescending,
       ) ??
         this.sortEntries()[0] ??
-        DEFAULT_SORT_ORDER_ENTRIES[0]
+        DEFAULT_SORT_ORDER_ENTRIES[0],
     );
     this.form.markAsPristine();
   }

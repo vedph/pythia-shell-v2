@@ -14,6 +14,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { CorpusFilter } from '@myrmidon/pythia-api';
 
+/**
+ * Corpus filter component. This is used to filter the list
+ * of corpora.
+ */
 @Component({
   selector: 'pythia-corpus-filter',
   imports: [
@@ -28,8 +32,14 @@ import { CorpusFilter } from '@myrmidon/pythia-api';
   styleUrls: ['./corpus-filter.component.css'],
 })
 export class CorpusFilterComponent {
+  /**
+   * The filter to edit.
+   */
   public readonly filter = model<CorpusFilter | null | undefined>();
 
+  /**
+   * True if the filter component is disabled.
+   */
   public readonly disabled = input<boolean | undefined>();
 
   public id: FormControl<string | null>;

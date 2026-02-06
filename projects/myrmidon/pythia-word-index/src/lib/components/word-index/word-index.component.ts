@@ -29,8 +29,8 @@ import { WordTreeFilterSortOrderEntry } from '../paged-word-tree-filter/paged-wo
     MatSelectModule,
     MatTooltipModule,
     PagedWordTreeBrowserComponent,
-    TokenCountsListComponent
-],
+    TokenCountsListComponent,
+  ],
   templateUrl: './word-index.component.html',
   styleUrl: './word-index.component.scss',
 })

@@ -5,36 +5,36 @@
 >
   <!-- language -->
   @if (!hideLanguage()) {
-  <div>
-    <mat-form-field>
-      <mat-label i18n>language</mat-label>
-      <input matInput [formControl]="language" maxlength="50" />
-    </mat-form-field>
-  </div>
+    <div>
+      <mat-form-field>
+        <mat-label i18n>language</mat-label>
+        <input matInput [formControl]="language" maxlength="50" />
+      </mat-form-field>
+    </div>
   }
 
   <!-- pos -->
   @if (!hidePos()) {
-  <div>
-    <mat-form-field>
-      <mat-label>POS</mat-label>
-      <mat-select [formControl]="pos">
-        <mat-option [value]="null">-</mat-option>
-        <mat-option value="NOUN" i18n>noun</mat-option>
-        <mat-option value="PROPN" i18n>proper noun</mat-option>
-        <mat-option value="PRON" i18n>pronoun</mat-option>
-        <mat-option value="DET" i18n>determiner</mat-option>
-        <mat-option value="ADJ" i18n>adjective</mat-option>
-        <mat-option value="ADV" i18n>adverb</mat-option>
-        <mat-option value="ADP" i18n>adposition</mat-option>
-        <mat-option value="INTJ" i18n>interjection</mat-option>
-        <mat-option value="CCONJ" i18n>coordinating conjunction</mat-option>
-        <mat-option value="SCONJ" i18n>subordinating conjunction</mat-option>
-        <mat-option value="VERB" i18n>verb</mat-option>
-        <mat-option value="AUX" i18n>auxiliary</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
+    <div>
+      <mat-form-field>
+        <mat-label>POS</mat-label>
+        <mat-select [formControl]="pos">
+          <mat-option [value]="null">-</mat-option>
+          <mat-option value="NOUN" i18n>noun</mat-option>
+          <mat-option value="PROPN" i18n>proper noun</mat-option>
+          <mat-option value="PRON" i18n>pronoun</mat-option>
+          <mat-option value="DET" i18n>determiner</mat-option>
+          <mat-option value="ADJ" i18n>adjective</mat-option>
+          <mat-option value="ADV" i18n>adverb</mat-option>
+          <mat-option value="ADP" i18n>adposition</mat-option>
+          <mat-option value="INTJ" i18n>interjection</mat-option>
+          <mat-option value="CCONJ" i18n>coordinating conjunction</mat-option>
+          <mat-option value="SCONJ" i18n>subordinating conjunction</mat-option>
+          <mat-option value="VERB" i18n>verb</mat-option>
+          <mat-option value="AUX" i18n>auxiliary</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
   }
 
   <!-- value pattern -->
@@ -78,7 +78,7 @@
       <mat-label i18n>sort order</mat-label>
       <mat-select [formControl]="sortOrder">
         @for (e of sortEntries(); track e.key) {
-        <mat-option [value]="e">{{ e.key }}</mat-option>
+          <mat-option [value]="e">{{ e.key }}</mat-option>
         }
       </mat-select>
     </mat-form-field>

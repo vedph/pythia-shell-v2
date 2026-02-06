@@ -30,6 +30,9 @@ import {
 } from '../corpus-editor/corpus-editor.component';
 import { CorpusFilterComponent } from '../corpus-filter/corpus-filter.component';
 
+/**
+ * A list of corpora.
+ */
 @Component({
   selector: 'pythia-corpus-list',
   imports: [

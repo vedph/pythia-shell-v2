@@ -10,6 +10,9 @@ import { DataPage } from '@myrmidon/ngx-tools';
 import { ProfileService } from '@myrmidon/pythia-api';
 import { Profile } from '@myrmidon/pythia-core';
 
+/**
+ * Lookup service for profiles.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -23,7 +26,7 @@ export class ProfileRefLookupService implements RefLookupService {
           id: filter.text,
         },
         1,
-        filter.limit
+        filter.limit,
       )
       .pipe(map((page: DataPage<Profile>) => page.items));
   }

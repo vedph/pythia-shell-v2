@@ -963,7 +963,7 @@ export class QueryBuilder {
   private supplyMinMax(
     args: QueryBuilderTermDefArg[],
     min = 'n',
-    max = 'm'
+    max = 'm',
   ): void {
     let arg = args.find((a) => a.id === min);
     if (!arg) {
@@ -984,7 +984,7 @@ export class QueryBuilder {
   private validateMinMax(
     args: QueryBuilderTermDefArg[],
     min = 'n',
-    max = 'm'
+    max = 'm',
   ): boolean {
     let arg = args.find((a) => a.id === min);
     const n = !arg?.value ? 0 : +arg.value!;
@@ -1052,7 +1052,7 @@ export class QueryBuilder {
   private appendArgs(
     entry: QueryBuilderEntry,
     keys: string[],
-    sb: string[]
+    sb: string[],
   ): string[] {
     if (!entry?.opArgs) {
       return [];
@@ -1060,7 +1060,7 @@ export class QueryBuilder {
     const found: string[] = [];
     for (let i = 0; i < keys.length; i++) {
       const v: string | undefined = entry.opArgs.find(
-        (a) => a.id === keys[i]
+        (a) => a.id === keys[i],
       )?.value;
       if (v) {
         if (i) {

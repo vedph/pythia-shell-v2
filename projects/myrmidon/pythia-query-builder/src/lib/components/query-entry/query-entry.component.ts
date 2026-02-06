@@ -91,7 +91,7 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
   ]);
 
   public readonly opGroups = signal<GroupedQueryBuilderTermDefs | undefined>(
-    undefined
+    undefined,
   );
   public readonly attrGroups = signal<GroupedQueryBuilderTermDefs>({});
 
@@ -121,8 +121,8 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
     this.opGroups.set(
       this.groupByKey(
         QUERY_PAIR_OP_DEFS.filter((d) => !d.hidden),
-        'group'
-      ) as GroupedQueryBuilderTermDefs
+        'group',
+      ) as GroupedQueryBuilderTermDefs,
     );
     // pair form
     this.attribute = formBuilder.control(null, Validators.required);
@@ -154,8 +154,8 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
       this.attrGroups.set(
         this.groupByKey(
           this.attrDefinitions().filter((d) => !d.hidden),
-          'group'
-        )
+          'group',
+        ),
       );
     });
 
@@ -180,8 +180,8 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
       // if not a document, add location operators
       this.entryTypes.set(
         [...this.entryTypes(), ...QUERY_LOCATION_OP_DEFS].filter(
-          (d) => !d.hidden && d.type !== QueryBuilderTermType.Document
-        )
+          (d) => !d.hidden && d.type !== QueryBuilderTermType.Document,
+        ),
       );
     }
 
@@ -194,7 +194,7 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
           this.pairForm.disable();
           this.args.setValue(def.args || []);
         }
-      })
+      }),
     );
 
     // when operator changes, setup type args
@@ -207,7 +207,7 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
           } else {
             this.pairArgs.setValue([]);
           }
-        })
+        }),
     );
   }
 
@@ -225,7 +225,7 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
       entry.pair
         ? this.entryTypes()[0]
         : this.entryTypes().find((t) => t.value === entry.operator?.value) ||
-            this.entryTypes()[0]
+            this.entryTypes()[0],
     );
 
     // set pair form

@@ -1,4 +1,11 @@
-import { Component, ElementRef, input, OnInit, signal, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  input,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -82,11 +89,26 @@ export class SearchComponent implements OnInit {
   public history: FormControl<string | null>;
   public form: FormGroup;
 
-  public readonly leftContextLabels = signal<string[]>(['5', '4', '3', '2', '1']);
-  public readonly rightContextLabels = signal<string[]>(['1', '2', '3', '4', '5']);
+  public readonly leftContextLabels = signal<string[]>([
+    '5',
+    '4',
+    '3',
+    '2',
+    '1',
+  ]);
+  public readonly rightContextLabels = signal<string[]>([
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+  ]);
   public readonly queryTabIndex = signal<number>(0);
 
-  constructor(private _repository: SearchRepository, formBuilder: FormBuilder) {
+  constructor(
+    private _repository: SearchRepository,
+    formBuilder: FormBuilder,
+  ) {
     this.query = formBuilder.control(null, [
       Validators.required,
       Validators.maxLength(1000),

@@ -61,20 +61,21 @@ export class TokenCountsComponent {
   public readonly total = signal(0);
   public readonly downloading = signal<boolean>(false);
 
-  constructor(private _clipboard: Clipboard, private _snackbar: MatSnackBar) {
-    effect(
-      () => {
-        const counts = this.counts();
-        if (counts && counts.length > 0) {
-          console.log('input counts', counts);
-          this.updateChart(counts);
-        } else {
-          // reset chart when no counts
-          this.chartOptions.set(null);
-          this.total.set(0);
-        }
+  constructor(
+    private _clipboard: Clipboard,
+    private _snackbar: MatSnackBar,
+  ) {
+    effect(() => {
+      const counts = this.counts();
+      if (counts && counts.length > 0) {
+        console.log('input counts', counts);
+        this.updateChart(counts);
+      } else {
+        // reset chart when no counts
+        this.chartOptions.set(null);
+        this.total.set(0);
       }
-    );
+    });
   }
 
   private updateChart(counts: TokenCount[]): void {

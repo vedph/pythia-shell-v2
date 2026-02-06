@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/pythia-document-list",
-  "version": "9.0.1",
+  "version": "9.0.2",
   "description": "Pythia - document list.",
   "keywords": [
     "Pythia"
@@ -19,11 +19,11 @@
     "@angular/material": "^20.0.0 || ^21.0.0",
     "@myrmidon/ngx-tools": "^2.0.2",
     "@myrmidon/auth-jwt-login": "^8.0.3",
-    "@myrmidon/cadmus-refs-lookup": "^10.0.6",
-    "@myrmidon/paged-data-browsers": "^5.1.2",
-    "@myrmidon/pythia-api": "^8.0.1",
-    "@myrmidon/pythia-core": "^8.0.0",
-    "@myrmidon/pythia-ui": "^8.0.0"
+    "@myrmidon/cadmus-refs-lookup": "^10.0.7",
+    "@myrmidon/paged-data-browsers": "^5.1.4",
+    "@myrmidon/pythia-api": "^8.0.2",
+    "@myrmidon/pythia-core": "^8.0.1",
+    "@myrmidon/pythia-ui": "^8.0.2"
   },
   "dependencies": {
     "tslib": "^2.3.0"

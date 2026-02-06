@@ -16,7 +16,7 @@
   "peerDependencies": {
     "@angular/common": "^20.0.0 || ^21.0.0",
     "@angular/core": "^20.0.0 || ^21.0.0",
-    "@myrmidon/pythia-core": "^8.0.0"
+    "@myrmidon/pythia-core": "^8.0.1"
   },
   "dependencies": {
     "tslib": "^2.3.0"

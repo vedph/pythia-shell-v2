@@ -80,7 +80,7 @@ export class QueryOpArgsComponent {
         // value is the arg's value being effectively edited
         value: this._formBuilder.control<string | null>(
           args[i].value ?? null,
-          validators
+          validators,
         ),
       });
       this.arguments.push(g);

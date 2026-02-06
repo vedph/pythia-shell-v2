@@ -20,6 +20,9 @@ interface StatEntry {
   value: number;
 }
 
+/**
+ * Component to display statistics about a Pythia index component.
+ */
 @Component({
   selector: 'pythia-stats',
   imports: [
@@ -42,7 +45,7 @@ export class PythiaStatsComponent implements OnInit {
   constructor(
     private _snackbar: MatSnackBar,
     private _statsService: StatsService,
-    private _localStorage: LocalStorageService
+    private _localStorage: LocalStorageService,
   ) {}
 
   ngOnInit(): void {
@@ -73,7 +76,7 @@ export class PythiaStatsComponent implements OnInit {
                   name: k,
                   value: stats[k],
                 };
-              })
+              }),
           );
           this._localStorage.store('pythia-stats', this.entries(), true);
         },

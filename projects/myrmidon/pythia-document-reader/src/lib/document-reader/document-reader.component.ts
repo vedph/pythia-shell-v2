@@ -17,6 +17,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { MapPagedTreeBrowserComponent } from '../map-paged-tree-browser/map-paged-tree-browser.component';
 
+/**
+ * Document text reader component.
+ */
 @Component({
   selector: 'pythia-document-reader',
   imports: [
@@ -61,7 +64,7 @@ export class DocumentReaderComponent {
 
   constructor(
     private _repository: DocumentReaderRepository,
-    private _readerService: ReaderService
+    private _readerService: ReaderService,
   ) {
     this.loading$ = _repository.loading$;
     this.document$ = _repository.document$;

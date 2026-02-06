@@ -23,20 +23,20 @@
     </thead>
     <tbody>
       @for (c of corpora(); track c; let i = $index) {
-      <tr>
-        <td>
-          <button
-            type="button"
-            class="mat-warn"
-            mat-icon-button
-            (click)="deleteCorpus(i)"
-          >
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-        <td>{{ c.id }}</td>
-        <td>{{ c.title }}</td>
-      </tr>
+        <tr>
+          <td>
+            <button
+              type="button"
+              class="mat-warn"
+              mat-icon-button
+              (click)="deleteCorpus(i)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+          <td>{{ c.id }}</td>
+          <td>{{ c.title }}</td>
+        </tr>
       }
     </tbody>
   </table>

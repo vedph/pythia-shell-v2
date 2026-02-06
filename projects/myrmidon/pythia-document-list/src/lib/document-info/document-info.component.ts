@@ -1,4 +1,3 @@
-import { trigger, transition, style, animate } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 
@@ -8,18 +7,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { Document } from '@myrmidon/pythia-core';
 
+/**
+ * Component used to display information about a document.
+ */
 @Component({
   selector: 'pythia-document-info',
   imports: [CommonModule, MatButtonModule, MatIconModule, MatTooltipModule],
   templateUrl: './document-info.component.html',
   styleUrls: ['./document-info.component.css'],
-  // https://stackoverflow.com/questions/47248898/angular-4-5-6-7-simple-example-of-slide-in-out-animation-on-ngif
-  animations: [
-    trigger('slideInOut', [
-      transition(':enter', [animate('200ms ease-in', style({ height: '*' }))]),
-      transition(':leave', [animate('200ms ease-in', style({ height: 0 }))]),
-    ]),
-  ],
 })
 export class DocumentInfoComponent {
   /**

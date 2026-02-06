@@ -11,6 +11,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { SearchService } from '@myrmidon/pythia-api';
 
+/**
+ * Search results export component.
+ */
 @Component({
   selector: 'pythia-search-export',
   imports: [
@@ -41,7 +44,7 @@ export class SearchExportComponent implements OnDestroy {
 
   constructor(
     private _searchService: SearchService,
-    private _snackbar: MatSnackBar
+    private _snackbar: MatSnackBar,
   ) {}
 
   public ngOnDestroy() {

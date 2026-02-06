@@ -85,14 +85,14 @@ export class QueryBuilderComponent {
 
   constructor(
     @Inject(QUERY_BUILDER_ATTR_DEFS_KEY)
-    attrDefinitions: QueryBuilderTermDef[]
+    attrDefinitions: QueryBuilderTermDef[],
   ) {
     this._queryBuilder = new QueryBuilder();
     this.attrDefinitions.set(
-      attrDefinitions.filter((d) => d.type !== QueryBuilderTermType.Document)
+      attrDefinitions.filter((d) => d.type !== QueryBuilderTermType.Document),
     );
     this.docAttrDefinitions.set(
-      attrDefinitions.filter((d) => d.type === QueryBuilderTermType.Document)
+      attrDefinitions.filter((d) => d.type === QueryBuilderTermType.Document),
     );
   }
 
@@ -102,7 +102,7 @@ export class QueryBuilderComponent {
 
   private updateHasErrors(): void {
     this.hasErrors.set(
-      this.set().errors?.length || this.docSet().errors?.length ? true : false
+      this.set().errors?.length || this.docSet().errors?.length ? true : false,
     );
   }
 

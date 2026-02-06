@@ -29,6 +29,9 @@ import {
 } from '../document-filter/document-filter.component';
 import { DocumentInfoComponent } from '../document-info/document-info.component';
 
+/**
+ * A list of documents with paging and filtering.
+ */
 @Component({
   selector: 'pythia-document-list',
   imports: [
@@ -70,7 +73,7 @@ export class DocumentListComponent {
   constructor(
     private _repository: DocumentRepository,
     private _snackbar: MatSnackBar,
-    private _corpusService: CorpusService
+    private _corpusService: CorpusService,
   ) {
     this.loading$ = _repository.loading$;
     this.activeDocument$ = _repository.activeDocument$;

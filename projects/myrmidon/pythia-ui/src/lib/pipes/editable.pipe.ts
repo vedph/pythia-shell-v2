@@ -4,6 +4,9 @@ import { HasUserId } from '@myrmidon/pythia-core';
 
 import { EditableCheckService } from '../services/editable-check.service';
 
+/**
+ * Pipe to check if an object with userId is editable.
+ */
 @Pipe({
   name: 'editable',
 })

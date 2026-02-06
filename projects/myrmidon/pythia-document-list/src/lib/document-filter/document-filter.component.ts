@@ -47,6 +47,9 @@ export interface DocumentFilters {
   attributes?: boolean;
 }
 
+/**
+ * Filters for the document list.
+ */
 @Component({
   selector: 'pythia-document-filter',
   imports: [

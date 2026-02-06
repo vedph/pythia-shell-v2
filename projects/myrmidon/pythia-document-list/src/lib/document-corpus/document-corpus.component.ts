@@ -27,6 +27,9 @@ export interface CorpusActionRequest {
   action: string;
 }
 
+/**
+ * Component used to add or remove a document to a corpus.
+ */
 @Component({
   selector: 'pythia-document-corpus',
   imports: [

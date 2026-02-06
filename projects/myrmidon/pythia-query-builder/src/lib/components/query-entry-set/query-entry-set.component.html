@@ -20,92 +20,97 @@
 </div>
 <table>
   <tbody>
-    @for ( e of entries$ | async; track e; let i = $index; let first = $first;
-    let last = $last) {
-    <tr [class.selected]="i === editedIndex()">
-      <td class="fit-width">
-        <span class="nr">{{ i + 1 }}. </span>
-        <button
-          type="button"
-          mat-icon-button
-          class="mat-primary"
-          i18n-matTooltip
-          matTooltip="Edit this entry"
-          (click)="editEntry(e, i)"
-        >
-          <mat-icon class="mat-primary">edit</mat-icon>
-        </button>
-        <button
-          type="button"
-          mat-icon-button
-          class="mat-primary"
-          i18n-matTooltip
-          matTooltip="Add a new entry before this one"
-          (click)="addEntry(i)"
-        >
-          <mat-icon class="mat-primary">control_point_duplicate</mat-icon>
-        </button>
-        <button
-          [disabled]="first"
-          mat-icon-button
-          type="button"
-          i18n-matTooltip
-          matTooltip="Move this entry up"
-          (click)="moveEntryUp(i)"
-        >
-          <mat-icon>arrow_upward</mat-icon>
-        </button>
-        <button
-          [disabled]="last"
-          mat-icon-button
-          type="button"
-          i18n-matTooltip
-          matTooltip="Move this entry down"
-          (click)="moveEntryDown(i)"
-        >
-          <mat-icon>arrow_downward</mat-icon>
-        </button>
-        <button
-          type="button"
-          mat-icon-button
-          class="mat-warn"
-          i18n-matTooltip
-          matTooltip="Delete this entry"
-          (click)="deleteEntry(i)"
-        >
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-      @if (e.pair) {
-      <td [class.error]="e.error" class="attr">
-        {{ e.pair.attribute.label }}
-      </td>
-      <td [class.error]="e.error" class="op">
-        {{ e.pair.operator.label }}
-      </td>
-      <td [class.error]="e.error" class="value">{{ e.pair.value }}</td>
-      } @else {
-      <td class="non-clause" [class.error]="e.error">
-        {{ e.operator?.label }}
-      </td>
-      <td [class.error]="e.error"></td>
-      <td [class.error]="e.error"></td>
-      }
-      <td>
-        @if (e.error) {
-        <mat-icon class="mat-warn" [matTooltip]="e.error">error</mat-icon>
+    @for (
+      e of entries$ | async;
+      track e;
+      let i = $index;
+      let first = $first;
+      let last = $last
+    ) {
+      <tr [class.selected]="i === editedIndex()">
+        <td class="fit-width">
+          <span class="nr">{{ i + 1 }}. </span>
+          <button
+            type="button"
+            mat-icon-button
+            class="mat-primary"
+            i18n-matTooltip
+            matTooltip="Edit this entry"
+            (click)="editEntry(e, i)"
+          >
+            <mat-icon class="mat-primary">edit</mat-icon>
+          </button>
+          <button
+            type="button"
+            mat-icon-button
+            class="mat-primary"
+            i18n-matTooltip
+            matTooltip="Add a new entry before this one"
+            (click)="addEntry(i)"
+          >
+            <mat-icon class="mat-primary">control_point_duplicate</mat-icon>
+          </button>
+          <button
+            [disabled]="first"
+            mat-icon-button
+            type="button"
+            i18n-matTooltip
+            matTooltip="Move this entry up"
+            (click)="moveEntryUp(i)"
+          >
+            <mat-icon>arrow_upward</mat-icon>
+          </button>
+          <button
+            [disabled]="last"
+            mat-icon-button
+            type="button"
+            i18n-matTooltip
+            matTooltip="Move this entry down"
+            (click)="moveEntryDown(i)"
+          >
+            <mat-icon>arrow_downward</mat-icon>
+          </button>
+          <button
+            type="button"
+            mat-icon-button
+            class="mat-warn"
+            i18n-matTooltip
+            matTooltip="Delete this entry"
+            (click)="deleteEntry(i)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+        @if (e.pair) {
+          <td [class.error]="e.error" class="attr">
+            {{ e.pair.attribute.label }}
+          </td>
+          <td [class.error]="e.error" class="op">
+            {{ e.pair.operator.label }}
+          </td>
+          <td [class.error]="e.error" class="value">{{ e.pair.value }}</td>
+        } @else {
+          <td class="non-clause" [class.error]="e.error">
+            {{ e.operator?.label }}
+          </td>
+          <td [class.error]="e.error"></td>
+          <td [class.error]="e.error"></td>
         }
-      </td>
-    </tr>
+        <td>
+          @if (e.error) {
+            <mat-icon class="mat-warn" [matTooltip]="e.error">error</mat-icon>
+          }
+        </td>
+      </tr>
     }
   </tbody>
 </table>
 @if (errors$ | async; as errors) {
-<ul>
-  @for (e of errors; track e) {
-  <li class="error">{{ e }}</li>
-  }
-</ul>
+  <ul>
+    @for (e of errors; track e) {
+      <li class="error">{{ e }}</li>
+    }
+  </ul>
 }
 <mat-expansion-panel [expanded]="editedEntry()" [disabled]="!editedEntry()">
   <mat-expansion-panel-header

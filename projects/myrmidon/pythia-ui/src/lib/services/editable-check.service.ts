@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { AuthJwtService } from '@myrmidon/auth-jwt-login';
 import { HasUserId } from '@myrmidon/pythia-core';
 
+/**
+ * Service to check if an object with userId is editable.
+ */
 @Injectable({
   providedIn: 'root',
 })
