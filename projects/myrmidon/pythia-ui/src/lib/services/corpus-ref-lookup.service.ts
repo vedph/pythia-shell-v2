@@ -18,6 +18,11 @@ import { Corpus } from '@myrmidon/pythia-core';
 })
 export class CorpusRefLookupService implements RefLookupService {
   constructor(private _corpusService: CorpusService) {}
+  public readonly id: string = 'corpus';
+
+  getById(id: string): Observable<any | undefined> {
+    return this._corpusService.getCorpus(id, true);
+  }
 
   lookup(filter: RefLookupFilter, options?: any): Observable<Corpus[]> {
     return this._corpusService

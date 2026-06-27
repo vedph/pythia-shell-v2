@@ -1,4 +1,4 @@
-import { Component, input, model, output } from '@angular/core';
+import { Component, input, model, output, ChangeDetectionStrategy } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -29,6 +29,7 @@ import { CorpusRefLookupService } from '@myrmidon/pythia-ui';
     RefLookupComponent,
   ],
   templateUrl: './corpus-set.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./corpus-set.component.css'],
 })
 export class CorpusSetComponent {

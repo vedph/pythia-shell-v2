@@ -1,4 +1,4 @@
-import { Component, Inject, input, output, signal } from '@angular/core';
+import { Component, Inject, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -43,6 +43,7 @@ export const QUERY_BUILDER_ATTR_DEFS_KEY = 'pythiaQueryBuilderAttrDefs';
     QueryEntrySetComponent,
   ],
   templateUrl: './query-builder.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./query-builder.component.css'],
 })
 export class QueryBuilderComponent {

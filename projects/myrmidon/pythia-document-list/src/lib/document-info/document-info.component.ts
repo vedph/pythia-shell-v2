@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +14,7 @@ import { Document } from '@myrmidon/pythia-core';
   selector: 'pythia-document-info',
   imports: [CommonModule, MatButtonModule, MatIconModule, MatTooltipModule],
   templateUrl: './document-info.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./document-info.component.css'],
 })
 export class DocumentInfoComponent {

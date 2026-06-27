@@ -1,4 +1,4 @@
-import { Component, input, OnInit, output, signal } from '@angular/core';
+import { Component, input, OnInit, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -44,6 +44,7 @@ import {
     PagedWordTreeFilterComponent,
   ],
   templateUrl: './paged-word-tree-browser.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './paged-word-tree-browser.component.scss',
 })
 export class PagedWordTreeBrowserComponent implements OnInit {

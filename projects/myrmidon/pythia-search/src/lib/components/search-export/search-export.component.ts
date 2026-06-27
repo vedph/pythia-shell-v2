@@ -1,4 +1,4 @@
-import { Component, input, Input, OnDestroy, signal } from '@angular/core';
+import { Component, input, Input, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -25,6 +25,7 @@ import { SearchService } from '@myrmidon/pythia-api';
     MatTooltipModule,
   ],
   templateUrl: './search-export.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './search-export.component.scss',
 })
 export class SearchExportComponent implements OnDestroy {

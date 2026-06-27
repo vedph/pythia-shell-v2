@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -36,6 +36,7 @@ interface StatEntry {
     MatTooltipModule,
   ],
   templateUrl: './pythia-stats.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./pythia-stats.component.css'],
 })
 export class PythiaStatsComponent implements OnInit {

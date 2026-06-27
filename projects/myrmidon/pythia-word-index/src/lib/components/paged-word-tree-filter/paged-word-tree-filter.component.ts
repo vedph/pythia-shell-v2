@@ -7,6 +7,7 @@ import {
   model,
   Optional,
   signal,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import {
   FormBuilder,
@@ -70,6 +71,7 @@ const DEFAULT_SORT_ORDER_ENTRIES: WordTreeFilterSortOrderEntry[] = [
     MatTooltipModule,
   ],
   templateUrl: './paged-word-tree-filter.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './paged-word-tree-filter.component.scss',
 })
 export class PagedWordTreeFilterComponent {

@@ -1,4 +1,4 @@
-import { Component, effect, model, output, signal } from '@angular/core';
+import { Component, effect, model, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -47,6 +47,7 @@ export interface EditedCorpus extends Corpus {
     RefLookupComponent,
   ],
   templateUrl: './corpus-editor.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./corpus-editor.component.css'],
 })
 export class CorpusEditorComponent {

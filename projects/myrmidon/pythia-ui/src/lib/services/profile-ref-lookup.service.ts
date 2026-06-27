@@ -18,6 +18,11 @@ import { Profile } from '@myrmidon/pythia-core';
 })
 export class ProfileRefLookupService implements RefLookupService {
   constructor(private _profileService: ProfileService) {}
+  public readonly id: string = 'profile';
+
+  getById(id: string): Observable<any | undefined> {
+    return this._profileService.getProfile(id);
+  }
 
   lookup(filter: RefLookupFilter, options?: any): Observable<Profile[]> {
     return this._profileService

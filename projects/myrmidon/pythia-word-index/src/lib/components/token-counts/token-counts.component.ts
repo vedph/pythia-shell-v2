@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, input, signal } from '@angular/core';
+import { Component, effect, input, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -39,6 +39,7 @@ import { PercentagePipe } from '../../pipes/percentage.pipe';
   ],
   providers: [provideEchartsCore({ echarts })],
   templateUrl: './token-counts.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './token-counts.component.scss',
 })
 export class TokenCountsComponent {

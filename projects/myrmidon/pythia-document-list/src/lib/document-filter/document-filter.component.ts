@@ -1,4 +1,4 @@
-import { Component, model, effect, input } from '@angular/core';
+import { Component, model, effect, input, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -67,6 +67,7 @@ export interface DocumentFilters {
     RefLookupComponent,
   ],
   templateUrl: './document-filter.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./document-filter.component.css'],
 })
 export class DocumentFilterComponent {

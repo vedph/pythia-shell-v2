@@ -1,4 +1,4 @@
-import { Component, effect, input, Input, model, signal } from '@angular/core';
+import { Component, effect, input, Input, model, signal, ChangeDetectionStrategy } from '@angular/core';
 import { take } from 'rxjs';
 
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -34,6 +34,7 @@ import { TokenCountsComponent } from '../token-counts/token-counts.component';
     TokenCountsComponent,
   ],
   templateUrl: './token-counts-list.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './token-counts-list.component.scss',
 })
 export class TokenCountsListComponent {

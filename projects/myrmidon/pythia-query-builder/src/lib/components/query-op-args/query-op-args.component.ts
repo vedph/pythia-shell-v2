@@ -1,4 +1,4 @@
-import { Component, effect, model, output } from '@angular/core';
+import { Component, effect, model, output, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -29,6 +29,7 @@ import { QueryBuilderTermDefArg } from '../../query-builder';
     MatTooltipModule,
   ],
   templateUrl: './query-op-args.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./query-op-args.component.css'],
 })
 export class QueryOpArgsComponent {

@@ -1,4 +1,4 @@
-import { Component, output, signal } from '@angular/core';
+import { Component, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -43,6 +43,7 @@ export interface CorpusActionRequest {
     RefLookupComponent,
   ],
   templateUrl: './document-corpus.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./document-corpus.component.css'],
 })
 export class DocumentCorpusComponent {

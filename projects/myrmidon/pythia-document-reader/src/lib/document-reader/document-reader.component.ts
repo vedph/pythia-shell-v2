@@ -1,4 +1,4 @@
-import { Component, effect, input, ViewEncapsulation } from '@angular/core';
+import { Component, effect, input, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ReaderService } from '@myrmidon/pythia-api';
@@ -35,6 +35,7 @@ import { MapPagedTreeBrowserComponent } from '../map-paged-tree-browser/map-page
   ],
   templateUrl: './document-reader.component.html',
   styleUrls: ['./document-reader.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   encapsulation: ViewEncapsulation.None,
 })
 export class DocumentReaderComponent {

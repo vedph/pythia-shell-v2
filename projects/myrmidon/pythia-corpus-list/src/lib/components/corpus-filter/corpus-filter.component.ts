@@ -1,4 +1,4 @@
-import { Component, effect, input, model, output } from '@angular/core';
+import { Component, effect, input, model, output, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -29,6 +29,7 @@ import { CorpusFilter } from '@myrmidon/pythia-api';
     MatTooltipModule,
   ],
   templateUrl: './corpus-filter.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./corpus-filter.component.css'],
 })
 export class CorpusFilterComponent {

@@ -7,6 +7,7 @@ import {
   OnInit,
   output,
   signal,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import {
   FormBuilder,
@@ -63,6 +64,7 @@ interface GroupedQueryBuilderTermDefs {
     QueryOpArgsComponent,
   ],
   templateUrl: './query-entry.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./query-entry.component.css'],
 })
 export class QueryEntryComponent implements OnInit, OnDestroy {

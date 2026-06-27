@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, input, OnDestroy, output } from '@angular/core';
+import { Component, effect, input, OnDestroy, output, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -48,6 +48,7 @@ import {
     BrowserTreeNodeComponent,
   ],
   templateUrl: './map-paged-tree-browser.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './map-paged-tree-browser.component.scss',
 })
 export class MapPagedTreeBrowserComponent implements OnDestroy {

@@ -104,6 +104,9 @@ graph LR;
 
 ## History
 
+- 2026-06-26:
+  - updated Angular and packages.
+  - implemented missing members in lookup services.
 - 2026-02-06:
   - updated Angular and packages.
   - minor improvements.
