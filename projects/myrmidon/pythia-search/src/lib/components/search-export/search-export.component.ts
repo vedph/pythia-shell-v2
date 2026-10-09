@@ -1,4 +1,4 @@
-import { Component, input, Input, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -61,6 +61,7 @@ export class SearchExportComponent implements OnDestroy {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   }
 
   public exportCsv() {

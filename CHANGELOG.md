@@ -33,6 +33,8 @@
     - `pythia-query-builder`, `CorpusSetComponent`: the duplicate check compared each corpus with itself, so only one corpus could be added to the set; the lookup user filter was passed the signal function instead of its value.
     - `pythia-query-builder`, `QueryOpArgsComponent`: `min: 0` constraints were ignored (allowing negative distances), and the numeric pattern accepted any character as decimal separator.
     - `pythia-query-builder`: "too long" value error key fixed (`maxlength`); added accessible names to icon-only buttons.
+    - `pythia-search`, `SearchRepository`: a failed search request (e.g. server or network error) left the progress bar spinning forever, with no error shown and an unhandled promise rejection; the error is now shown and loading stops. Same page size cache issue as the other lists.
+    - `pythia-search`: reading in context a hit at the very beginning of a document (index 0) now works (see the `pythia-document-reader` fix); "query too long" error key fixed; the CSV export now releases its object URL; added accessible names to icon-only buttons and table headers.
 - 2026-08-27: updated packages.
 
 ## 9.0.0

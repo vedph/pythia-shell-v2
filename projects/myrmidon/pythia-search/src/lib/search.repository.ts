@@ -91,8 +91,15 @@ export class SearchRepository
     return this._searchService
       .search(query, filter.contextSize, pageNumber, pageSize)
       .pipe(
-        tap(() => {
-          this._loading$.next(false);
+        tap({
+          next: () => this._loading$.next(false),
+          // e.g. network or server errors (syntax errors are in the result)
+          error: (error) => {
+            this._loading$.next(false);
+            this._error$.next(
+              typeof error === 'string' ? error : $localize`Search failed`,
+            );
+          },
         }),
         map((r) => {
           this._query$.next(query);
@@ -126,11 +133,20 @@ export class SearchRepository
   }
 
   public setFilter(filter: KwicSearchFilter): void {
-    this._store.setFilter(filter);
+    this._store.setFilter(filter).catch(() => {
+      // error already notified via error$
+    });
   }
 
   public setPage(pageNumber: number, pageSize: number): void {
-    this._store.setPage(pageNumber, pageSize);
+    // cached pages are keyed by number and filter only, so they are stale
+    // when the page size changes
+    if (pageSize !== this._store.pageSize) {
+      this._store.clearCache();
+    }
+    this._store.setPage(pageNumber, pageSize).catch(() => {
+      // error already notified via error$
+    });
   }
 
   public addToHistory(query: string): void {
