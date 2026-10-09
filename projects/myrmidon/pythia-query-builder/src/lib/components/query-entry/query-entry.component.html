@@ -74,7 +74,7 @@
             <mat-error i18n>value required</mat-error>
           }
           @if (
-            $any(value).errors?.maxLength && (value.dirty || value.touched)
+            $any(value).errors?.maxlength && (value.dirty || value.touched)
           ) {
             <mat-error i18n>value too long</mat-error>
           }
@@ -91,10 +91,23 @@
   }
 
   <div>
-    <button type="button" class="mat-warn" mat-icon-button (click)="close()">
+    <button
+      type="button"
+      class="mat-warn"
+      mat-icon-button
+      (click)="close()"
+      i18n-aria-label
+      aria-label="Close"
+    >
       <mat-icon>clear</mat-icon>
     </button>
-    <button type="submit" class="mat-primary" mat-icon-button>
+    <button
+      type="submit"
+      class="mat-primary"
+      mat-icon-button
+      i18n-aria-label
+      aria-label="Save entry"
+    >
       <mat-icon>check_circle</mat-icon>
     </button>
   </div>

@@ -54,7 +54,7 @@ export class CorpusSetComponent {
       return;
     }
     const corpora = [...this.corpora()];
-    if (corpora.find((c) => c.id === c.id)) {
+    if (corpora.find((x) => x.id === c.id)) {
       return;
     }
     corpora.push(c);

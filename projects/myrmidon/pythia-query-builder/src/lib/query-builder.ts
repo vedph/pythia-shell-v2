@@ -239,7 +239,8 @@ export const QUERY_PAIR_OP_DEFS: QueryBuilderTermDef[] = [
   },
   {
     value: '<=',
-    label: $localize`d) less-than or equal`,
+    label: $localize`less-than or equal`,
+    group: $localize`d) numeric`,
   },
   {
     value: '==',
@@ -767,7 +768,9 @@ export class QueryBuilder {
         // - location operators must not be in documents, and must be between pairs
         // - a pair cannot follow another pair
         // - () must be balanced
-        let depth = 0;
+        // the first entry may be an opening bracket
+        let depth = entry.operator?.value === '(' ? 1 : 0;
+        let unbalanced = false;
         for (let i = 1; i < entries.length; i++) {
           entry = entries[i];
           const prevEntry = entries[i - 1];
@@ -775,7 +778,11 @@ export class QueryBuilder {
           switch (entry.operator?.value) {
             case '(':
               depth++;
-              if (prevEntry.pair || prevEntry.operator?.value === '(') {
+              if (
+                prevEntry.pair ||
+                prevEntry.operator?.value === ')' ||
+                QueryBuilder.isLocOperator(prevEntry.operator?.value)
+              ) {
                 entry.error = $localize`Unexpected entry type`;
                 break;
               }
@@ -786,6 +793,10 @@ export class QueryBuilder {
               break;
             case ')':
               depth--;
+              // a closing bracket cannot precede its opening one
+              if (depth < 0) {
+                unbalanced = true;
+              }
               if (!prevEntry.pair && prevEntry.operator?.value !== ')') {
                 entry.error = $localize`Unexpected entry type`;
               }
@@ -808,7 +819,7 @@ export class QueryBuilder {
               break;
             default: // location or pair
               if (entry.pair) {
-                if (prevEntry.pair) {
+                if (prevEntry.pair || prevEntry.operator?.value === ')') {
                   entry.error = $localize`Pairs not connected by operator`;
                   break;
                 }
@@ -831,11 +842,18 @@ export class QueryBuilder {
           }
         }
         // balancement
-        if (depth) {
+        if (depth || unbalanced) {
           errors.push($localize`Unbalanced parentheses`);
         }
         break;
     }
+
+    // values are delimited by double quotes, which cannot be escaped
+    entries.forEach((e) => {
+      if (!e.error && e.pair?.value?.includes('"')) {
+        e.error = $localize`Value cannot contain double quotes`;
+      }
+    });
 
     // prepend entry-related errors
     for (let i = 0; i < entries.length; i++) {
@@ -857,27 +875,31 @@ export class QueryBuilder {
    */
   public addEntry(entry: QueryBuilderEntry, index = -1, insert = false): void {
     const entries = [...this._entries$.value];
+    const and = (): QueryBuilderEntry => ({
+      operator: QUERY_OP_DEFS.find((op) => op.value === 'AND')!,
+    });
 
-    // if clause, prepend AND if none
-    if (entry.pair) {
-      const prevEntry = entries.length
-        ? entries[index === -1 ? entries.length - 1 : index - 1]
-        : undefined;
-      if (prevEntry && prevEntry.pair) {
-        entries.push({
-          operator: QUERY_OP_DEFS.find((op) => op.value === 'AND')!,
-        });
-      }
-    }
     // append, insert or replace
     if (index === -1) {
-      entries.push(entry);
-    } else {
-      if (insert) {
-        entries.splice(index, 0, entry);
-      } else {
-        entries.splice(index, 1, entry);
+      // when appending a clause after a clause, connect them with AND
+      if (entry.pair && entries[entries.length - 1]?.pair) {
+        entries.push(and());
       }
+      entries.push(entry);
+    } else if (insert) {
+      // when inserting a clause next to clauses, connect them with AND
+      const toInsert: QueryBuilderEntry[] = [entry];
+      if (entry.pair) {
+        if (index > 0 && entries[index - 1]?.pair) {
+          toInsert.unshift(and());
+        }
+        if (entries[index]?.pair) {
+          toInsert.push(and());
+        }
+      }
+      entries.splice(index, 0, ...toInsert);
+    } else {
+      entries.splice(index, 1, entry);
     }
     // validate
     const errors = this.validate(entries);
@@ -965,12 +987,16 @@ export class QueryBuilder {
     min = 'n',
     max = 'm',
   ): void {
+    // args may be present without a value (e.g. when just copied
+    // from their definitions)
     let arg = args.find((a) => a.id === min);
     if (!arg) {
       args.push({
         id: min,
         value: '0',
       });
+    } else if (!arg.value) {
+      arg.value = '0';
     }
     arg = args.find((a) => a.id === max);
     if (!arg) {
@@ -978,6 +1004,8 @@ export class QueryBuilder {
         id: max,
         value: '2147483647', // int.MaxValue
       });
+    } else if (!arg.value) {
+      arg.value = '2147483647';
     }
   }
 
@@ -1009,7 +1037,7 @@ export class QueryBuilder {
 
     // s cannot be used with NOT
     let arg = entry.opArgs.find((a) => a.id === 's');
-    if (arg && entry.operator?.value.startsWith('NOT ')) {
+    if (arg?.value && entry.operator?.value.startsWith('NOT ')) {
       entry.error = $localize`Argument s cannot be used with NOT.`;
     }
 
@@ -1042,7 +1070,7 @@ export class QueryBuilder {
 
     // s cannot be used with NOT
     let arg = entry.opArgs.find((a) => a.id === 's');
-    if (arg && entry.operator?.value.startsWith('NOT ')) {
+    if (arg?.value && entry.operator?.value.startsWith('NOT ')) {
       entry.error = $localize`Argument s cannot be used with NOT.`;
     }
 
@@ -1063,7 +1091,7 @@ export class QueryBuilder {
         (a) => a.id === keys[i],
       )?.value;
       if (v) {
-        if (i) {
+        if (found.length) {
           sb.push(',');
         }
         sb.push(keys[i]);
@@ -1141,17 +1169,18 @@ export class QueryBuilder {
         }
         sb.push(pair.attribute.value);
         sb.push(pair.operator.value);
-        sb.push(`"${pair.value}"`);
+        sb.push('"');
+        sb.push(pair.value);
         // special case for fuzzy (the only pair op with args):
-        // syntax there is like [value%="chommoda:0.75"]
+        // the treshold is inside the value, like [value%="chommoda:0.75"]
         if (pair.operator.value === '%=') {
           const arg = pair.opArgs?.find((a) => a.id === 't');
-          if (arg) {
+          if (arg?.value) {
             sb.push(':');
-            sb.push(arg.value!);
+            sb.push(arg.value);
           }
         }
-        sb.push(']');
+        sb.push('"]');
       } else {
         // (b) location or logical operator
         if (QueryBuilder.isLocOperator(entries[i].operator?.value)) {

@@ -65,12 +65,12 @@ export class QueryOpArgsComponent {
         validators.push(Validators.required);
       }
       if (args[i].numeric) {
-        validators.push(Validators.pattern('-?[0-9]+(?:.[0-9]+)?'));
+        validators.push(Validators.pattern('-?[0-9]+(?:\\.[0-9]+)?'));
       }
-      if (args[i].min) {
+      if (args[i].min !== undefined) {
         validators.push(Validators.min(+args[i].min!));
       }
-      if (args[i].max) {
+      if (args[i].max !== undefined) {
         validators.push(Validators.max(+args[i].max!));
       }
       const g = this._formBuilder.group({

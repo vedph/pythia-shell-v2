@@ -3,11 +3,20 @@
   <div class="form-row">
     <cadmus-refs-lookup
       [service]="corpusLookupService"
-      [baseFilter]="{ userId: userId }"
+      [baseFilter]="{ userId: userId() }"
       label="corpus"
       (itemChange)="onCorpusChange($event)"
     />
-    <button type="button" mat-icon-button class="mat-warn" (click)="clear()">
+    <button
+      type="button"
+      mat-icon-button
+      class="mat-warn"
+      (click)="clear()"
+      i18n-matTooltip
+      matTooltip="Remove all corpora"
+      i18n-aria-label
+      aria-label="Remove all corpora"
+    >
       <mat-icon class="mat-warn">clear</mat-icon>
     </button>
   </div>
@@ -16,7 +25,7 @@
   <table>
     <thead>
       <tr>
-        <th></th>
+        <th><span class="cdk-visually-hidden" i18n>actions</span></th>
         <th>ID</th>
         <th i18n>title</th>
       </tr>
@@ -30,6 +39,10 @@
               class="mat-warn"
               mat-icon-button
               (click)="deleteCorpus(i)"
+              i18n-matTooltip
+              matTooltip="Remove this corpus"
+              i18n-aria-label
+              aria-label="Remove corpus"
             >
               <mat-icon>delete</mat-icon>
             </button>
