@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { ReactiveFormsModule } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -18,7 +17,6 @@ import { AuthJwtRegistrationComponent } from '@myrmidon/auth-jwt-admin';
   templateUrl: './register-user-page.component.html',
   styleUrls: ['./register-user-page.component.css'],
   imports: [
-    ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
     MatFormFieldModule,

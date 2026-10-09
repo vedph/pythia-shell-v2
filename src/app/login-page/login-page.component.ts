@@ -1,7 +1,5 @@
-
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -22,15 +20,14 @@ import {
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.css'],
   imports: [
-    ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
     MatTooltipModule,
-    AuthJwtLoginComponent
-],
+    AuthJwtLoginComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginPageComponent {
@@ -40,7 +37,7 @@ export class LoginPageComponent {
   constructor(
     private _authService: AuthJwtService,
     private _router: Router,
-    private _snackbar: MatSnackBar
+    private _snackbar: MatSnackBar,
   ) {}
 
   public onLoginRequest(credentials: Credentials): void {
@@ -48,7 +45,6 @@ export class LoginPageComponent {
 
     this._authService.login(credentials.name, credentials.password).subscribe({
       next: (user) => {
-        console.log('User logged in', user);
         this._router.navigate([credentials.returnUrl || '/home']);
       },
       error: (error) => {

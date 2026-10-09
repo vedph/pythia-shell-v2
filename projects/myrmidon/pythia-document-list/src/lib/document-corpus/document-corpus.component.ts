@@ -1,11 +1,11 @@
-import { Component, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  output,
+  signal,
+} from '@angular/core';
+import { FormField, form, maxLength, required } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,7 +33,7 @@ export interface CorpusActionRequest {
 @Component({
   selector: 'pythia-document-corpus',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
@@ -43,56 +43,45 @@ export interface CorpusActionRequest {
     RefLookupComponent,
   ],
   templateUrl: './document-corpus.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./document-corpus.component.css'],
 })
 export class DocumentCorpusComponent {
-  public corpusId: FormControl<string | null>;
-  public action: FormControl<string | null>;
-  public form: FormGroup;
+  private readonly _editableCheckService = inject(EditableCheckService);
+  private readonly _authService = inject(AuthJwtService);
+  public readonly corpusRefLookupService = inject(CorpusRefLookupService);
 
   public readonly corpusAction = output<CorpusActionRequest>();
-  public readonly baseFilter = signal<CorpusFilter | undefined>(undefined);
+
+  // preset userId filter for corpus lookup
+  public readonly baseFilter = signal<CorpusFilter | undefined>({
+    userId: this._authService.isCurrentUserInRole('admin')
+      ? undefined
+      : this._authService.currentUserValue?.userName,
+  });
   public readonly editable = signal<boolean>(false);
 
-  constructor(
-    formBuilder: FormBuilder,
-    public corpusRefLookupService: CorpusRefLookupService,
-    private _editableCheckService: EditableCheckService,
-    authService: AuthJwtService
-  ) {
-    // form
-    this.corpusId = formBuilder.control(null, [
-      Validators.required,
-      Validators.maxLength(50),
-    ]);
-    this.action = formBuilder.control('add-filtered', Validators.required);
-    this.form = formBuilder.group({
-      corpusId: this.corpusId,
-      action: this.action,
-    });
-    // preset userId filter for corpus lookup (used in cloner)
-    this.baseFilter.set({
-      userId: authService.isCurrentUserInRole('admin')
-        ? undefined
-        : authService.currentUserValue?.userName,
-    });
-  }
+  // corpusId is not bound to a control: it is set from the corpus lookup
+  private readonly _draft = signal({ corpusId: '', action: 'add-filtered' });
+
+  public readonly form = form(this._draft, (path) => {
+    required(path.corpusId);
+    maxLength(path.corpusId, 50);
+    required(path.action);
+  });
 
   public onCorpusChange(corpus: unknown): void {
-    this.corpusId.setValue((corpus as Corpus | undefined)?.id || null);
-    this.editable.set(this._editableCheckService.isEditable(
-      corpus as Corpus | undefined
-    ));
+    this.form.corpusId().value.set((corpus as Corpus | undefined)?.id || '');
+    this.editable.set(
+      this._editableCheckService.isEditable(corpus as Corpus | undefined),
+    );
   }
 
   public apply(): void {
-    if (this.form.invalid || !this.editable()) {
+    if (this.form().invalid() || !this.editable()) {
       return;
     }
-    this.corpusAction.emit({
-      corpusId: this.corpusId.value?.trim() || '',
-      action: this.action.value || '',
-    });
+    const { corpusId, action } = this._draft();
+    this.corpusAction.emit({ corpusId: corpusId.trim(), action });
   }
 }

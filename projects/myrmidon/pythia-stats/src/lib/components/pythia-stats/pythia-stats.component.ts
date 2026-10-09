@@ -36,7 +36,7 @@ interface StatEntry {
     MatTooltipModule,
   ],
   templateUrl: './pythia-stats.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./pythia-stats.component.css'],
 })
 export class PythiaStatsComponent implements OnInit {

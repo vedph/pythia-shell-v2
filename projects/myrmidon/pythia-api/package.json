@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/pythia-api",
-  "version": "9.0.0",
+  "version": "11.0.0",
   "description": "Pythia - API services.",
   "keywords": [
     "Pythia"
@@ -14,9 +14,9 @@
     "name": "Daniele Fusi"
   },
   "peerDependencies": {
-    "@angular/common": "^22.0.3",
-    "@angular/core": "^22.0.3",
-    "@myrmidon/pythia-core": "^8.0.2"
+    "@angular/common": "^22.2.1",
+    "@angular/core": "^22.2.1",
+    "@myrmidon/pythia-core": "^11.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

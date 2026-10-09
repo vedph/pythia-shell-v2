@@ -1,76 +1,46 @@
-<form [formGroup]="form" (submit)="save()">
+<div>
   @if (args()) {
     <fieldset>
       <legend i18n>arguments</legend>
-      <div formArrayName="arguments" class="form-row">
-        @for (
-          g of arguments.controls;
-          track g;
-          let i = $index;
-          let first = $first;
-          let last = $last
-        ) {
+      <div class="form-row">
+        @for (g of form.args; track g) {
+          @let def = g.def().value();
+          @let value = g.value();
           <div>
-            <!-- child form -->
-            <div [formGroupName]="i">
-              <mat-form-field class="arg">
-                <mat-label>{{
-                  $any(g)["controls"].def.value.label ??
-                    $any(g)["controls"].def.value.id
-                }}</mat-label>
-                <input
-                  matInput
-                  formControlName="value"
-                  [type]="
-                    $any(g)['controls'].def.value.numeric ? 'number' : 'text'
-                  "
-                />
-                @if (
-                  $any(g)["controls"].value.errors?.required &&
-                  ($any(g)["controls"].value.dirty ||
-                    $any(g)["controls"].value.touched)
-                ) {
-                  <mat-error i18n>value required</mat-error>
-                }
-                @if (
-                  $any(g)["controls"].value.errors?.maxLength &&
-                  ($any(g)["controls"].value.dirty ||
-                    $any(g)["controls"].value.touched)
-                ) {
-                  <mat-error i18n>value too long</mat-error>
-                }
-                @if (
-                  $any(g)["controls"].value.errors?.min &&
-                  ($any(g)["controls"].value.dirty ||
-                    $any(g)["controls"].value.touched)
-                ) {
-                  <mat-error i18n>value too low</mat-error>
-                }
-                @if (
-                  $any(g)["controls"].value.errors?.max &&
-                  ($any(g)["controls"].value.dirty ||
-                    $any(g)["controls"].value.touched)
-                ) {
-                  <mat-error i18n>value too big</mat-error>
-                }
-                @if (
-                  $any(g)["controls"].value.errors?.pattern &&
-                  ($any(g)["controls"].value.dirty ||
-                    $any(g)["controls"].value.touched)
-                ) {
-                  <mat-error i18n>invalid value</mat-error>
-                }
-              </mat-form-field>
-            </div>
+            <mat-form-field class="arg">
+              <mat-label>{{ def.label ?? def.id }}</mat-label>
+              <input
+                matInput
+                [formField]="g.value"
+                [type]="def.numeric ? 'number' : 'text'"
+                (keydown.enter)="onEnter()"
+              />
+              @if (value.getError("required") && (value.dirty() || value.touched())) {
+                <mat-error i18n>value required</mat-error>
+              }
+              @if (value.getError("min") && (value.dirty() || value.touched())) {
+                <mat-error i18n>value too low</mat-error>
+              }
+              @if (value.getError("max") && (value.dirty() || value.touched())) {
+                <mat-error i18n>value too big</mat-error>
+              }
+              @if (
+                (value.getError("pattern") || value.getError("parse")) &&
+                (value.dirty() || value.touched())
+              ) {
+                <mat-error i18n>invalid value</mat-error>
+              }
+            </mat-form-field>
           </div>
         }
       </div>
       <div>
         <button
-          type="submit"
+          type="button"
           mat-icon-button
           class="mat-primary"
-          [disabled]="form.invalid || form.pristine"
+          [disabled]="form().invalid() || !form().dirty()"
+          (click)="save()"
           i18n-matTooltip
           matTooltip="Save arguments"
           i18n-aria-label
@@ -81,4 +51,4 @@
       </div>
     </fieldset>
   }
-</form>
+</div>

@@ -1,6 +1,5 @@
 import { Component, input, OnInit, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import { MatDialog } from '@angular/material/dialog';
@@ -31,7 +30,6 @@ import {
   selector: 'pythia-paged-word-tree-browser',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
     MatFormFieldModule,
@@ -44,7 +42,7 @@ import {
     PagedWordTreeFilterComponent,
   ],
   templateUrl: './paged-word-tree-browser.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './paged-word-tree-browser.component.scss',
 })
 export class PagedWordTreeBrowserComponent implements OnInit {

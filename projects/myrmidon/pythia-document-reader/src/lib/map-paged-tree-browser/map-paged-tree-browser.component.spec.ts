@@ -122,6 +122,32 @@ describe('MapPagedTreeBrowserComponent', () => {
     ).toBe('');
   });
 
+  it('should enable clear at once but filter only after a pause', async () => {
+    const { user, fixture } = await setup();
+    await user.click(within(treeNode('root')).getByRole('button'));
+    await screen.findByText(/book 1/);
+
+    await user.type(screen.getByRole('textbox', { name: 'filter' }), '2');
+    fixture.detectChanges();
+    // the control value is immediate...
+    expect(
+      (screen.getByRole('button', { name: 'Clear filter' }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(false);
+    // ...the filter is not applied yet
+    expect(screen.queryByText(/book 1/)).toBeTruthy();
+    expect(fixture.componentInstance.filterForm.label().value()).toBe('');
+
+    await vi.waitFor(() =>
+      expect(fixture.componentInstance.filterForm.label().value()).toBe('2'),
+    );
+  });
+
+  it('should render no <form> element', async () => {
+    const { fixture } = await setup();
+    expect(fixture.nativeElement.querySelector('form')).toBeNull();
+  });
+
   it('should clear the tree when map is removed', async () => {
     const { map, fixture } = await setup();
     map.set(undefined);

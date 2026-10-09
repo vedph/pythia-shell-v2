@@ -54,8 +54,10 @@ async function setup(options: SetupOptions = {}) {
   };
 }
 
-const idBox = () => screen.getByRole('textbox', { name: /^ID/ });
-const titleBox = () => screen.getByRole('textbox', { name: /title/i });
+const idBox = () =>
+  screen.getByRole('textbox', { name: /^ID/ }) as HTMLInputElement;
+const titleBox = () =>
+  screen.getByRole('textbox', { name: /title/i }) as HTMLInputElement;
 const descriptionBox = () =>
   screen.getByRole('textbox', { name: /description/i });
 const saveButton = () => screen.getByRole('button', { name: 'Save corpus' });
@@ -160,31 +162,48 @@ describe('CorpusEditorComponent', () => {
     expect(corpusChange).not.toHaveBeenCalled();
   });
 
-  it('should show an error when title is too long', async () => {
+  // signal forms project maxLength onto the native maxlength attribute, so
+  // typing is capped; the error still shows for an over-long bound value
+  it('should cap typing in title at its max length', async () => {
     const { user } = await setup({
-      corpus: { id: 'zeus_a', title: 'A', description: '' },
+      corpus: { id: 'zeus_a', title: '', description: '' },
     });
-    await user.clear(titleBox());
     await user.type(titleBox(), 'x'.repeat(101));
+    expect(titleBox().value.length).toBe(100);
+  });
+
+  it('should show an error when a bound title is too long', async () => {
+    const { user } = await setup({
+      corpus: { id: 'zeus_a', title: 'x'.repeat(101), description: '' },
+    });
+    await user.click(titleBox());
     await user.tab();
     expect(screen.getByText('title too long')).toBeTruthy();
     expect((saveButton() as HTMLButtonElement).disabled).toBe(true);
   });
 
-  it('should show an error when ID exceeds the room left by prefix', async () => {
+  it('should cap the ID at the room left by prefix', async () => {
     const { user } = await setup({
       corpus: { id: '', title: 'A', description: '' },
     });
     // 50 - "zeus_".length = 45
     await user.type(idBox(), 'x'.repeat(46));
+    expect(idBox().value.length).toBe(45);
+  });
+
+  it('should show an error when a bound ID exceeds the room left by prefix', async () => {
+    const { user } = await setup({
+      corpus: { id: 'zeus_' + 'x'.repeat(46), title: 'A', description: '' },
+    });
+    await user.click(idBox());
     await user.tab();
     expect(screen.getByText('ID too long')).toBeTruthy();
   });
 
   it('should not save when there is no corpus', async () => {
     const { component, corpusChange } = await setup({ corpus: null });
-    component.id.setValue('x');
-    component.title.setValue('t');
+    component.form.id().value.set('x');
+    component.form.title().value.set('t');
     component.save();
     expect(corpusChange).not.toHaveBeenCalled();
   });
@@ -197,6 +216,63 @@ describe('CorpusEditorComponent', () => {
     await fixture.whenStable();
     expect((idBox() as HTMLInputElement).value).toBe('');
     expect((titleBox() as HTMLInputElement).value).toBe('');
+  });
+
+  it('should render no <form> element, so it stays valid at any nesting depth', async () => {
+    const { fixture } = await setup();
+    expect(fixture.nativeElement.querySelector('form')).toBeNull();
+  });
+
+  it('should not save on Enter in an input', async () => {
+    const { user, corpusChange } = await setup({
+      corpus: { id: 'zeus_a', title: 'A', description: '' },
+    });
+    await user.type(titleBox(), 'b{Enter}');
+    expect(corpusChange).not.toHaveBeenCalled();
+  });
+
+  it('should refuse to save an invalid draft and surface the errors', async () => {
+    const { component, corpusChange } = await setup({
+      corpus: { id: 'zeus_a', title: 'A', description: '' },
+    });
+    component.form.title().value.set('');
+    component.save();
+    expect(corpusChange).not.toHaveBeenCalled();
+    expect(component.form.title().touched()).toBe(true);
+  });
+
+  it('should keep the draft as typed when its own save echoes back', async () => {
+    const { user, fixture, component, corpusChange } = await setup({
+      corpus: { id: 'zeus_a', title: 'A', description: '' },
+    });
+    await user.clear(titleBox());
+    await user.type(titleBox(), 'abc ');
+    await user.click(saveButton());
+    await fixture.whenStable();
+
+    // the model got the trimmed value...
+    expect(corpusChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ title: 'abc' }),
+    );
+    // ...but the draft still holds what the user typed, and is pristine
+    expect(titleBox().value).toBe('abc ');
+    expect(component.form().dirty()).toBe(false);
+  });
+
+  it('should rebuild the draft when a different corpus is bound', async () => {
+    const { user, fixture, corpus } = await setup({
+      corpus: { id: 'zeus_a', title: 'A', description: '' },
+    });
+    await user.click(screen.getByRole('checkbox', { name: 'clone' }));
+    await user.type(titleBox(), 'x');
+    corpus.set({ id: 'zeus_b', title: 'B', description: '' });
+    await fixture.whenStable();
+    expect(idBox().value).toBe('b');
+    expect(titleBox().value).toBe('B');
+    expect(
+      (screen.getByRole('checkbox', { name: 'clone' }) as HTMLInputElement)
+        .checked,
+    ).toBe(false);
   });
 
   it('should emit editorClose on close', async () => {

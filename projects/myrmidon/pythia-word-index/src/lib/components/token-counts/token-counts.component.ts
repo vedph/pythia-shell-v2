@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, effect, input, signal, ChangeDetectionStrategy } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
 
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,7 +26,6 @@ import { PercentagePipe } from '../../pipes/percentage.pipe';
   selector: 'pythia-token-counts',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     MatButtonModule,
     MatExpansionModule,
     MatIconModule,
@@ -39,7 +37,7 @@ import { PercentagePipe } from '../../pipes/percentage.pipe';
   ],
   providers: [provideEchartsCore({ echarts })],
   templateUrl: './token-counts.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './token-counts.component.scss',
 })
 export class TokenCountsComponent {

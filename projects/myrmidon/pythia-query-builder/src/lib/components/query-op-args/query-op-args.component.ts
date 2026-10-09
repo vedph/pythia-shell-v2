@@ -1,11 +1,19 @@
-import { Component, effect, model, output, ChangeDetectionStrategy } from '@angular/core';
 import {
-  FormArray,
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  linkedSignal,
+  model,
+  untracked,
+} from '@angular/core';
+import {
+  FormField,
+  ValidationError,
+  applyEach,
+  form,
+  required,
+  validate,
+} from '@angular/forms/signals';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,13 +23,78 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { QueryBuilderTermDefArg } from '../../query-builder';
 
+const NUMERIC_REGEX = /^-?[0-9]+(?:\.[0-9]+)?$/;
+
+interface QueryOpArgControls {
+  // def is just to hold the arg's definition
+  def: QueryBuilderTermDefArg;
+  // value is the arg's value being effectively edited
+  value: string;
+}
+
+interface QueryOpArgsControls {
+  args: QueryOpArgControls[];
+}
+
+/**
+ * Bound args -> draft. Each row gets fresh objects, so that the form's own
+ * bookkeeping (it tags array items with a hidden identity Symbol) never
+ * touches the caller's, often shared, definitions. The JSON round-trip,
+ * unlike spreading, does not copy Symbol-keyed properties either.
+ */
+function toDraft(
+  args: QueryBuilderTermDefArg[] | undefined | null,
+): QueryOpArgsControls {
+  return {
+    args: (args || []).map((a) => ({
+      def: JSON.parse(JSON.stringify(a)),
+      value: a.value ?? '',
+    })),
+  };
+}
+
+/**
+ * Draft -> args: only the args having a value are included.
+ */
+function toModel(draft: QueryOpArgsControls): QueryBuilderTermDefArg[] {
+  return draft.args
+    .filter((a) => a.value)
+    .map((a) => ({ ...a.def, value: a.value }));
+}
+
+/**
+ * Validate a non-empty arg value against its definition, like the numeric
+ * pattern, min and max validators did: min/max are compared with the value
+ * parsed as a number, and ignored when it is not a number.
+ */
+function validateArgValue(
+  value: string,
+  def: QueryBuilderTermDefArg,
+): ValidationError[] {
+  if (!value) {
+    return [];
+  }
+  const errors: ValidationError[] = [];
+  if (def.numeric && !NUMERIC_REGEX.test(value)) {
+    errors.push({ kind: 'pattern' });
+  }
+  const n = parseFloat(value);
+  if (def.min !== undefined && !isNaN(n) && n < +def.min) {
+    errors.push({ kind: 'min' });
+  }
+  if (def.max !== undefined && !isNaN(n) && n > +def.max) {
+    errors.push({ kind: 'max' });
+  }
+  return errors;
+}
+
 /**
  * Query operator arguments editor.
  */
 @Component({
   selector: 'pythia-query-op-args',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
@@ -29,85 +102,77 @@ import { QueryBuilderTermDefArg } from '../../query-builder';
     MatTooltipModule,
   ],
   templateUrl: './query-op-args.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./query-op-args.component.css'],
 })
 export class QueryOpArgsComponent {
-  public arguments: FormArray;
-  public form: FormGroup;
-
   /**
    * The arguments definitions and their values. Values are edited
    * by this component.
    */
   public readonly args = model<QueryBuilderTermDefArg[] | undefined | null>();
 
-  constructor(private _formBuilder: FormBuilder) {
-    this.arguments = _formBuilder.array([]);
-    this.form = _formBuilder.group({ arguments: this.arguments });
+  /**
+   * The editable draft, derived from `args`. `previous` tells an external
+   * change apart from the echo of our own save: `toModel()` drops the args
+   * without a value, so without this check the echo would remove them from
+   * the editor.
+   */
+  private readonly _draft = linkedSignal<
+    QueryBuilderTermDefArg[] | undefined | null,
+    QueryOpArgsControls
+  >({
+    source: () => this.args(),
+    computation: (args, previous) =>
+      previous &&
+      JSON.stringify(args) === JSON.stringify(toModel(previous.value))
+        ? previous.value
+        : toDraft(args),
+  });
 
+  public readonly form = form(this._draft, (path) => {
+    applyEach(path.args, (arg) => {
+      required(arg.value, { when: ({ valueOf }) => !!valueOf(arg.def).required });
+      validate(arg.value, ({ value, valueOf }) =>
+        validateArgValue(value(), valueOf(arg.def)),
+      );
+    });
+  });
+
+  constructor() {
+    // once the draft mirrors the bound args again there are no unsaved
+    // edits, so clear touched/dirty
     effect(() => {
-      this.updateForm(this.args() || undefined);
+      const draft = this._draft();
+      untracked(() => {
+        if (this.isDraftInSync(draft)) {
+          this.form().reset();
+        }
+      });
     });
   }
 
-  private updateForm(args?: QueryBuilderTermDefArg[]): void {
-    this.arguments.clear();
-
-    if (!args?.length) {
-      this.arguments.disable();
-      return;
-    }
-
-    for (let i = 0; i < args.length; i++) {
-      const validators = [];
-      if (args[i].required) {
-        validators.push(Validators.required);
-      }
-      if (args[i].numeric) {
-        validators.push(Validators.pattern('-?[0-9]+(?:\\.[0-9]+)?'));
-      }
-      if (args[i].min !== undefined) {
-        validators.push(Validators.min(+args[i].min!));
-      }
-      if (args[i].max !== undefined) {
-        validators.push(Validators.max(+args[i].max!));
-      }
-      const g = this._formBuilder.group({
-        // def is just to hold the arg's definition
-        def: this._formBuilder.control<QueryBuilderTermDefArg>(args[i], {
-          nonNullable: true,
-        }),
-        // value is the arg's value being effectively edited
-        value: this._formBuilder.control<string | null>(
-          args[i].value ?? null,
-          validators,
-        ),
-      });
-      this.arguments.push(g);
-    }
-    this.arguments.enable();
-
-    this.form.markAsPristine();
+  /** True when the draft still mirrors the bound args. */
+  private isDraftInSync(draft: QueryOpArgsControls): boolean {
+    return JSON.stringify(draft) === JSON.stringify(toDraft(this.args()));
   }
 
-  private getArgs(): QueryBuilderTermDefArg[] {
-    const args: QueryBuilderTermDefArg[] = [];
-
-    for (let i = 0; i < this.arguments.length; i++) {
-      const g = this.arguments.at(i) as FormGroup;
-      const value = g.controls['value'].value as string;
-      if (value) {
-        const def = g.controls['def'].value as QueryBuilderTermDefArg;
-        args.push({ ...def, value: value });
-      }
+  /**
+   * Enter in an arg saves, under the same condition which enabled the
+   * save button (and thus the implicit form submission it replaces).
+   */
+  public onEnter(): void {
+    if (!this.form().invalid() && this.form().dirty()) {
+      this.save();
     }
-
-    return args;
   }
 
   public save(): void {
-    this.args.set(this.getArgs());
-    this.form.markAsPristine();
+    if (this.form().invalid()) {
+      this.form().markAsTouched();
+      return;
+    }
+    this.args.set(toModel(this._draft()));
+    this.form().reset();
   }
 }

@@ -141,6 +141,11 @@ describe('SearchComponent', () => {
     expect(screen.getByRole('button', { name: /export/ })).toBeTruthy();
   });
 
+  it('should render no <form> element', async () => {
+    const { fixture } = await setup();
+    expect(fixture.nativeElement.querySelector('form')).toBeNull();
+  });
+
   it('should search with ctrl+Enter', async () => {
     const { user, searchService } = await setup();
     await user.type(queryBox(), 'q');
@@ -177,7 +182,7 @@ describe('SearchComponent', () => {
 
   it('should show a query too long error', async () => {
     const { fixture, user } = await setup();
-    fixture.componentInstance.query.setValue('x'.repeat(1001));
+    fixture.componentInstance.form.query().value.set('x'.repeat(1001));
     await user.click(queryBox());
     await user.tab();
     expect(screen.getByText('query too long')).toBeTruthy();

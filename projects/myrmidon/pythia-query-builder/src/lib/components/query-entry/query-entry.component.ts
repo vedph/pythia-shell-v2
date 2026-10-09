@@ -1,22 +1,22 @@
 import {
+  ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   input,
+  linkedSignal,
   model,
-  OnDestroy,
-  OnInit,
   output,
   signal,
-  ChangeDetectionStrategy
+  untracked,
 } from '@angular/core';
 import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { distinctUntilChanged, Subscription } from 'rxjs';
+  FormField,
+  applyWhen,
+  form,
+  maxLength,
+  required,
+} from '@angular/forms/signals';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -46,13 +46,123 @@ interface GroupedQueryBuilderTermDefs {
 }
 
 /**
+ * The pseudo-type of entry representing a pair (clause).
+ */
+const PAIR_TYPE: QueryBuilderTermDef = {
+  value: '-',
+  label: $localize`pair`,
+  group: '',
+};
+
+interface QueryPairControls {
+  attribute: QueryBuilderTermDef | null;
+  operator: QueryBuilderTermDef | null;
+  value: string;
+  pairArgs: QueryBuilderTermDefArg[] | null;
+}
+
+interface QueryEntryControls {
+  type: QueryBuilderTermDef;
+  args: QueryBuilderTermDefArg[] | null;
+  clause: QueryPairControls;
+}
+
+/**
+ * Deep-copy a plain JSON value.
+ *
+ * Definitions and their args must never enter the form as they are: a form
+ * tags the object items of the arrays in its value with a hidden identity
+ * Symbol (measured: even the items of an array nested in an object field,
+ * like a definition's `args`), and here they are shared constants. So the
+ * option lists and the draft only hold copies, and the model gets a fresh
+ * copy too, so that no tag leaks out. A JSON round-trip, unlike spreading,
+ * does not copy Symbol-keyed properties.
+ */
+function cloneJson<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value));
+}
+
+/**
+ * Compare definitions by value, as the draft holds copies of them.
+ */
+function compareDefs(
+  a: QueryBuilderTermDef | null,
+  b: QueryBuilderTermDef | null,
+): boolean {
+  return a?.value === b?.value;
+}
+
+function makeEmptyPair(): QueryPairControls {
+  return { attribute: null, operator: null, value: '', pairArgs: null };
+}
+
+/**
+ * Bound entry -> draft.
+ * @param entry The entry.
+ * @param types The available entry types, the first being the pair.
+ */
+function toDraft(
+  entry: QueryBuilderEntry | undefined | null,
+  types: QueryBuilderTermDef[],
+): QueryEntryControls {
+  const pairType = types[0];
+  if (!entry) {
+    return { type: pairType, args: null, clause: makeEmptyPair() };
+  }
+  if (entry.pair) {
+    const pair = entry.pair;
+    return {
+      type: pairType,
+      args: null,
+      clause: {
+        attribute: pair.attribute ? cloneJson(pair.attribute) : null,
+        operator: pair.operator ? cloneJson(pair.operator) : null,
+        value: pair.value,
+        pairArgs: pair.opArgs?.length ? cloneJson(pair.opArgs) : null,
+      },
+    };
+  }
+  const type =
+    types.find((t) => t.value === entry.operator?.value) || pairType;
+  return {
+    type,
+    args:
+      type.value === '-'
+        ? null
+        : cloneJson(entry.opArgs?.length ? entry.opArgs : type.args || []),
+    clause: makeEmptyPair(),
+  };
+}
+
+/**
+ * Draft -> entry, as a fresh copy (see cloneJson).
+ */
+function toModel(draft: QueryEntryControls): QueryBuilderEntry {
+  if (draft.type.value === '-') {
+    const clause = draft.clause;
+    return cloneJson({
+      pair: {
+        attribute: clause.attribute!,
+        operator: clause.operator!,
+        opArgs: clause.pairArgs || [],
+        value: clause.value,
+      },
+    });
+  }
+  return cloneJson({
+    operator: draft.type,
+    opArgs: draft.args || [],
+  });
+}
+
+/**
  * Query entry editor component. This edits a clause or just a logical term
  * like logical operators or brackets.
  */
 @Component({
   selector: 'pythia-query-entry',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     KeyValuePipe,
     MatButtonModule,
     MatCheckboxModule,
@@ -64,39 +174,10 @@ interface GroupedQueryBuilderTermDefs {
     QueryOpArgsComponent,
   ],
   templateUrl: './query-entry.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./query-entry.component.css'],
 })
-export class QueryEntryComponent implements OnInit, OnDestroy {
-  private readonly _subs: Subscription[];
-  // clause form
-  public attribute: FormControl<QueryBuilderTermDef | null>;
-  public operator: FormControl<QueryBuilderTermDef | null>;
-  public value: FormControl<string>;
-  public pairArgs: FormControl<QueryBuilderTermDefArg[] | null>;
-  public pairForm: FormGroup;
-  // outer form
-  public type: FormControl<QueryBuilderTermDef>;
-  public args: FormControl<QueryBuilderTermDefArg[] | null>;
-  public form: FormGroup;
-
-  /**
-   * Types of entry. Text-specific types are optionally added during init.
-   */
-  public readonly entryTypes = signal<any[]>([
-    {
-      value: '-',
-      label: $localize`pair`,
-      group: '',
-    },
-    ...QUERY_OP_DEFS,
-  ]);
-
-  public readonly opGroups = signal<GroupedQueryBuilderTermDefs | undefined>(
-    undefined,
-  );
-  public readonly attrGroups = signal<GroupedQueryBuilderTermDefs>({});
-
+export class QueryEntryComponent {
   /**
    * True if this entry editor should target a document rather than text.
    * This property is meant to set only once.
@@ -118,51 +199,89 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
    */
   public readonly editorClose = output();
 
-  constructor(formBuilder: FormBuilder) {
-    this._subs = [];
+  /**
+   * Types of entry: the pair, followed by operators; when not targeting
+   * a document, location operators are added.
+   */
+  public readonly entryTypes = computed<QueryBuilderTermDef[]>(() => {
+    const types = [PAIR_TYPE, ...QUERY_OP_DEFS];
+    return cloneJson(
+      this.isDocument()
+        ? types
+        : [...types, ...QUERY_LOCATION_OP_DEFS].filter(
+            (d) => !d.hidden && d.type !== QueryBuilderTermType.Document,
+          ),
+    );
+  });
+
+  public readonly compareDefs = compareDefs;
+
+  public readonly opGroups = signal<GroupedQueryBuilderTermDefs | undefined>(
+    undefined,
+  );
+  public readonly attrGroups = signal<GroupedQueryBuilderTermDefs>({});
+
+  /**
+   * The editable draft, derived from `entry`. `previous` tells an external
+   * change apart from the echo of our own save, which would otherwise
+   * rebuild the draft.
+   */
+  private readonly _draft = linkedSignal<
+    {
+      entry: QueryBuilderEntry | undefined | null;
+      types: QueryBuilderTermDef[];
+    },
+    QueryEntryControls
+  >({
+    source: () => ({ entry: this.entry(), types: this.entryTypes() }),
+    computation: ({ entry, types }, previous) =>
+      previous &&
+      types === previous.source.types &&
+      JSON.stringify(entry) === JSON.stringify(toModel(previous.value))
+        ? previous.value
+        : toDraft(entry, types),
+  });
+
+  public readonly form = form(this._draft, (path) => {
+    // the clause is validated only when editing a pair
+    applyWhen(
+      path.clause,
+      ({ valueOf }) => valueOf(path.type).value === '-',
+      (clause) => {
+        required(clause.attribute);
+        required(clause.operator);
+        required(clause.value);
+        maxLength(clause.value, 100);
+      },
+    );
+  });
+
+  constructor() {
     this.opGroups.set(
       this.groupByKey(
-        QUERY_PAIR_OP_DEFS.filter((d) => !d.hidden),
+        cloneJson(QUERY_PAIR_OP_DEFS.filter((d) => !d.hidden)),
         'group',
       ) as GroupedQueryBuilderTermDefs,
     );
-    // pair form
-    this.attribute = formBuilder.control(null, Validators.required);
-    this.operator = formBuilder.control(null, Validators.required);
-    this.value = formBuilder.control('', {
-      validators: [Validators.required, Validators.maxLength(100)],
-      nonNullable: true,
-    });
-    this.pairArgs = formBuilder.control(null);
-    this.pairForm = formBuilder.group({
-      attribute: this.attribute,
-      operator: this.operator,
-      value: this.value,
-      pairArgs: this.pairArgs,
-    });
-
-    // main form
-    this.type = formBuilder.control(this.entryTypes()[0], {
-      nonNullable: true,
-    });
-    this.args = formBuilder.control(null);
-    this.form = formBuilder.group({
-      type: this.type,
-      args: this.args,
-      clause: this.pairForm,
-    });
 
     effect(() => {
       this.attrGroups.set(
         this.groupByKey(
-          this.attrDefinitions().filter((d) => !d.hidden),
+          cloneJson(this.attrDefinitions().filter((d) => !d.hidden)),
           'group',
         ),
       );
     });
 
+    // once the draft mirrors the bound entry again there are no unsaved
+    // edits, so clear touched/dirty
     effect(() => {
-      this.updateForm(this.entry() || undefined);
+      const draft = this._draft();
+      untracked(() => {
+        if (this.isDraftInSync(draft)) {
+          this.form().reset();
+        }
+      });
     });
   }
 
@@ -176,113 +295,38 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
     }, {});
   }
 
-  public ngOnInit(): void {
-    // configure according to target
-    if (!this.isDocument()) {
-      // if not a document, add location operators
-      this.entryTypes.set(
-        [...this.entryTypes(), ...QUERY_LOCATION_OP_DEFS].filter(
-          (d) => !d.hidden && d.type !== QueryBuilderTermType.Document,
-        ),
-      );
-    }
-
-    // when type changes, enable or disable pair form and setup type args
-    this._subs.push(
-      this.type.valueChanges.pipe(distinctUntilChanged()).subscribe((def) => {
-        if (def.value === '-') {
-          this.pairForm.enable();
-        } else {
-          this.pairForm.disable();
-          this.args.setValue(def.args || []);
-        }
-      }),
-    );
-
-    // when operator changes, setup type args
-    this._subs.push(
-      this.operator.valueChanges
-        .pipe(distinctUntilChanged())
-        .subscribe((def) => {
-          if (def) {
-            this.pairArgs.setValue(def.args || []);
-          } else {
-            this.pairArgs.setValue([]);
-          }
-        }),
+  /** True when the draft still mirrors the bound entry. */
+  private isDraftInSync(draft: QueryEntryControls): boolean {
+    return (
+      JSON.stringify(draft) ===
+      JSON.stringify(toDraft(this.entry(), this.entryTypes()))
     );
   }
 
-  public ngOnDestroy(): void {
-    this._subs.forEach((s) => s.unsubscribe());
+  /**
+   * When the user picks another type, setup its args.
+   */
+  public onTypeChange(def: QueryBuilderTermDef): void {
+    if (def.value !== '-') {
+      this.form.args().value.set(cloneJson(def.args || []));
+    }
   }
 
-  private updateForm(entry?: QueryBuilderEntry): void {
-    if (!entry) {
-      this.form.reset();
-      return;
-    }
-    // set entry type
-    this.type.setValue(
-      entry.pair
-        ? this.entryTypes()[0]
-        : this.entryTypes().find((t) => t.value === entry.operator?.value) ||
-            this.entryTypes()[0],
-    );
-
-    // set pair form
-    setTimeout(() => {
-      // if not a pair, reset pair and set op args if any
-      if (!entry.pair) {
-        this.pairForm.reset();
-        if (entry.opArgs?.length) {
-          this.args.setValue(entry.opArgs);
-        }
-      } else {
-        // else set values from entry.pair
-        const pair = entry.pair!;
-        this.attribute.setValue(pair.attribute || null);
-        this.operator.setValue(pair.operator || null);
-        this.value.setValue(pair.value);
-        if (pair.opArgs?.length) {
-          this.pairArgs.setValue(pair.opArgs);
-        } else {
-          this.pairArgs.setValue(null);
-        }
-        this.pairForm.markAsPristine();
-      }
-      this.form.markAsPristine();
-    });
+  /**
+   * When the user picks another operator, setup its args.
+   */
+  public onOperatorChange(def: QueryBuilderTermDef | null): void {
+    this.form.clause.pairArgs().value.set(cloneJson(def?.args || []));
   }
 
   public onArgsChange(args?: QueryBuilderTermDefArg[] | null): void {
-    this.args.setValue(args || []);
-    this.args.updateValueAndValidity();
-    this.args.markAsDirty();
+    this.form.args().value.set(cloneJson(args || []));
+    this.form.args().markAsDirty();
   }
 
   public onPairArgsChange(args?: QueryBuilderTermDefArg[] | null): void {
-    this.pairArgs.setValue(args || []);
-    this.pairArgs.updateValueAndValidity();
-    this.pairArgs.markAsDirty();
-  }
-
-  private getEntry(): QueryBuilderEntry {
-    if (this.type.value.value === '-') {
-      return {
-        pair: {
-          attribute: this.attribute.value!,
-          operator: this.operator.value!,
-          opArgs: this.pairArgs.value || [],
-          value: this.value.value,
-        },
-      };
-    } else {
-      return {
-        operator: this.type.value as any,
-        opArgs: this.args.value || [],
-      };
-    }
+    this.form.clause.pairArgs().value.set(cloneJson(args || []));
+    this.form.clause.pairArgs().markAsDirty();
   }
 
   public close(): void {
@@ -290,9 +334,11 @@ export class QueryEntryComponent implements OnInit, OnDestroy {
   }
 
   public save(): void {
-    if (this.form.invalid) {
+    if (this.form().invalid()) {
+      this.form().markAsTouched();
       return;
     }
-    this.entry.set(this.getEntry());
+    this.entry.set(toModel(this._draft()));
+    this.form().reset();
   }
 }

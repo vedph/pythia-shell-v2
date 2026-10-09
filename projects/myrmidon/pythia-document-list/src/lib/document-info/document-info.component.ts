@@ -14,7 +14,7 @@ import { Document } from '@myrmidon/pythia-core';
   selector: 'pythia-document-info',
   imports: [CommonModule, MatButtonModule, MatIconModule, MatTooltipModule],
   templateUrl: './document-info.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./document-info.component.css'],
 })
 export class DocumentInfoComponent {

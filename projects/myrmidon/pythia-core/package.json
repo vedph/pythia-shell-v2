@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/pythia-core",
-  "version": "9.0.0",
+  "version": "11.0.0",
   "description": "Pythia - core.",
   "keywords": [
     "Pythia"
@@ -14,8 +14,8 @@
     "name": "Daniele Fusi"
   },
   "peerDependencies": {
-    "@angular/common": "^22.0.3",
-    "@angular/core": "^22.0.3"
+    "@angular/common": "^22.2.1",
+    "@angular/core": "^22.2.1"
   },
   "dependencies": {
     "tslib": "^2.3.0"

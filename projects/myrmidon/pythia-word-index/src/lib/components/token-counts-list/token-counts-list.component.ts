@@ -1,7 +1,17 @@
-import { Component, effect, input, model, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  model,
+  signal,
+  untracked,
+} from '@angular/core';
+import { FormField, form } from '@angular/forms/signals';
 import { Subscription, take } from 'rxjs';
 
-import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -25,7 +35,7 @@ import { TokenCountsComponent } from '../token-counts/token-counts.component';
 @Component({
   selector: 'pythia-token-counts-list',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
@@ -34,7 +44,7 @@ import { TokenCountsComponent } from '../token-counts/token-counts.component';
     TokenCountsComponent,
   ],
   templateUrl: './token-counts-list.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './token-counts-list.component.scss',
 })
 export class TokenCountsListComponent {
@@ -60,22 +70,33 @@ export class TokenCountsListComponent {
   public readonly counts = signal<{ [key: string]: TokenCount[] }>({});
   private readonly _emptyCounts = {}; // reuse the same empty object reference
 
-  public readonly selectedAttributes: FormControl<AttributeInfo[]>;
+  private readonly _wordService = inject(WordService);
 
-  constructor(
-    formBuilder: FormBuilder,
-    private _wordService: WordService,
-  ) {
-    this.selectedAttributes = formBuilder.control<AttributeInfo[]>([], {
-      nonNullable: true,
-    });
+  /**
+   * The attributes selection. This holds the attribute names rather than the
+   * attribute objects, which belong to the caller: a form tags the object
+   * items of the arrays in its value.
+   */
+  public readonly form = form(signal<{ names: string[] }>({ names: [] }));
+
+  /**
+   * The selected attributes, in their list order.
+   */
+  public readonly selectedAttributes = computed<AttributeInfo[]>(() => {
+    const names = this.form.names().value();
+    return (this.attributes() || []).filter((a) => names.includes(a.name));
+  });
+
+  constructor() {
     effect(() => {
       const token = this.token();
       if (this.isWordOrLemmaEqual(token, this._previousToken)) {
         return;
       }
       this._previousToken = token;
-      this.loadCounts(token, true);
+      // the selection must not become a dependency of this effect: counts
+      // are loaded for it only on the user's request
+      untracked(() => this.loadCounts(token, true));
     });
   }
 
@@ -109,7 +130,7 @@ export class TokenCountsListComponent {
         .getDocAttributeInfo()
         .pipe(take(1))
         .subscribe((attributes) => {
-          this.selectedAttributes.reset();
+          this.form.names().value.set([]);
           this.attributes.set(attributes);
         });
     }
@@ -131,7 +152,8 @@ export class TokenCountsListComponent {
       return;
     }
 
-    if (!this.selectedAttributes.value?.length) {
+    const selected = this.selectedAttributes();
+    if (!selected.length) {
       // only set counts to empty if it's not already empty
       // (use the same empty object reference to avoid unnecessary updates)
       if (Object.keys(this.counts()).length > 0) {
@@ -142,7 +164,7 @@ export class TokenCountsListComponent {
 
     this.busy.set(true);
 
-    const names = this.selectedAttributes.value.map((i) => i.name);
+    const names = selected.map((i) => i.name);
     const counts$ =
       token.type === 'lemma'
         ? this._wordService.getLemmaCounts(token.id, names)

@@ -14,11 +14,27 @@ export interface KwicSearchFilter {
   contextSize?: number; // default is 5
 }
 
+/**
+ * A KWIC search result with a client-side key, used to track it in lists.
+ * The server data carry no field guaranteed to be unique, so each loaded
+ * result gets a key unique within this application session.
+ */
+export interface KwicSearchResultItem extends KwicSearchResult {
+  key: number;
+}
+
+// a counter rather than crypto.randomUUID(), which is available only in
+// secure contexts (HTTPS or localhost)
+let lastKey = 0;
+
 @Injectable({ providedIn: 'root' })
 export class SearchRepository
-  implements PagedListStoreService<KwicSearchFilter, KwicSearchResult>
+  implements PagedListStoreService<KwicSearchFilter, KwicSearchResultItem>
 {
-  private readonly _store: PagedListStore<KwicSearchFilter, KwicSearchResult>;
+  private readonly _store: PagedListStore<
+    KwicSearchFilter,
+    KwicSearchResultItem
+  >;
   private readonly _query$: BehaviorSubject<string | undefined>;
   private readonly _prevQuery$: BehaviorSubject<string | undefined>;
   private readonly _lastQueries$: BehaviorSubject<string[]>;
@@ -37,7 +53,7 @@ export class SearchRepository
   public get lastQueries$(): Observable<string[]> {
     return this._lastQueries$.asObservable();
   }
-  public get page$(): Observable<DataPage<KwicSearchResult> | undefined> {
+  public get page$(): Observable<DataPage<KwicSearchResultItem> | undefined> {
     return this._store.page$;
   }
   public get error$(): Observable<string | undefined> {
@@ -51,7 +67,7 @@ export class SearchRepository
   }
 
   constructor(private _searchService: SearchService) {
-    this._store = new PagedListStore<any, KwicSearchResult>(this);
+    this._store = new PagedListStore<any, KwicSearchResultItem>(this);
     this._query$ = new BehaviorSubject<string | undefined>(undefined);
     this._prevQuery$ = new BehaviorSubject<string | undefined>(undefined);
     this._lastQueries$ = new BehaviorSubject<string[]>([]);
@@ -66,7 +82,7 @@ export class SearchRepository
     pageNumber: number,
     pageSize: number,
     filter: KwicSearchFilter
-  ): Observable<DataPage<KwicSearchResult>> {
+  ): Observable<DataPage<KwicSearchResultItem>> {
     if (!filter.contextSize) {
       filter.contextSize = 5;
     }
@@ -81,7 +97,7 @@ export class SearchRepository
           pageSize: 0,
           pageCount: 0,
           total: 0,
-        } as DataPage<KwicSearchResult>);
+        } as DataPage<KwicSearchResultItem>);
       }
     }
 
@@ -112,9 +128,12 @@ export class SearchRepository
               pageSize: 0,
               pageCount: 0,
               total: 0,
-            } as DataPage<KwicSearchResult>;
+            } as DataPage<KwicSearchResultItem>;
           } else {
-            return r.value!;
+            return {
+              ...r.value!,
+              items: r.value!.items.map((i) => ({ ...i, key: ++lastKey })),
+            };
           }
         })
       );

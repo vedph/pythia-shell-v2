@@ -1,15 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, input, OnDestroy, output, ChangeDetectionStrategy } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input,
+  output,
+  signal,
+  untracked,
+} from '@angular/core';
+import { FormField, debounce, form } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  Observable,
-  Subscription,
-} from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -35,8 +38,7 @@ import {
   selector: 'pythia-map-paged-tree-browser',
   imports: [
     CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
+    FormField,
     // material
     MatButtonModule,
     MatFormFieldModule,
@@ -48,11 +50,10 @@ import {
     BrowserTreeNodeComponent,
   ],
   templateUrl: './map-paged-tree-browser.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './map-paged-tree-browser.component.scss',
 })
-export class MapPagedTreeBrowserComponent implements OnDestroy {
-  private readonly _sub?: Subscription;
+export class MapPagedTreeBrowserComponent {
   private _store?: PagedTreeStore<FlatMapNode, FlatMapNodeFilter>;
   private _service?: MapPagedTreeStoreService;
 
@@ -81,45 +82,50 @@ export class MapPagedTreeBrowserComponent implements OnDestroy {
    */
   public readonly mapNodeClick = output<TextMapNode>();
 
-  public readonly labelFilter: FormControl<string | null>;
-  public nodes$?: Observable<readonly FlatMapNode[] | undefined>;
-  public filter$?: Observable<FlatMapNodeFilter | undefined>;
+  /**
+   * The label filter. Its model value is debounced, so that the store is
+   * filtered only once the user pauses typing; the control value
+   * (`controlValue()`) is immediate.
+   */
+  public readonly filterForm = form(signal({ label: '' }), (path) => {
+    debounce(path.label, 300);
+  });
+  // signals, because they are replaced whenever the map changes
+  public readonly nodes$ = signal<
+    Observable<readonly FlatMapNode[] | undefined> | undefined
+  >(undefined);
+  public readonly filter$ = signal<
+    Observable<FlatMapNodeFilter | undefined> | undefined
+  >(undefined);
 
   constructor() {
-    this.labelFilter = new FormControl<string | null>(null);
-    this._sub = this.labelFilter.valueChanges
-      .pipe(distinctUntilChanged(), debounceTime(300))
-      .subscribe((value) => {
-        if (this._store) {
-          this._store.setFilter({ label: value } as FlatMapNodeFilter);
-        }
-      });
+    // apply the (debounced) label filter to the current store
+    effect(() => {
+      const label = this.filterForm.label().value();
+      untracked(() => this._store?.setFilter({ label }));
+    });
 
     effect(() => {
       this.updateTree(this.map());
     });
   }
 
-  public ngOnDestroy(): void {
-    this._sub?.unsubscribe();
-  }
-
   public resetLabelFilter(): void {
-    this.labelFilter.reset();
+    this.filterForm.label().value.set('');
   }
 
   private updateTree(map: TextMapNode | undefined): void {
     if (map) {
       this._service = new MapPagedTreeStoreService(map);
       this._store = new PagedTreeStore(this._service);
-      this.nodes$ = this._store.nodes$;
-      this.filter$ = this._store.filter$;
+      this.nodes$.set(this._store.nodes$);
+      this.filter$.set(this._store.filter$);
       this._store.reset();
     } else {
       this._service = undefined;
       this._store = undefined;
-      this.nodes$ = undefined;
-      this.filter$ = undefined;
+      this.nodes$.set(undefined);
+      this.filter$.set(undefined);
     }
   }
 

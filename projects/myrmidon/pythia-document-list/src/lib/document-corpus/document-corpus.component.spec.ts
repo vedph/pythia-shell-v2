@@ -63,6 +63,11 @@ const applyButton = () =>
   screen.getByRole('button', { name: /apply/ }) as HTMLButtonElement;
 
 describe('DocumentCorpusComponent', () => {
+  it('should render no <form> element', async () => {
+    const { fixture } = await setup();
+    expect(fixture.nativeElement.querySelector('form')).toBeNull();
+  });
+
   it('should disable apply until a corpus is picked', async () => {
     await setup();
     expect(applyButton().disabled).toBe(true);

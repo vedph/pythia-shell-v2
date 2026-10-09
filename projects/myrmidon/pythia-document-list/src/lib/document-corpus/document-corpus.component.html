@@ -1,12 +1,13 @@
-<form [formGroup]="form" (submit)="apply()">
+<div>
   <div class="form-row">
     <mat-form-field>
       <mat-label i18n>action</mat-label>
-      <mat-select [formControl]="action">
+      <mat-select [formField]="form.action">
         <mat-option value="add-filtered" i18n>add to corpus</mat-option>
         <mat-option value="del-filtered" i18n>delete from corpus</mat-option>
       </mat-select>
-      @if ($any(action).errors?.required && (action.dirty || action.touched)) {
+      @if (form.action().getError('required') && (form.action().dirty() ||
+      form.action().touched())) {
         <mat-error i18n>action required</mat-error>
       }
       <mat-hint i18n>action for matching docs</mat-hint>
@@ -20,8 +21,9 @@
     />
 
     <button
-      type="submit"
-      [disabled]="form.invalid || !editable()"
+      type="button"
+      [disabled]="form().invalid() || !editable()"
+      (click)="apply()"
       mat-flat-button
       class="mat-primary"
       i18n-matTooltip
@@ -31,4 +33,4 @@
       <ng-container i18n>apply</ng-container>
     </button>
   </div>
-</form>
+</div>

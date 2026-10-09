@@ -10,7 +10,6 @@ import {
 
 import { DocumentReaderRepository } from '../document-reader.repository';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -24,8 +23,6 @@ import { MapPagedTreeBrowserComponent } from '../map-paged-tree-browser/map-page
   selector: 'pythia-document-reader',
   imports: [
     CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
     // material
     MatButtonModule,
     MatIconModule,
@@ -35,7 +32,7 @@ import { MapPagedTreeBrowserComponent } from '../map-paged-tree-browser/map-page
   ],
   templateUrl: './document-reader.component.html',
   styleUrls: ['./document-reader.component.css'],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
 export class DocumentReaderComponent {

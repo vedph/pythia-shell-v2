@@ -5,7 +5,7 @@ import { DataPage, ErrorWrapper } from '@myrmidon/ngx-tools';
 import { KwicSearchResult, SearchService } from '@myrmidon/pythia-api';
 import { DocumentReadRequest } from '@myrmidon/pythia-core';
 
-import { SearchRepository } from './search.repository';
+import { KwicSearchResultItem, SearchRepository } from './search.repository';
 
 function result(i: number): KwicSearchResult {
   return {
@@ -56,7 +56,7 @@ describe('SearchRepository', () => {
       prevQuery?: string;
       error?: string;
       loading?: boolean;
-      page?: DataPage<KwicSearchResult>;
+      page?: DataPage<KwicSearchResultItem>;
       history?: string[];
       read?: DocumentReadRequest;
     } = {};
@@ -80,6 +80,18 @@ describe('SearchRepository', () => {
       providers: [{ provide: SearchService, useValue: searchService }],
     });
     repo = TestBed.inject(SearchRepository);
+  });
+
+  it('should give each loaded result a distinct key', async () => {
+    const s = state();
+    repo.setFilter({ query: '[value="a"]' });
+    await Promise.resolve();
+    const items = s.page!.items;
+    expect(new Set(items.map((i) => i.key)).size).toBe(items.length);
+    // the server data are kept as they are
+    const { key, ...data } = items[0];
+    expect(typeof key).toBe('number');
+    expect(data).toEqual(result(0));
   });
 
   it('should search with default context size', async () => {

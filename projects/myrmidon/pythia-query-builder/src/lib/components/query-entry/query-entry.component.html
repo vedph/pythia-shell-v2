@@ -1,35 +1,39 @@
-<form [formGroup]="form" (submit)="save()">
+<div>
   <!-- type -->
   <div>
     <mat-form-field>
       <mat-label i18n>type</mat-label>
-      <mat-select [formControl]="type">
+      <mat-select
+        [formField]="form.type"
+        [compareWith]="compareDefs"
+        (selectionChange)="onTypeChange($event.value)"
+      >
         @for (t of entryTypes(); track t) {
           <mat-option [value]="t">{{ t.label }}</mat-option>
         }
       </mat-select>
-      @if ($any(type).errors?.required && (type.dirty || type.touched)) {
-        <mat-error i18n>type required</mat-error>
-      }
     </mat-form-field>
-    <p class="tip">{{ type.value.tip }}</p>
+    <p class="tip">{{ form.type().value().tip }}</p>
   </div>
   <!-- args -->
-  @if (type.value.args) {
+  @if (form.type().value().args) {
     <pythia-query-op-args
-      [args]="args.value"
+      [args]="form.args().value()"
       (argsChange)="onArgsChange($event)"
     />
   }
 
   <!-- pair -->
-  @if (type.value.value === "-") {
-    <form [formGroup]="pairForm">
+  @if (form.type().value().value === "-") {
+    <div>
       <div class="form-row">
         <!-- attribute -->
         <mat-form-field>
           <mat-label i18n>attribute</mat-label>
-          <mat-select [formControl]="attribute">
+          <mat-select
+            [formField]="form.clause.attribute"
+            [compareWith]="compareDefs"
+          >
             @for (kv of attrGroups() | keyvalue; track kv) {
               <mat-optgroup [label]="kv.key" style="font-weight: bold">
                 @for (d of kv.value; track d) {
@@ -38,10 +42,11 @@
               </mat-optgroup>
             }
           </mat-select>
-          <mat-hint>{{ attribute.value?.tip }}</mat-hint>
+          <mat-hint>{{ form.clause.attribute().value()?.tip }}</mat-hint>
           @if (
-            $any(attribute).errors?.required &&
-            (attribute.dirty || attribute.touched)
+            form.clause.attribute().getError("required") &&
+            (form.clause.attribute().dirty() ||
+              form.clause.attribute().touched())
           ) {
             <mat-error i18n>attribute required</mat-error>
           }
@@ -49,7 +54,11 @@
         <!-- operator -->
         <mat-form-field>
           <mat-label i18n>operator</mat-label>
-          <mat-select [formControl]="operator">
+          <mat-select
+            [formField]="form.clause.operator"
+            [compareWith]="compareDefs"
+            (selectionChange)="onOperatorChange($event.value)"
+          >
             @for (kv of opGroups() | keyvalue; track kv) {
               <mat-optgroup style="font-weight: bold" [label]="kv.key">
                 @for (d of kv.value; track d) {
@@ -58,10 +67,11 @@
               </mat-optgroup>
             }
           </mat-select>
-          <mat-hint>{{ operator.value?.tip }}</mat-hint>
+          <mat-hint>{{ form.clause.operator().value()?.tip }}</mat-hint>
           @if (
-            $any(operator).errors?.required &&
-            (operator.dirty || operator.touched)
+            form.clause.operator().getError("required") &&
+            (form.clause.operator().dirty() ||
+              form.clause.operator().touched())
           ) {
             <mat-error i18n>operator required</mat-error>
           }
@@ -69,25 +79,33 @@
         <!-- value -->
         <mat-form-field>
           <mat-label i18n>value</mat-label>
-          <input matInput [formControl]="value" (keydown.enter)="save()" />
-          @if ($any(value).errors?.required && (value.dirty || value.touched)) {
+          <input
+            matInput
+            [formField]="form.clause.value"
+            (keydown.enter)="save()"
+          />
+          @if (
+            form.clause.value().getError("required") &&
+            (form.clause.value().dirty() || form.clause.value().touched())
+          ) {
             <mat-error i18n>value required</mat-error>
           }
           @if (
-            $any(value).errors?.maxlength && (value.dirty || value.touched)
+            form.clause.value().getError("maxLength") &&
+            (form.clause.value().dirty() || form.clause.value().touched())
           ) {
             <mat-error i18n>value too long</mat-error>
           }
         </mat-form-field>
       </div>
       <!-- pairArgs -->
-      @if (operator.value?.args) {
+      @if (form.clause.operator().value()?.args) {
         <pythia-query-op-args
-          [args]="pairArgs.value"
+          [args]="form.clause.pairArgs().value()"
           (argsChange)="onPairArgsChange($event)"
         />
       }
-    </form>
+    </div>
   }
 
   <div>
@@ -102,13 +120,14 @@
       <mat-icon>clear</mat-icon>
     </button>
     <button
-      type="submit"
+      type="button"
       class="mat-primary"
       mat-icon-button
+      (click)="save()"
       i18n-aria-label
       aria-label="Save entry"
     >
       <mat-icon>check_circle</mat-icon>
     </button>
   </div>
-</form>
+</div>

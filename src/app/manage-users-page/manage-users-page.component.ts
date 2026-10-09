@@ -1,6 +1,5 @@
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -17,7 +16,6 @@ import { UserListComponent } from '@myrmidon/auth-jwt-admin';
   templateUrl: './manage-users-page.component.html',
   styleUrls: ['./manage-users-page.component.css'],
   imports: [
-    ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
     MatFormFieldModule,

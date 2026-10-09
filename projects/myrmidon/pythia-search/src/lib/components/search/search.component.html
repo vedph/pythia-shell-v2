@@ -7,24 +7,26 @@
     >
       <!-- query - advanced -->
       <mat-tab i18n-label label="advanced">
-        <form [formGroup]="form" (submit)="search()">
+        <div>
           <mat-form-field style="width: 100%">
             <mat-label i18n>query</mat-label>
             <textarea
               #queryCtl
               rows="3"
               matInput
-              [formControl]="query"
+              [formField]="form.query"
               (keyup.control.enter)="searchByEnter($any($event))"
             ></textarea>
             <mat-hint i18n>ctrl+Enter to submit</mat-hint>
             @if (
-              $any(query).errors?.required && (query.dirty || query.touched)
+              form.query().getError("required") &&
+              (form.query().dirty() || form.query().touched())
             ) {
               <mat-error i18n>query required</mat-error>
             }
             @if (
-              $any(query).errors?.maxlength && (query.dirty || query.touched)
+              form.query().getError("maxLength") &&
+              (form.query().dirty() || form.query().touched())
             ) {
               <mat-error i18n>query too long</mat-error>
             }
@@ -34,10 +36,11 @@
             <!-- submit -->
             <button
               style="margin-top: -24px"
-              type="submit"
+              type="button"
               class="mat-primary"
               mat-flat-button
-              [disabled]="form.invalid || (loading$ | async)"
+              [disabled]="form().invalid() || (loading$ | async)"
+              (click)="search()"
             >
               <mat-icon>search</mat-icon>
               <ng-container i18n>search</ng-container>
@@ -47,7 +50,7 @@
             @if (lastQueries$ | async; as queries) {
               <mat-form-field>
                 <mat-label>history</mat-label>
-                <mat-select [formControl]="history">
+                <mat-select [formField]="form.history">
                   @for (q of queries; track q) {
                     <mat-option [value]="q">{{ q }}</mat-option>
                   }
@@ -67,7 +70,7 @@
               </mat-form-field>
             }
           </div>
-        </form>
+        </div>
       </mat-tab>
       <!-- query - builder -->
       <mat-tab i18n-label label="builder">
@@ -121,7 +124,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (r of page.items; track r; let index = $index) {
+            @for (r of page.items; track r.key; let index = $index) {
               <tr>
                 <td class="fit-width">
                   <!-- read -->

@@ -1,12 +1,14 @@
-<form [formGroup]="form" (submit)="save()">
+<div>
   <!-- ID -->
   <div>
     <mat-form-field>
       <mat-label>ID {{ idPrefix }}</mat-label>
-      <input matInput [formControl]="id" />
-      @if ($any(id).errors?.required && (id.dirty || id.touched)) {
+      <input matInput [formField]="form.id" />
+      @if (form.id().getError('required') && (form.id().dirty() ||
+      form.id().touched())) {
       <mat-error i18n>ID required</mat-error>
-      } @if ($any(id).errors?.maxlength && (id.dirty || id.touched)) {
+      } @if (form.id().getError('maxLength') && (form.id().dirty() ||
+      form.id().touched())) {
       <mat-error i18n>ID too long</mat-error>
       }
     </mat-form-field>
@@ -16,10 +18,12 @@
   <div>
     <mat-form-field>
       <mat-label i18n>title</mat-label>
-      <input matInput [formControl]="title" />
-      @if ($any(title).errors?.required && (title.dirty || title.touched)) {
+      <input matInput [formField]="form.title" />
+      @if (form.title().getError('required') && (form.title().dirty() ||
+      form.title().touched())) {
       <mat-error i18n>title required</mat-error>
-      } @if ($any(title).errors?.maxlength && (title.dirty || title.touched)) {
+      } @if (form.title().getError('maxLength') && (form.title().dirty() ||
+      form.title().touched())) {
       <mat-error i18n>title too long</mat-error>
       }
     </mat-form-field>
@@ -29,17 +33,17 @@
   <div>
     <mat-form-field class="long-text">
       <mat-label i18n>description</mat-label>
-      <textarea matInput [formControl]="description"></textarea>
-      @if ( $any(description).errors?.maxlength && (description.dirty ||
-      description.touched) ) {
+      <textarea matInput [formField]="form.description"></textarea>
+      @if (form.description().getError('maxLength') &&
+      (form.description().dirty() || form.description().touched())) {
       <mat-error i18n>description too long</mat-error>
       }
     </mat-form-field>
   </div>
 
   <!-- sourceId -->
-  <mat-checkbox [formControl]="clone" i18n>clone</mat-checkbox>
-  @if (clone.value) {
+  <mat-checkbox [formField]="form.clone" i18n>clone</mat-checkbox>
+  @if (form.clone().value()) {
   <fieldset>
     <legend i18n>clone from</legend>
     <cadmus-refs-lookup
@@ -65,14 +69,15 @@
       <mat-icon>clear</mat-icon>
     </button>
     <button
-      type="submit"
+      type="button"
       mat-icon-button
       class="mat-primary"
-      [disabled]="form.invalid"
+      [disabled]="form().invalid()"
+      (click)="save()"
       i18n-aria-label
       aria-label="Save corpus"
     >
       <mat-icon>check_circle</mat-icon>
     </button>
   </div>
-</form>
+</div>

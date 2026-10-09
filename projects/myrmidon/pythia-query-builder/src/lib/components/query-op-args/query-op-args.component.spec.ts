@@ -100,13 +100,59 @@ describe('QueryOpArgsComponent', () => {
 
   it('should validate numeric args pattern', async () => {
     const { fixture } = await setup([{ id: 'k', label: 'k', numeric: true }]);
-    const control = fixture.componentInstance.arguments.at(0).get('value')!;
-    control.setValue('1a5');
-    expect(control.hasError('pattern')).toBe(true);
-    control.setValue('1.5');
-    expect(control.valid).toBe(true);
-    control.setValue('-2');
-    expect(control.valid).toBe(true);
+    const field = fixture.componentInstance.form.args[0].value;
+    field().value.set('1a5');
+    expect(field().getError('pattern')).toBeTruthy();
+    field().value.set('1.5');
+    expect(field().valid()).toBe(true);
+    field().value.set('-2');
+    expect(field().valid()).toBe(true);
+  });
+
+  it('should keep valueless args after its own save echoes back', async () => {
+    const { user, fixture, args } = await setup(NEAR_ARGS);
+    await user.type(screen.getByRole('spinbutton', { name: 'max distance' }), '3');
+    await user.click(saveButton());
+    await fixture.whenStable();
+    // the model only holds the arg with a value...
+    expect(args()).toBe(NEAR_ARGS);
+    expect(fixture.componentInstance.args()).toEqual([
+      { ...NEAR_ARGS[1], value: '3' },
+    ]);
+    // ...but the editor still shows all of them
+    expect(screen.getByRole('spinbutton', { name: 'min.distance' })).toBeTruthy();
+    expect(screen.getByRole('textbox', { name: 'in structure' })).toBeTruthy();
+  });
+
+  it('should save on Enter only when valid and dirty', async () => {
+    const { user, argsChange } = await setup(NEAR_ARGS);
+    const max = screen.getByRole('spinbutton', { name: 'max distance' });
+    await user.click(max);
+    await user.keyboard('{Enter}');
+    expect(argsChange).not.toHaveBeenCalled();
+    await user.type(max, '3{Enter}');
+    expect(argsChange).toHaveBeenCalledWith([{ ...NEAR_ARGS[1], value: '3' }]);
+  });
+
+  it('should keep numeric values as strings', async () => {
+    const { user, argsChange } = await setup(NEAR_ARGS);
+    await user.type(screen.getByRole('spinbutton', { name: 'max distance' }), '3');
+    await user.click(saveButton());
+    expect(typeof argsChange.mock.calls[0][0][0].value).toBe('string');
+  });
+
+  it('should not tag the caller args', async () => {
+    const { user } = await setup(NEAR_ARGS);
+    await user.type(screen.getByRole('spinbutton', { name: 'max distance' }), '3');
+    await user.click(saveButton());
+    for (const a of NEAR_ARGS) {
+      expect(Object.getOwnPropertySymbols(a)).toEqual([]);
+    }
+  });
+
+  it('should render no <form> element', async () => {
+    const { fixture } = await setup(NEAR_ARGS);
+    expect(fixture.nativeElement.querySelector('form')).toBeNull();
   });
 
   it('should rebuild the controls when args change', async () => {

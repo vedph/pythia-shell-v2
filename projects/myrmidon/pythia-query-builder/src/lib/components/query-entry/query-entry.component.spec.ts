@@ -115,13 +115,121 @@ describe('QueryEntryComponent', () => {
 
   it('should show value errors', async () => {
     const { user } = await setup();
-    const value = screen.getByRole('textbox', { name: 'value' });
+    const value = screen.getByRole('textbox', {
+      name: 'value',
+    }) as HTMLInputElement;
+    // signal forms project maxLength onto the native maxlength attribute
     await user.type(value, 'x'.repeat(101));
-    await user.tab();
-    expect(screen.getByText('value too long')).toBeTruthy();
+    expect(value.value.length).toBe(100);
     await user.clear(value);
     await user.tab();
     expect(screen.getByText('value required')).toBeTruthy();
+  });
+
+  it('should show a too long loaded value as an error', async () => {
+    const { user } = await setup({
+      entry: {
+        pair: { attribute: VALUE_ATTR, operator: EQ_OP, value: 'x'.repeat(101) },
+      },
+    });
+    await user.click(screen.getByRole('textbox', { name: 'value' }));
+    await user.tab();
+    expect(screen.getByText('value too long')).toBeTruthy();
+  });
+
+  it('should save on Enter in value', async () => {
+    const { user, entryChange } = await setup();
+    await choose(user, 'attribute', 'value');
+    await choose(user, 'operator', 'equals to');
+    await user.type(screen.getByRole('textbox', { name: 'value' }), 'amor{Enter}');
+    expect(entryChange).toHaveBeenCalledTimes(1);
+  });
+
+  it('should reset operator args when the operator changes', async () => {
+    const { user, entryChange } = await setup({
+      entry: {
+        pair: {
+          attribute: VALUE_ATTR,
+          operator: FUZZY_OP,
+          value: 'amor',
+          opArgs: [{ ...FUZZY_OP.args![0], value: '0.6' }],
+        },
+      },
+    });
+    await choose(user, 'operator', 'equals to');
+    await user.click(saveButton());
+    expect(entryChange).toHaveBeenCalledWith({
+      pair: { attribute: VALUE_ATTR, operator: EQ_OP, opArgs: [], value: 'amor' },
+    });
+  });
+
+  it('should keep the draft when its own save echoes back', async () => {
+    const { user, fixture, entryChange } = await setup();
+    await choose(user, 'attribute', 'value');
+    await choose(user, 'operator', 'equals to');
+    await user.type(screen.getByRole('textbox', { name: 'value' }), 'amor');
+    await user.click(saveButton());
+    await fixture.whenStable();
+    expect(entryChange).toHaveBeenCalledTimes(1);
+    expect(
+      (screen.getByRole('textbox', { name: 'value' }) as HTMLInputElement).value,
+    ).toBe('amor');
+    expect(fixture.componentInstance.form().dirty()).toBe(false);
+  });
+
+  it('should not validate the empty clause of an operator', async () => {
+    const { user, entryChange } = await setup();
+    await choose(user, 'type', 'OR');
+    await user.click(saveButton());
+    expect(entryChange).toHaveBeenCalled();
+  });
+
+  it('should not tag the shared definitions', async () => {
+    const { user } = await setup();
+    await choose(user, 'type', 'near to');
+    await user.type(screen.getByRole('spinbutton', { name: 'max distance' }), '3');
+    await user.click(screen.getByRole('button', { name: 'Save arguments' }));
+    await user.click(saveButton());
+    // a form tags the object items of arrays in its value with a Symbol
+    const defs = [
+      ...QUERY_LOCATION_OP_DEFS,
+      ...QUERY_PAIR_OP_DEFS,
+      ...QUERY_OP_DEFS,
+      ...QUERY_TOK_ATTR_DEFS,
+    ];
+    const tagged = defs.flatMap((d) => [
+      ...(Object.getOwnPropertySymbols(d).length ? [d.value] : []),
+      ...(d.args || [])
+        .filter((a) => Object.getOwnPropertySymbols(a).length)
+        .map((a) => `${d.value}.${a.id}`),
+    ]);
+    expect(tagged).toEqual([]);
+  });
+
+  it('should show the selection of a deep-copied entry', async () => {
+    // the entry set edits a deep copy of the entry
+    await setup({
+      entry: JSON.parse(
+        JSON.stringify({
+          pair: { attribute: VALUE_ATTR, operator: FUZZY_OP, value: 'amor' },
+        }),
+      ),
+    });
+    expect(
+      within(screen.getByRole('combobox', { name: 'attribute' })).getByText(
+        'value',
+      ),
+    ).toBeTruthy();
+    expect(
+      within(screen.getByRole('combobox', { name: 'operator' })).getByText(
+        'is similar to',
+      ),
+    ).toBeTruthy();
+  });
+
+  it('should render no <form> element', async () => {
+    const { fixture } = await setup();
+    expect(fixture.nativeElement.querySelector('form')).toBeNull();
   });
 
   it('should save a pair with operator args', async () => {

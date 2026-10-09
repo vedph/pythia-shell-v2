@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -36,7 +35,6 @@ import { CorpusFilterComponent } from '../corpus-filter/corpus-filter.component'
 @Component({
   selector: 'pythia-corpus-list',
   imports: [
-    ReactiveFormsModule,
     AsyncPipe,
     EditablePipe,
     MatButtonModule,

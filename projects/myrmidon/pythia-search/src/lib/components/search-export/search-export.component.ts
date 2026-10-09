@@ -25,7 +25,7 @@ import { SearchService } from '@myrmidon/pythia-api';
     MatTooltipModule,
   ],
   templateUrl: './search-export.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './search-export.component.scss',
 })
 export class SearchExportComponent implements OnDestroy {

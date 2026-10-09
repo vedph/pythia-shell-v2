@@ -158,6 +158,48 @@ describe('PagedWordTreeFilterComponent', () => {
     expect(options.map((o) => o.textContent?.trim())).toEqual(['by count']);
   });
 
+  it('should apply the filter on Enter', async () => {
+    const { user, filterChange } = await setup();
+    await user.type(box('language'), 'lat{Enter}');
+    expect(last(filterChange).language).toBe('lat');
+  });
+
+  it('should refuse a negative count, also on Enter', async () => {
+    const { user, filterChange, fixture } = await setup();
+    await user.clear(num('min.freq.'));
+    await user.type(num('min.freq.'), '-1');
+    await fixture.whenStable();
+    expect(fixture.componentInstance.form.minCount().value()).toBe(-1);
+    expect((apply() as HTMLButtonElement).disabled).toBe(true);
+    await user.type(num('min.freq.'), '{Enter}');
+    expect(filterChange).not.toHaveBeenCalled();
+  });
+
+  it('should pick the first sort entry when the entries drop the current one', async () => {
+    const entries = signal<WordTreeFilterSortOrderEntry[]>([
+      { key: 'by value', value: WordSortOrder.ByValue },
+      { key: 'by count', value: WordSortOrder.ByCount },
+    ]);
+    const filterChange = vi.fn();
+    const { fixture } = await render(PagedWordTreeFilterComponent, {
+      bindings: [
+        inputBinding('sortOrderEntries', entries),
+        outputBinding('filterChange', filterChange),
+      ],
+    });
+    const user = userEvent.setup();
+    await choose(user, 'sort order', 'by count');
+    entries.set([{ key: 'by reversed', value: WordSortOrder.ByReversedValue }]);
+    await fixture.whenStable();
+    await user.click(apply());
+    expect(last(filterChange).sortOrder).toBe(WordSortOrder.ByReversedValue);
+  });
+
+  it('should render no <form> element', async () => {
+    const { fixture } = await setup();
+    expect(fixture.nativeElement.querySelector('form')).toBeNull();
+  });
+
   it('should reset the filter', async () => {
     const { user, filterChange } = await setup({ filter: { language: 'x' } });
     await user.click(screen.getByRole('button', { name: 'Reset filters' }));

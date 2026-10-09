@@ -1,5 +1,4 @@
 import { Component, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -19,7 +18,6 @@ import { WordTreeFilterSortOrderEntry } from '../paged-word-tree-filter/paged-wo
 @Component({
   selector: 'pythia-word-index',
   imports: [
-    ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
     MatFormFieldModule,
@@ -32,7 +30,7 @@ import { WordTreeFilterSortOrderEntry } from '../paged-word-tree-filter/paged-wo
     TokenCountsListComponent,
   ],
   templateUrl: './word-index.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './word-index.component.scss',
 })
 export class WordIndexComponent {

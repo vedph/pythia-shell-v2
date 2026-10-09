@@ -43,7 +43,7 @@ export const QUERY_BUILDER_ATTR_DEFS_KEY = 'pythiaQueryBuilderAttrDefs';
     QueryEntrySetComponent,
   ],
   templateUrl: './query-builder.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./query-builder.component.css'],
 })
 export class QueryBuilderComponent {

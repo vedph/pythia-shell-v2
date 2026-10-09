@@ -88,6 +88,24 @@ describe('CorpusFilterComponent', () => {
     expect(filterChange).toHaveBeenCalledWith({ id: undefined, title: 'x' });
   });
 
+  it('should not apply filter on Enter when disabled', async () => {
+    const { user, filterChange } = await setup(undefined, true);
+    await user.type(titleBox(), 'x{Enter}');
+    expect(filterChange).not.toHaveBeenCalled();
+  });
+
+  it('should omit fields cleared by the user', async () => {
+    const { user, filterChange } = await setup({ id: 'a', title: 'b' });
+    await user.clear(idBox());
+    await user.click(applyButton());
+    expect(filterChange).toHaveBeenCalledWith({ id: undefined, title: 'b' });
+  });
+
+  it('should render no <form> element', async () => {
+    const { fixture } = await setup();
+    expect(fixture.nativeElement.querySelector('form')).toBeNull();
+  });
+
   it('should reset controls and emit an empty filter', async () => {
     const { user, filterChange } = await setup({ id: 'a', title: 'b' });
     await user.click(resetButton());

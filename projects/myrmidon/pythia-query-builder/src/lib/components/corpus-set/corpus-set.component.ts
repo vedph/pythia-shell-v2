@@ -29,7 +29,7 @@ import { CorpusRefLookupService } from '@myrmidon/pythia-ui';
     RefLookupComponent,
   ],
   templateUrl: './corpus-set.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./corpus-set.component.css'],
 })
 export class CorpusSetComponent {

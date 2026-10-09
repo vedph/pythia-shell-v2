@@ -1,20 +1,16 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
-  Inject,
+  inject,
   input,
+  linkedSignal,
   model,
-  Optional,
   signal,
-  ChangeDetectionStrategy
+  untracked,
 } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { FormField, form, maxLength, min } from '@angular/forms/signals';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -58,10 +54,80 @@ const DEFAULT_SORT_ORDER_ENTRIES: WordTreeFilterSortOrderEntry[] = [
   },
 ];
 
+interface PagedWordTreeFilterControls {
+  language: string;
+  pos: string | null;
+  valuePattern: string;
+  minValueLength: number | null;
+  maxValueLength: number | null;
+  minCount: number | null;
+  maxCount: number | null;
+  sortOrder: WordTreeFilterSortOrderEntry;
+}
+
+/**
+ * Bound filter -> draft.
+ * @param filter The filter.
+ * @param entries The available sort order entries.
+ */
+function toDraft(
+  filter: WordFilter | null | undefined,
+  entries: WordTreeFilterSortOrderEntry[],
+): PagedWordTreeFilterControls {
+  return {
+    language: filter?.language ?? '',
+    pos: filter?.pos ?? null,
+    // the filter uses SQL wildcards, while the UI uses * and ?
+    valuePattern: filter?.valuePattern
+      ? filter.valuePattern.replace(/%/g, '*').replace(/_/g, '?')
+      : '',
+    minValueLength: filter?.minValueLength ?? 0,
+    maxValueLength: filter?.maxValueLength ?? 0,
+    minCount: filter?.minCount ?? 0,
+    maxCount: filter?.maxCount ?? 0,
+    sortOrder:
+      (filter &&
+        entries.find(
+          (e) =>
+            e.value === (filter.sortOrder ?? WordSortOrder.Default) &&
+            !!e.descending === !!filter.isSortDescending,
+        )) ??
+      entries[0] ??
+      DEFAULT_SORT_ORDER_ENTRIES[0],
+  };
+}
+
+/**
+ * Draft -> filter.
+ * @param draft The draft.
+ * @param entries The available sort order entries.
+ */
+function toModel(
+  draft: PagedWordTreeFilterControls,
+  entries: WordTreeFilterSortOrderEntry[],
+): WordFilter {
+  const sortOrderEntry =
+    entries.find((e) => e.key === draft.sortOrder.key) || entries[0];
+
+  return {
+    language: draft.language || undefined,
+    pos: draft.pos ?? undefined,
+    valuePattern: draft.valuePattern
+      ? draft.valuePattern.replace(/\*/g, '%').replace(/\?/g, '_')
+      : undefined,
+    minValueLength: draft.minValueLength || undefined,
+    maxValueLength: draft.maxValueLength || undefined,
+    minCount: draft.minCount || undefined,
+    maxCount: draft.maxCount || undefined,
+    sortOrder: sortOrderEntry.value,
+    isSortDescending: sortOrderEntry.descending,
+  };
+}
+
 @Component({
   selector: 'pythia-paged-word-tree-filter',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatCheckboxModule,
     MatFormFieldModule,
@@ -71,7 +137,7 @@ const DEFAULT_SORT_ORDER_ENTRIES: WordTreeFilterSortOrderEntry[] = [
     MatTooltipModule,
   ],
   templateUrl: './paged-word-tree-filter.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './paged-word-tree-filter.component.scss',
 })
 export class PagedWordTreeFilterComponent {
@@ -102,134 +168,68 @@ export class PagedWordTreeFilterComponent {
    */
   public readonly filter = model<WordFilter | null | undefined>();
 
-  public language: FormControl<string | null>;
-  public pos: FormControl<string | null>;
-  public valuePattern: FormControl<string | null>;
-  public minValueLength: FormControl<number>;
-  public maxValueLength: FormControl<number>;
-  public minCount: FormControl<number>;
-  public maxCount: FormControl<number>;
-  public sortOrder: FormControl<WordTreeFilterSortOrderEntry>;
-  public form: FormGroup;
+  // for dialog wrapper:
+  public readonly dialogRef = inject<
+    MatDialogRef<PagedWordTreeFilterComponent>
+  >(MatDialogRef, { optional: true });
+  public readonly data = inject<any>(MAT_DIALOG_DATA, { optional: true });
 
-  public readonly wrapped = signal<boolean>(false);
+  public readonly wrapped = signal<boolean>(!!this.dialogRef);
 
-  constructor(
-    formBuilder: FormBuilder,
-    // for dialog wrapper:
-    @Optional()
-    public dialogRef: MatDialogRef<PagedWordTreeFilterComponent>,
-    @Optional()
-    @Inject(MAT_DIALOG_DATA)
-    public data: any,
-  ) {
-    // form
-    this.language = formBuilder.control<string | null>(null);
-    this.pos = formBuilder.control<string | null>(null);
-    this.valuePattern = formBuilder.control<string | null>(null);
-    this.minValueLength = formBuilder.control<number>(0, { nonNullable: true });
-    this.maxValueLength = formBuilder.control<number>(0, { nonNullable: true });
-    this.minCount = formBuilder.control<number>(0, { nonNullable: true });
-    this.maxCount = formBuilder.control<number>(0, { nonNullable: true });
-    this.sortOrder = formBuilder.control<WordTreeFilterSortOrderEntry>(
-      this.sortEntries()[0],
-      {
-        nonNullable: true,
-      },
-    );
-    this.form = formBuilder.group({
-      language: this.language,
-      pos: this.pos,
-      valuePattern: this.valuePattern,
-      minValueLength: this.minValueLength,
-      maxValueLength: this.maxValueLength,
-      minCount: this.minCount,
-      maxCount: this.maxCount,
-      sortOrder: this.sortOrder,
-    });
-    // dialog
-    this.wrapped.set(dialogRef ? true : false);
+  // the filter is applied explicitly, so any incoming filter rebuilds the
+  // draft
+  private readonly _draft = linkedSignal(() =>
+    toDraft(
+      this.filter(),
+      untracked(() => this.sortEntries()),
+    ),
+  );
+
+  public readonly form = form(this._draft, (path) => {
+    maxLength(path.language, 50);
+    maxLength(path.valuePattern, 500);
+    min(path.minValueLength, 0);
+    min(path.maxValueLength, 0);
+    min(path.minCount, 0);
+    min(path.maxCount, 0);
+  });
+
+  constructor() {
     // bind dialog data if any
-    if (data) {
-      this.filter.set(data.filter);
+    if (this.data) {
+      this.filter.set(this.data.filter);
     }
 
     effect(() => {
       // update sort order value if it is not in the new entries
-      if (
-        !this.sortEntries().some(
-          (e) =>
-            e.value === this.sortOrder.value.value &&
-            e.descending === this.sortOrder.value.descending,
-        )
-      ) {
-        this.sortOrder.setValue(this.sortEntries()[0]);
-      }
+      const entries = this.sortEntries();
+      untracked(() => {
+        const sortOrder = this.form.sortOrder().value();
+        if (
+          !entries.some(
+            (e) =>
+              e.value === sortOrder.value &&
+              e.descending === sortOrder.descending,
+          )
+        ) {
+          this.form.sortOrder().value.set(entries[0]);
+        }
+      });
     });
-
-    effect(() => {
-      this.updateForm(this.filter());
-    });
-  }
-
-  private updateForm(filter?: WordFilter | null): void {
-    if (!filter) {
-      this.form.reset();
-      return;
-    }
-
-    this.language.setValue(filter.language ?? null);
-    this.pos.setValue(filter.pos ?? null);
-    // the filter uses SQL wildcards, while the UI uses * and ?
-    this.valuePattern.setValue(
-      filter.valuePattern
-        ? filter.valuePattern.replace(/%/g, '*').replace(/_/g, '?')
-        : null,
-    );
-    this.minValueLength.setValue(filter.minValueLength ?? 0);
-    this.maxValueLength.setValue(filter.maxValueLength ?? 0);
-    this.minCount.setValue(filter.minCount ?? 0);
-    this.maxCount.setValue(filter.maxCount ?? 0);
-    this.sortOrder.setValue(
-      this.sortEntries().find(
-        (e) =>
-          e.value === (filter.sortOrder ?? WordSortOrder.Default) &&
-          !!e.descending === !!filter.isSortDescending,
-      ) ??
-        this.sortEntries()[0] ??
-        DEFAULT_SORT_ORDER_ENTRIES[0],
-    );
-    this.form.markAsPristine();
-  }
-
-  private getFilter(): WordFilter {
-    const sortOrderEntry =
-      this.sortEntries().find((e) => e.key === this.sortOrder.value.key) ||
-      this.sortEntries()[0];
-
-    return {
-      language: this.language.value ?? undefined,
-      pos: this.pos.value ?? undefined,
-      valuePattern: this.valuePattern.value
-        ? this.valuePattern.value.replace(/\*/g, '%').replace(/\?/g, '_')
-        : undefined,
-      minValueLength: this.minValueLength.value || undefined,
-      maxValueLength: this.maxValueLength.value || undefined,
-      minCount: this.minCount.value || undefined,
-      maxCount: this.maxCount.value || undefined,
-      sortOrder: sortOrderEntry.value,
-      isSortDescending: sortOrderEntry.descending,
-    };
   }
 
   public reset(): void {
-    this.form.reset();
     this.filter.set({});
     this.dialogRef?.close(null);
   }
 
   public apply(): void {
-    this.filter.set(this.getFilter());
+    // also reached by Enter, which used to be blocked by the disabled
+    // submit button
+    if (this.form().invalid()) {
+      return;
+    }
+    this.filter.set(toModel(this._draft(), this.sortEntries()));
     this.dialogRef?.close(this.filter());
   }
 }

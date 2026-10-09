@@ -1,5 +1,5 @@
 <div>
-  @if (nodes$ && nodes$ | async; as nodes) {
+  @if (nodes$() | async; as nodes) {
     <div class="form-row">
       <!-- filters -->
       @if (nodes.length > filterTreshold()) {
@@ -11,13 +11,13 @@
               i18n-placeholder
               aria-label="filter"
               i18n-aria-label
-              [formControl]="labelFilter"
+              [formField]="filterForm.label"
             />
             <button
               type="button"
               mat-icon-button
               matSuffix
-              [disabled]="!labelFilter.value"
+              [disabled]="!filterForm.label().controlValue()"
               (click)="resetLabelFilter()"
               i18n-aria-label
               aria-label="Clear filter"

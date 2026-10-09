@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/pythia-search",
-  "version": "10.0.0",
+  "version": "11.0.0",
   "description": "Pythia - search.",
   "keywords": [
     "Pythia"
@@ -14,15 +14,15 @@
     "name": "Daniele Fusi"
   },
   "peerDependencies": {
-    "@angular/common": "^22.0.3",
-    "@angular/core": "^22.0.3",
-    "@angular/material": "^22.0.2",
-    "@myrmidon/ngx-tools": "^3.0.0",
-    "@myrmidon/pythia-api": "^8.0.2",
-    "@myrmidon/pythia-core": "^8.0.2",
-    "@myrmidon/pythia-document-reader": "^8.0.2",
-    "@myrmidon/pythia-ui": "^8.0.2",
-    "@myrmidon/pythia-query-builder": "^9.0.2"
+    "@angular/common": "^22.2.1",
+    "@angular/core": "^22.2.1",
+    "@angular/material": "^22.2.1",
+    "@myrmidon/ngx-tools": "^3.0.2",
+    "@myrmidon/pythia-api": "^11.0.0",
+    "@myrmidon/pythia-core": "^11.0.0",
+    "@myrmidon/pythia-document-reader": "^11.0.0",
+    "@myrmidon/pythia-ui": "^11.0.0",
+    "@myrmidon/pythia-query-builder": "^11.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

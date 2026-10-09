@@ -1,13 +1,21 @@
-import { Component, model, effect, input, ChangeDetectionStrategy } from '@angular/core';
 import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { forkJoin, Observable, of } from 'rxjs';
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  linkedSignal,
+  model,
+  untracked,
+} from '@angular/core';
+import {
+  FormField,
+  applyEach,
+  form,
+  maxLength,
+  required,
+} from '@angular/forms/signals';
+import { Subscription } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -47,13 +55,113 @@ export interface DocumentFilters {
   attributes?: boolean;
 }
 
+interface AttributeControls {
+  name: string;
+  value: string;
+}
+
+/**
+ * The editable shape behind the form. The corpus and profile are the
+ * objects picked via lookup (or loaded from the filter's IDs); they are not
+ * bound to native controls.
+ */
+interface DocumentFilterControls {
+  corpus: Corpus | null;
+  author: string;
+  title: string;
+  source: string;
+  profile: Profile | null;
+  minDateValue: number | null;
+  maxDateValue: number | null;
+  minTimeModified: Date | null;
+  maxTimeModified: Date | null;
+  attrs: AttributeControls[];
+  sortOrder: number;
+  descending: boolean;
+}
+
+function parseAttributes(csv?: string): AttributeControls[] {
+  if (!csv) {
+    return [];
+  }
+  const pairRegex = /^\s*([^=]+)=(.*)\s*/;
+  return csv
+    .split(',')
+    .map((p) => pairRegex.exec(p))
+    .filter((m) => m !== null)
+    .map((m) => ({ name: m[1], value: m[2] }));
+}
+
+/**
+ * Bound filter -> draft. The corpus and profile objects cannot be derived
+ * from their IDs synchronously: the previous ones are kept when their ID is
+ * unchanged, otherwise they are left null for the loader to fill.
+ */
+function toDraft(
+  filter: DocumentFilter | null | undefined,
+  previous?: DocumentFilterControls,
+): DocumentFilterControls {
+  const corpusId = filter?.corpusId;
+  const profileId = filter?.profileId;
+  return {
+    corpus:
+      corpusId && previous?.corpus?.id === corpusId ? previous.corpus : null,
+    author: filter?.author || '',
+    title: filter?.title || '',
+    source: filter?.source || '',
+    profile:
+      profileId && previous?.profile?.id === profileId
+        ? previous.profile
+        : null,
+    minDateValue: filter?.minDateValue || null,
+    maxDateValue: filter?.maxDateValue || null,
+    minTimeModified: filter?.minTimeModified || null,
+    maxTimeModified: filter?.maxTimeModified || null,
+    attrs: parseAttributes(filter?.attributes),
+    sortOrder: filter?.sortOrder || 0,
+    descending: !!filter?.descending,
+  };
+}
+
+function toAttributes(attrs: AttributeControls[]): Attribute[] | undefined {
+  const entries: Attribute[] = [];
+  for (const a of attrs) {
+    const name = a.name.trim();
+    const value = a.value.trim();
+    // the backend requires both name and value
+    if (name && value) {
+      entries.push({ targetId: 0, name, value });
+    }
+  }
+  return entries.length ? entries : undefined;
+}
+
+function toModel(draft: DocumentFilterControls): DocumentFilter {
+  return {
+    corpusId: draft.corpus?.id,
+    author: draft.author.trim() || undefined,
+    title: draft.title.trim() || undefined,
+    source: draft.source.trim() || undefined,
+    profileId: draft.profile?.id,
+    minDateValue: draft.minDateValue || undefined,
+    maxDateValue: draft.maxDateValue || undefined,
+    minTimeModified: draft.minTimeModified || undefined,
+    maxTimeModified: draft.maxTimeModified || undefined,
+    attributes: toAttributes(draft.attrs)
+      ?.map((a) => `${a.name}=${a.value}`)
+      ?.join(','),
+    sortOrder: draft.sortOrder,
+    descending: draft.descending,
+  };
+}
+
 /**
  * Filters for the document list.
  */
 @Component({
   selector: 'pythia-document-filter',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatCheckboxModule,
     MatChipsModule,
@@ -67,10 +175,15 @@ export interface DocumentFilters {
     RefLookupComponent,
   ],
   templateUrl: './document-filter.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./document-filter.component.css'],
 })
 export class DocumentFilterComponent {
+  private readonly _corpusService = inject(CorpusService);
+  private readonly _profileService = inject(ProfileService);
+  public readonly corpusLookupService = inject(CorpusRefLookupService);
+  public readonly profileLookupService = inject(ProfileRefLookupService);
+
   /**
    * The filter.
    */
@@ -96,190 +209,97 @@ export class DocumentFilterComponent {
    */
   public readonly sortable = input<boolean | undefined>(true);
 
-  public corpus: FormControl<Corpus | null>;
-  public author: FormControl<string | null>;
-  public title: FormControl<string | null>;
-  public source: FormControl<string | null>;
-  public profile: FormControl<Profile | null>;
-  public minDateValue: FormControl<number | null>;
-  public maxDateValue: FormControl<number | null>;
-  public minTimeModified: FormControl<Date | null>;
-  public maxTimeModified: FormControl<Date | null>;
-  public attrs: FormArray;
-  public sortOrder: FormControl<number>;
-  public descending: FormControl<boolean>;
-  public form: FormGroup;
+  // the filter is applied explicitly, so any incoming filter rebuilds the
+  // draft; `previous` only serves to reuse an already loaded corpus/profile
+  private readonly _draft = linkedSignal<
+    DocumentFilter | null | undefined,
+    DocumentFilterControls
+  >({
+    source: () => this.filter(),
+    computation: (filter, previous) => toDraft(filter, previous?.value),
+  });
 
-  constructor(
-    public corpusLookupService: CorpusRefLookupService,
-    public profileLookupService: ProfileRefLookupService,
-    private _corpusService: CorpusService,
-    private _profileService: ProfileService,
-    private _formBuilder: FormBuilder
-  ) {
-    // form
-    this.corpus = _formBuilder.control(null);
-    this.author = _formBuilder.control(null);
-    this.title = _formBuilder.control(null);
-    this.source = _formBuilder.control(null);
-    this.profile = _formBuilder.control(null);
-    this.minDateValue = _formBuilder.control(null);
-    this.maxDateValue = _formBuilder.control(null);
-    this.minTimeModified = _formBuilder.control(null);
-    this.maxTimeModified = _formBuilder.control(null);
-    this.attrs = _formBuilder.array([]);
-    this.sortOrder = _formBuilder.control(0, { nonNullable: true });
-    this.descending = _formBuilder.control(false, { nonNullable: true });
-    this.form = _formBuilder.group({
-      corpus: this.corpus,
-      author: this.author,
-      title: this.title,
-      source: this.source,
-      profile: this.profile,
-      minDateValue: this.minDateValue,
-      maxDateValue: this.maxDateValue,
-      minTimeModified: this.minTimeModified,
-      maxTimeModified: this.maxTimeModified,
-      attrs: this.attrs,
-      sortOrder: this.sortOrder,
-      descending: this.descending,
+  public readonly form = form(this._draft, (path) => {
+    maxLength(path.author, 500);
+    maxLength(path.title, 500);
+    maxLength(path.source, 500);
+    applyEach(path.attrs, (attr) => {
+      required(attr.name);
+      maxLength(attr.value, 100);
     });
+  });
 
-    effect(() => {
-      this.updateForm(this.filter());
-    });
-  }
-
-  private parseAttributes(csv?: string): Attribute[] {
-    if (!csv) {
-      return [];
-    }
-    const pairRegex = /^\s*([^=]+)=(.*)\s*/;
-    return csv
-      .split(',')
-      .map((p) => {
-        const m = pairRegex.exec(p);
-        return m ? { targetId: 0, name: m[1], value: m[2] } : null;
-      })
-      .filter((a) => a) as Attribute[];
-  }
-
-  private updateForm(filter?: DocumentFilter | null): void {
-    if (!filter) {
-      this.form.reset();
-      return;
-    }
-    this.author.setValue(filter.author || null);
-    this.title.setValue(filter.title || null);
-    this.source.setValue(filter.source || null);
-    this.minDateValue.setValue(filter.minDateValue || null);
-    this.maxDateValue.setValue(filter.maxDateValue || null);
-    this.minTimeModified.setValue(filter.minTimeModified || null);
-    this.maxTimeModified.setValue(filter.maxTimeModified || null);
-    this.sortOrder.setValue(filter.sortOrder || 0);
-    this.descending.setValue(filter.descending ? true : false);
-
-    this.attrs.clear({ emitEvent: false });
-    const attrs = this.parseAttributes(filter.attributes);
-    for (let i = 0; i < attrs.length; i++) {
-      this.attrs.push(this.getAttributeGroup(attrs[i]));
-    }
-
-    // each source must emit (forkJoin emits nothing if any source is empty);
-    // reuse the corpus and profile already loaded when unchanged
-    const corpus$: Observable<Corpus | null> = !filter.corpusId
-      ? of(null)
-      : this.corpus.value?.id === filter.corpusId
-        ? of(this.corpus.value)
-        : this._corpusService.getCorpus(filter.corpusId, true);
-    const profile$: Observable<Profile | null> = !filter.profileId
-      ? of(null)
-      : this.profile.value?.id === filter.profileId
-        ? of(this.profile.value)
-        : this._profileService.getProfile(filter.profileId);
-
-    forkJoin({ corpus: corpus$, profile: profile$ }).subscribe((result) => {
-      this.corpus.setValue(result.corpus);
-      this.profile.setValue(result.profile);
-      this.form.markAsPristine();
+  constructor() {
+    // load the corpus and profile objects for the IDs of an incoming filter,
+    // unless the draft already holds them
+    effect((onCleanup) => {
+      const filter = this.filter();
+      const draft = untracked(() => this._draft());
+      const subs = new Subscription();
+      if (filter?.corpusId && draft.corpus?.id !== filter.corpusId) {
+        subs.add(
+          this._corpusService
+            .getCorpus(filter.corpusId, true)
+            .subscribe((corpus) =>
+              this._draft.update((d) => ({ ...d, corpus: corpus || null })),
+            ),
+        );
+      }
+      if (filter?.profileId && draft.profile?.id !== filter.profileId) {
+        subs.add(
+          this._profileService
+            .getProfile(filter.profileId)
+            .subscribe((profile) =>
+              this._draft.update((d) => ({ ...d, profile: profile || null })),
+            ),
+        );
+      }
+      onCleanup(() => subs.unsubscribe());
     });
   }
 
   public onCorpusChange(corpus: unknown): void {
-    this.corpus.setValue((corpus as Corpus) || undefined || null);
+    this.form.corpus().value.set((corpus as Corpus | undefined) || null);
   }
 
   public removeCorpus(): void {
-    this.corpus.reset();
+    this.form.corpus().value.set(null);
   }
 
   public onProfileChange(profile: unknown): void {
-    this.profile.setValue((profile as Profile | undefined) || null);
+    this.form.profile().value.set((profile as Profile | undefined) || null);
   }
 
   public onProfileRemoved(): void {
-    this.profile.reset();
+    this.form.profile().value.set(null);
   }
 
   //#region Attributes
-  private getAttributeGroup(item?: Attribute): FormGroup {
-    return this._formBuilder.group({
-      name: this._formBuilder.control(item?.name, Validators.required),
-      value: this._formBuilder.control(item?.value, Validators.maxLength(100)),
-    });
-  }
-
   public addAttribute(item?: Attribute): void {
-    this.attrs.push(this.getAttributeGroup(item));
-    this.attrs.markAsDirty();
+    this._draft.update((d) => ({
+      ...d,
+      attrs: [...d.attrs, { name: item?.name || '', value: item?.value || '' }],
+    }));
   }
 
   public removeAttribute(index: number): void {
-    this.attrs.removeAt(index);
-    this.attrs.markAsDirty();
-  }
-
-  private getAttributes(): Attribute[] | undefined {
-    const entries: Attribute[] = [];
-    for (let i = 0; i < this.attrs.length; i++) {
-      const g = this.attrs.at(i) as FormGroup;
-      const name: string | undefined = g.controls['name'].value?.trim();
-      const value: string | undefined = g.controls['value'].value?.trim();
-      // the backend requires both name and value
-      if (name && value) {
-        entries.push({ targetId: 0, name, value });
-      }
-    }
-    return entries.length ? entries : undefined;
+    this._draft.update((d) => ({
+      ...d,
+      attrs: d.attrs.filter((_, i) => i !== index),
+    }));
   }
   //#endregion
 
-  private getFilter(): DocumentFilter {
-    return {
-      corpusId: this.corpus.value?.id,
-      author: this.author.value?.trim(),
-      title: this.title.value?.trim(),
-      source: this.source.value?.trim(),
-      profileId: this.profile.value?.id,
-      minDateValue: this.minDateValue.value || undefined,
-      maxDateValue: this.maxDateValue.value || undefined,
-      minTimeModified: this.minTimeModified.value || undefined,
-      maxTimeModified: this.maxTimeModified.value || undefined,
-      attributes: this.getAttributes()
-        ?.map((a) => `${a.name}=${a.value}`)
-        ?.join(','),
-      sortOrder: this.sortOrder.value,
-      descending: this.descending.value ? true : false,
-    };
-  }
-
   public reset(): void {
-    this.attrs.clear({ emitEvent: false });
-    this.form.reset();
     this.filter.set({});
   }
 
   public apply(): void {
-    this.filter.set(this.getFilter());
+    // also reached by Enter, which used to be blocked by the disabled
+    // submit button
+    if (this.disabled()) {
+      return;
+    }
+    this.filter.set(toModel(this._draft()));
   }
 }

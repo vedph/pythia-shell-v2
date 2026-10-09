@@ -5,15 +5,9 @@ import {
   input,
   OnInit,
   signal,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormField, form, maxLength, required } from '@angular/forms/signals';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
 
@@ -31,18 +25,20 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 import { DataPage } from '@myrmidon/ngx-tools';
 import { DocumentReadRequest } from '@myrmidon/pythia-core';
-import { KwicSearchResult } from '@myrmidon/pythia-api';
 import { QueryBuilderComponent } from '@myrmidon/pythia-query-builder';
 import { DocumentReaderComponent } from '@myrmidon/pythia-document-reader';
 
-import { SearchRepository } from '../../search.repository';
+import {
+  KwicSearchResultItem,
+  SearchRepository,
+} from '../../search.repository';
 import { SearchExportComponent } from '../search-export/search-export.component';
 
 @Component({
   selector: 'pythia-search',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
@@ -63,7 +59,8 @@ import { SearchExportComponent } from '../search-export/search-export.component'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchComponent implements OnInit {
-  @ViewChild('queryCtl') queryElementRef: ElementRef | undefined;
+  public readonly queryElementRef =
+    viewChild<ElementRef<HTMLTextAreaElement>>('queryCtl');
 
   /**
    * Initial query term to be set in the search input.
@@ -83,13 +80,20 @@ export class SearchComponent implements OnInit {
   public query$: Observable<string | undefined>;
   public lastQueries$: Observable<string[]>;
   public loading$: Observable<boolean | undefined>;
-  public page$: Observable<DataPage<KwicSearchResult> | undefined>;
+  public page$: Observable<DataPage<KwicSearchResultItem> | undefined>;
   public error$: Observable<string | undefined>;
   public readRequest$: Observable<DocumentReadRequest | undefined>;
 
-  public query: FormControl<string | null>;
-  public history: FormControl<string | null>;
-  public form: FormGroup;
+  public readonly form = form(
+    signal<{ query: string; history: string | null }>({
+      query: '',
+      history: null,
+    }),
+    (path) => {
+      required(path.query);
+      maxLength(path.query, 1000);
+    },
+  );
 
   public readonly leftContextLabels = signal<string[]>([
     '5',
@@ -107,19 +111,7 @@ export class SearchComponent implements OnInit {
   ]);
   public readonly queryTabIndex = signal<number>(0);
 
-  constructor(
-    private _repository: SearchRepository,
-    formBuilder: FormBuilder,
-  ) {
-    this.query = formBuilder.control(null, [
-      Validators.required,
-      Validators.maxLength(1000),
-    ]);
-    this.history = formBuilder.control(null);
-    this.form = formBuilder.group({
-      query: this.query,
-      history: this.history,
-    });
+  constructor(private _repository: SearchRepository) {
     this.page$ = _repository.page$;
     this.query$ = _repository.query$;
     this.lastQueries$ = _repository.lastQueries$;
@@ -132,9 +124,9 @@ export class SearchComponent implements OnInit {
     const term = this.initialQueryTerm();
     if (term) {
       if (term.startsWith('^')) {
-        this.query.setValue(`[lemma="${term.substring(1)}"]`);
+        this.form.query().value.set(`[lemma="${term.substring(1)}"]`);
       } else {
-        this.query.setValue(`[value="${term}"]`);
+        this.form.query().value.set(`[value="${term}"]`);
       }
       setTimeout(() => this.search(), 0);
     }
@@ -142,23 +134,24 @@ export class SearchComponent implements OnInit {
 
   public pageChange(event: PageEvent): void {
     this._repository.loadPage(event.pageIndex + 1, event.pageSize, {
-      query: this.query.value!,
+      query: this.form.query().value(),
     });
   }
 
   public pickHistory(): void {
-    if (!this.history.value) {
+    const history = this.form.history().value();
+    if (!history) {
       return;
     }
-    this.query.setValue(this.history.value);
-    setTimeout(() => this.queryElementRef?.nativeElement.focus(), 0);
+    this.form.query().value.set(history);
+    setTimeout(() => this.queryElementRef()?.nativeElement.focus(), 0);
   }
 
   public search(): void {
-    if (this.form.invalid) {
+    if (this.form().invalid()) {
       return;
     }
-    const query = this.query.value?.trim();
+    const query = this.form.query().value().trim();
     if (!query) {
       return;
     }
@@ -172,15 +165,15 @@ export class SearchComponent implements OnInit {
   }
 
   public onQueryPeek(query: string): void {
-    this.query.setValue(query);
+    this.form.query().value.set(query);
     setTimeout(() => {
       this.queryTabIndex.set(0);
-      this.queryElementRef?.nativeElement.focus();
+      this.queryElementRef()?.nativeElement.focus();
     }, 0);
   }
 
   public onQueryChange(query: string): void {
-    this.query.setValue(query);
+    this.form.query().value.set(query);
     this._repository.addToHistory(query);
     this._repository.setFilter({ query });
   }

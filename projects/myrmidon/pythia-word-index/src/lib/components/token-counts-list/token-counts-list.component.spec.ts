@@ -178,6 +178,27 @@ describe('TokenCountsListComponent', () => {
     expect(screen.queryByRole('heading', { name: 'genre' })).toBeNull();
   });
 
+  it('should not load counts on selection until requested', async () => {
+    const { user, wordService } = await setup({ token: word(1, 'amor') });
+    await user.click(screen.getByRole('combobox', { name: 'attributes' }));
+    await user.click(await screen.findByRole('option', { name: /^genre/ }));
+    await user.keyboard('{Escape}');
+    expect(wordService.getWordCounts).not.toHaveBeenCalled();
+    await user.click(
+      screen.getByRole('button', { name: 'Set selected attributes' }),
+    );
+    expect(wordService.getWordCounts).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not tag the caller attributes', async () => {
+    const attributes = ATTRS.map((a) => ({ ...a }));
+    const { user } = await setup({ token: word(1, 'amor'), attributes });
+    await selectAttributes(user, 'genre');
+    for (const a of attributes) {
+      expect(Object.getOwnPropertySymbols(a)).toEqual([]);
+    }
+  });
+
   it('should stop loading on error', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const { user, wordService } = await setup({ token: word(7, 'amat') });

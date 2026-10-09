@@ -1,14 +1,14 @@
-<form
-  [formGroup]="form"
-  [style.margin.px]="wrapped() ? 16 : 0"
-  (submit)="apply()"
->
+<div [style.margin.px]="wrapped() ? 16 : 0">
   <!-- language -->
   @if (!hideLanguage()) {
     <div>
       <mat-form-field>
         <mat-label i18n>language</mat-label>
-        <input matInput [formControl]="language" maxlength="50" />
+        <input
+          matInput
+          [formField]="form.language"
+          (keydown.enter)="apply()"
+        />
       </mat-form-field>
     </div>
   }
@@ -18,7 +18,7 @@
     <div>
       <mat-form-field>
         <mat-label>POS</mat-label>
-        <mat-select [formControl]="pos">
+        <mat-select [formField]="form.pos">
           <mat-option [value]="null">-</mat-option>
           <mat-option value="NOUN" i18n>noun</mat-option>
           <mat-option value="PROPN" i18n>proper noun</mat-option>
@@ -41,7 +41,11 @@
   <div>
     <mat-form-field>
       <mat-label i18n>value pattern</mat-label>
-      <input matInput [formControl]="valuePattern" maxlength="500" />
+      <input
+        matInput
+        [formField]="form.valuePattern"
+        (keydown.enter)="apply()"
+      />
       <mat-hint i18n>Wildcards * and ?</mat-hint>
     </mat-form-field>
   </div>
@@ -50,12 +54,22 @@
   <div class="form-row">
     <mat-form-field class="nr">
       <mat-label i18n>min.len.</mat-label>
-      <input matInput type="number" [formControl]="minValueLength" min="0" />
+      <input
+        matInput
+        type="number"
+        [formField]="form.minValueLength"
+        (keydown.enter)="apply()"
+      />
     </mat-form-field>
     -
     <mat-form-field class="nr">
       <mat-label i18n>max.len.</mat-label>
-      <input matInput type="number" [formControl]="maxValueLength" min="0" />
+      <input
+        matInput
+        type="number"
+        [formField]="form.maxValueLength"
+        (keydown.enter)="apply()"
+      />
     </mat-form-field>
   </div>
 
@@ -63,12 +77,22 @@
   <div class="form-row">
     <mat-form-field class="nr">
       <mat-label i18n>min.freq.</mat-label>
-      <input matInput type="number" [formControl]="minCount" min="0" />
+      <input
+        matInput
+        type="number"
+        [formField]="form.minCount"
+        (keydown.enter)="apply()"
+      />
     </mat-form-field>
     -
     <mat-form-field class="nr">
       <mat-label i18n>max.freq.</mat-label>
-      <input matInput type="number" [formControl]="maxCount" min="0" />
+      <input
+        matInput
+        type="number"
+        [formField]="form.maxCount"
+        (keydown.enter)="apply()"
+      />
     </mat-form-field>
   </div>
 
@@ -76,7 +100,7 @@
   <div>
     <mat-form-field>
       <mat-label i18n>sort order</mat-label>
-      <mat-select [formControl]="sortOrder">
+      <mat-select [formField]="form.sortOrder">
         @for (e of sortEntries(); track e.key) {
           <mat-option [value]="e">{{ e.key }}</mat-option>
         }
@@ -99,16 +123,17 @@
       <mat-icon>clear</mat-icon>
     </button>
     <button
-      type="submit"
+      type="button"
       class="mat-primary"
       mat-icon-button
       matTooltip="Apply"
       i18n-matTooltip
       aria-label="Apply filters"
       i18n-aria-label
-      [disabled]="form.invalid"
+      [disabled]="form().invalid()"
+      (click)="apply()"
     >
       <mat-icon>check_circle</mat-icon>
     </button>
   </div>
-</form>
+</div>

@@ -1,7 +1,7 @@
 import { inputBinding, outputBinding, signal } from '@angular/core';
 import { render, screen } from '@testing-library/angular';
 import userEvent from '@testing-library/user-event';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 import {
   CorpusService,
@@ -27,6 +27,7 @@ interface SetupOptions {
   attributes?: string[] | null;
   hiddenFilters?: DocumentFilters;
   sortable?: boolean;
+  disabled?: boolean;
 }
 
 async function setup(options: SetupOptions = {}) {
@@ -36,6 +37,7 @@ async function setup(options: SetupOptions = {}) {
     options.hiddenFilters,
   );
   const sortable = signal<boolean | undefined>(options.sortable ?? true);
+  const disabled = signal<boolean | undefined>(options.disabled);
   const filterChange = vi.fn();
   const corpusService = { getCorpus: vi.fn().mockReturnValue(of(CORPUS)) };
   const profileService = { getProfile: vi.fn().mockReturnValue(of(PROFILE)) };
@@ -45,6 +47,7 @@ async function setup(options: SetupOptions = {}) {
       inputBinding('attributes', attributes),
       inputBinding('hiddenFilters', hiddenFilters),
       inputBinding('sortable', sortable),
+      inputBinding('disabled', disabled),
       outputBinding('filterChange', filterChange),
     ],
     providers: [
@@ -301,18 +304,76 @@ describe('DocumentFilterComponent', () => {
       expect(lastFilter(filterChange).attributes).toBeUndefined();
     });
 
-    it('should show an error for a too long value', async () => {
+    // signal forms project maxLength onto the native maxlength attribute
+    it('should cap a too long value', async () => {
       const { user } = await setup({ attributes: ['genre'] });
       await user.click(
         screen.getByRole('button', { name: 'Add an attribute filter' }),
       );
-      await user.type(
-        screen.getByRole('textbox', { name: 'value' }),
-        'x'.repeat(101),
-      );
-      await user.tab();
-      expect(screen.getByText('too long')).toBeTruthy();
+      const value = screen.getByRole('textbox', {
+        name: 'value',
+      }) as HTMLInputElement;
+      await user.type(value, 'x'.repeat(101));
+      expect(value.value.length).toBe(100);
     });
+
+    it('should show an error for a missing name once touched', async () => {
+      const { user } = await setup({ attributes: ['genre'] });
+      await user.click(
+        screen.getByRole('button', { name: 'Add an attribute filter' }),
+      );
+      screen.getByRole('combobox', { name: 'name' }).focus();
+      await user.tab();
+      expect(screen.getByText('name required')).toBeTruthy();
+    });
+  });
+
+  describe('submission', () => {
+    it('should render no <form> element', async () => {
+      const { fixture } = await setup();
+      expect(fixture.nativeElement.querySelector('form')).toBeNull();
+    });
+
+    it('should apply filter on Enter', async () => {
+      const { user, filterChange } = await setup();
+      await user.type(box('author(s)'), 'Homer{Enter}');
+      expect(lastFilter(filterChange).author).toBe('Homer');
+    });
+
+    it('should not apply filter on Enter when disabled', async () => {
+      const { user, filterChange } = await setup({ disabled: true });
+      await user.type(box('author(s)'), 'Homer{Enter}');
+      expect(filterChange).not.toHaveBeenCalled();
+    });
+  });
+
+  it('should ignore a corpus load superseded by a new filter', async () => {
+    const { corpusService, filter, fixture, user, filterChange } =
+      await setup();
+    const pending = new Subject<Corpus>();
+    corpusService.getCorpus.mockReturnValue(pending);
+    filter.set({ corpusId: 'c1' });
+    await fixture.whenStable();
+    filter.set({ author: 'x' });
+    await fixture.whenStable();
+    pending.next(CORPUS);
+    await user.click(apply());
+    expect(lastFilter(filterChange).corpusId).toBeUndefined();
+  });
+
+  it('should keep typed values when a corpus load completes', async () => {
+    const { corpusService, filter, fixture, user, filterChange } =
+      await setup();
+    const pending = new Subject<Corpus>();
+    corpusService.getCorpus.mockReturnValue(pending);
+    filter.set({ corpusId: 'c1' });
+    await fixture.whenStable();
+    await user.type(box('title'), 'Iliad');
+    pending.next(CORPUS);
+    await user.click(apply());
+    expect(lastFilter(filterChange)).toEqual(
+      expect.objectContaining({ corpusId: 'c1', title: 'Iliad' }),
+    );
   });
 
   it('should reset all controls and emit an empty filter', async () => {

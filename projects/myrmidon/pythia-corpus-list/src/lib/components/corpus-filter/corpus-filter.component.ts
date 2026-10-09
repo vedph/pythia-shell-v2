@@ -1,10 +1,11 @@
-import { Component, effect, input, model, output, ChangeDetectionStrategy } from '@angular/core';
 import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  linkedSignal,
+  model,
+} from '@angular/core';
+import { FormField, form } from '@angular/forms/signals';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,6 +15,22 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { CorpusFilter } from '@myrmidon/pythia-api';
 
+interface CorpusFilterControls {
+  id: string;
+  title: string;
+}
+
+function toDraft(filter?: CorpusFilter | null): CorpusFilterControls {
+  return { id: filter?.id || '', title: filter?.title || '' };
+}
+
+function toModel(draft: CorpusFilterControls): CorpusFilter {
+  return {
+    id: draft.id.trim() || undefined,
+    title: draft.title.trim() || undefined,
+  };
+}
+
 /**
  * Corpus filter component. This is used to filter the list
  * of corpora.
@@ -21,7 +38,7 @@ import { CorpusFilter } from '@myrmidon/pythia-api';
 @Component({
   selector: 'pythia-corpus-filter',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
@@ -29,7 +46,7 @@ import { CorpusFilter } from '@myrmidon/pythia-api';
     MatTooltipModule,
   ],
   templateUrl: './corpus-filter.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./corpus-filter.component.css'],
 })
 export class CorpusFilterComponent {
@@ -43,46 +60,22 @@ export class CorpusFilterComponent {
    */
   public readonly disabled = input<boolean | undefined>();
 
-  public id: FormControl<string | null>;
-  public title: FormControl<string | null>;
-  public form: FormGroup;
+  // the filter is applied explicitly, so any incoming filter (including
+  // the echo of an applied one) just rebuilds the draft
+  private readonly _draft = linkedSignal(() => toDraft(this.filter()));
 
-  constructor(formBuilder: FormBuilder) {
-    // form
-    this.id = formBuilder.control(null);
-    this.title = formBuilder.control(null);
-    this.form = formBuilder.group({
-      id: this.id,
-      title: this.title,
-    });
-    effect(() => {
-      this.updateForm(this.filter());
-    });
-  }
-
-  private updateForm(filter?: CorpusFilter | null): void {
-    if (!filter) {
-      this.form.reset();
-      return;
-    }
-    this.id.setValue(filter.id || null);
-    this.title.setValue(filter.title || null);
-    this.form.markAsPristine();
-  }
-
-  private getFilter(): CorpusFilter {
-    return {
-      id: this.id.value?.trim(),
-      title: this.title.value?.trim(),
-    };
-  }
+  public readonly form = form(this._draft);
 
   public reset(): void {
-    this.form.reset();
     this.filter.set({});
   }
 
   public apply(): void {
-    this.filter.set(this.getFilter());
+    // also reached by Enter, which used to be blocked by the disabled
+    // submit button
+    if (this.disabled()) {
+      return;
+    }
+    this.filter.set(toModel(this._draft()));
   }
 }
