@@ -107,22 +107,33 @@ export class PagedWordTreeBrowserComponent implements OnInit {
     return key;
   }
 
+  private expandRoot(): void {
+    const root = this._store.getRootNode();
+    if (root && !root.expanded) {
+      this._store.expand(root.id).catch((error) => {
+        console.error('Error expanding root node', error);
+      });
+    }
+  }
+
   public ngOnInit(): void {
     if (!this._store.getNodes().length) {
       this.loading.set(true);
-      this._store.setFilter({}).finally(() => {
-        this.loading.set(false);
-        this._store.expand(this._store.getRootNode()!.id);
-      });
+      this._store
+        .setFilter({})
+        .then(() => this.expandRoot())
+        .catch((error) => console.error('Error loading words', error))
+        .finally(() => this.loading.set(false));
     }
   }
 
   public reset(): void {
     this.loading.set(true);
-    this._store.reset().finally(() => {
-      this.loading.set(false);
-      this._store.expand(this._store.getRootNode()!.id);
-    });
+    this._store
+      .reset()
+      .then(() => this.expandRoot())
+      .catch((error) => console.error('Error loading words', error))
+      .finally(() => this.loading.set(false));
   }
 
   public onToggleExpanded(node: PagedWordTreeNode): void {
@@ -149,13 +160,11 @@ export class PagedWordTreeBrowserComponent implements OnInit {
 
   public onFilterChange(filter?: WordFilter | null): void {
     this.loading.set(true);
-    this._store.setFilter(filter || {}).finally(() => {
-      this.loading.set(false);
-      const root = this._store.getRootNode();
-      if (root && !root.expanded) {
-        this._store.expand(root.id);
-      }
-    });
+    this._store
+      .setFilter(filter || {})
+      .then(() => this.expandRoot())
+      .catch((error) => console.error('Error loading words', error))
+      .finally(() => this.loading.set(false));
   }
 
   public onEditFilterRequest(node: PagedWordTreeNode): void {

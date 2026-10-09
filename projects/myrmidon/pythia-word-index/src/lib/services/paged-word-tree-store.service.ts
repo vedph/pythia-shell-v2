@@ -110,7 +110,7 @@ export class PagedWordTreeStoreService
           items: page.items.map((w, i) => ({
             parentId: filter.parentId,
             id: w.id,
-            y: 2,
+            y: 1,
             x: i + 1 + skip,
             label: w.value,
             hasChildren: false,

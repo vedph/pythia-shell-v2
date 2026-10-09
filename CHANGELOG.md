@@ -36,6 +36,12 @@
     - `pythia-search`, `SearchRepository`: a failed search request (e.g. server or network error) left the progress bar spinning forever, with no error shown and an unhandled promise rejection; the error is now shown and loading stops. Same page size cache issue as the other lists.
     - `pythia-search`: reading in context a hit at the very beginning of a document (index 0) now works (see the `pythia-document-reader` fix); "query too long" error key fixed; the CSV export now releases its object URL; added accessible names to icon-only buttons and table headers.
     - `pythia-stats`, `PythiaStatsComponent`: the "refresh" button had no click handler, and refreshing would anyway have returned the session-cached statistics; it now reloads them from the server.
+    - `pythia-word-index`, `TokenCountsListComponent`: two different words were considered equal when they had the same lemma (or none, as when the index has no lemmata), so requesting the distribution of another word kept showing the counts of the first one. Also, a token arriving while loading was dropped, and a loading error left the component busy forever.
+    - `pythia-word-index`, `PagedWordTreeFilterComponent`: only the first `*` and `?` wildcards in the value pattern were converted to the SQL wildcards expected by the backend; reloading a filter now shows `*`/`?` rather than `%`/`_`; an ascending sort order is matched also when the filter has `isSortDescending: false`.
+    - `pythia-word-index`, `TokenCountsComponent`: the CSV `attr_name` column contained the name of the signal function rather than the attribute name; CSV values with commas or quotes are now escaped; the download link is removed and its object URL released.
+    - `pythia-word-index`, `PagedWordTreeStoreService`: without lemmata, words were placed at depth 2 under a root at depth 0 (instead of 1), with a wrong indentation and location.
+    - `pythia-word-index`: avoided crashes and unhandled rejections when the words tree fails to load; removed leftover `console.log` calls; fixed an invalid CSS border value; added accessible names to icon-only buttons.
+    - note: `PagedTreeStore` and `PagedListStore` in `@myrmidon/paged-data-browsers` have upstream issues: list cache keys ignore the page size (worked around here), and tree `expand`/`changePage` do not handle server errors (the promise never settles and the error is unhandled).
 - 2026-08-27: updated packages.
 
 ## 9.0.0

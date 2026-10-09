@@ -1,5 +1,5 @@
-import { Component, effect, input, Input, model, signal, ChangeDetectionStrategy } from '@angular/core';
-import { take } from 'rxjs';
+import { Component, effect, input, model, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Subscription, take } from 'rxjs';
 
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -39,6 +39,7 @@ import { TokenCountsComponent } from '../token-counts/token-counts.component';
 })
 export class TokenCountsListComponent {
   private _previousToken?: Word | Lemma;
+  private _countsSub?: Subscription;
 
   /**
    * The token for which to display the counts.
@@ -74,8 +75,7 @@ export class TokenCountsListComponent {
         return;
       }
       this._previousToken = token;
-      console.log('input token', token);
-      this.loadCounts(token);
+      this.loadCounts(token, true);
     });
   }
 
@@ -86,17 +86,13 @@ export class TokenCountsListComponent {
     if (!a || !b) {
       return false;
     }
-    if (a.type !== b.type) {
-      return false;
-    }
     if (
-      a.type === 'lemma' &&
-      (a.type !== b.type ||
-        a.id !== b.id ||
-        a.value !== b.value ||
-        a.language !== b.language ||
-        a.pos !== b.pos ||
-        a.count !== b.count)
+      a.type !== b.type ||
+      a.id !== b.id ||
+      a.value !== b.value ||
+      a.language !== b.language ||
+      a.pos !== b.pos ||
+      a.count !== b.count
     ) {
       return false;
     }
@@ -119,7 +115,18 @@ export class TokenCountsListComponent {
     }
   }
 
-  public loadCounts(token?: Word | Lemma | undefined): void {
+  /**
+   * Load the counts for the specified token.
+   *
+   * @param token The token.
+   * @param replace True to replace any pending load (e.g. when the token
+   * changes), else do nothing while loading.
+   */
+  public loadCounts(token?: Word | Lemma | undefined, replace = false): void {
+    if (replace) {
+      this._countsSub?.unsubscribe();
+      this.busy.set(false);
+    }
     if (this.busy() || !token) {
       return;
     }
@@ -135,36 +142,23 @@ export class TokenCountsListComponent {
 
     this.busy.set(true);
 
-    if (token.type === 'lemma') {
-      this._wordService
-        .getLemmaCounts(
-          token!.id,
-          this.selectedAttributes.value.map((i) => i.name),
-        )
-        .pipe(take(1))
-        .subscribe({
-          next: (map) => {
-            this.counts.set(map);
-          },
-          complete: () => {
-            this.busy.set(false);
-          },
-        });
-    } else {
-      this._wordService
-        .getWordCounts(
-          token!.id,
-          this.selectedAttributes.value.map((i) => i.name),
-        )
-        .pipe(take(1))
-        .subscribe({
-          next: (map) => {
-            this.counts.set(map);
-          },
-          complete: () => {
-            this.busy.set(false);
-          },
-        });
-    }
+    const names = this.selectedAttributes.value.map((i) => i.name);
+    const counts$ =
+      token.type === 'lemma'
+        ? this._wordService.getLemmaCounts(token.id, names)
+        : this._wordService.getWordCounts(token.id, names);
+
+    this._countsSub = counts$.pipe(take(1)).subscribe({
+      next: (map) => {
+        this.counts.set(map);
+      },
+      error: (error) => {
+        console.error('Error loading token counts', error);
+        this.busy.set(false);
+      },
+      complete: () => {
+        this.busy.set(false);
+      },
+    });
   }
 }

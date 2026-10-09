@@ -24,7 +24,7 @@
             [style.border-top]="
               node.expanded
                 ? '1px solid rgb(137 181 203)'
-                : '1 px solid transparent'
+                : '1px solid transparent'
             "
           >
             <pdb-browser-tree-node
@@ -57,6 +57,8 @@
                     mat-icon-button
                     matTooltip="Search this form"
                     i18n-matTooltip
+                    aria-label="Search this form"
+                    i18n-aria-label
                     (click)="requestSearch(node.token)"
                   >
                     <mat-icon class="mat-warn">search</mat-icon>
@@ -66,6 +68,8 @@
                     mat-icon-button
                     matTooltip="See this form distribution"
                     i18n-matTooltip
+                    aria-label="See this form distribution"
+                    i18n-aria-label
                     (click)="requestCounts(node.token)"
                   >
                     <mat-icon class="mat-primary">pie_chart</mat-icon>

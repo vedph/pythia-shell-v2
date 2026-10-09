@@ -69,7 +69,6 @@ export class TokenCountsComponent {
     effect(() => {
       const counts = this.counts();
       if (counts && counts.length > 0) {
-        console.log('input counts', counts);
         this.updateChart(counts);
       } else {
         // reset chart when no counts
@@ -120,13 +119,21 @@ export class TokenCountsComponent {
     }
   }
 
+  private static csvField(value: string | undefined): string {
+    if (!value) {
+      return '';
+    }
+    return /[",\r\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+  }
+
   private getCSV(): string {
     // get a CSV representation of the counts
+    const name = TokenCountsComponent.csvField(this.attribute()?.name);
     let csv = 'attr_name,attr_value,nr,percent\n';
     for (const count of this.counts()) {
-      csv += `${this.attribute?.name},${count.attributeValue},${count.value},${
-        count.value / this.total()
-      }\n`;
+      csv += `${name},${TokenCountsComponent.csvField(
+        count.attributeValue,
+      )},${count.value},${count.value / this.total()}\n`;
     }
     return csv;
   }
@@ -165,6 +172,8 @@ export class TokenCountsComponent {
 
     document.body.appendChild(element);
     element.click();
+    document.body.removeChild(element);
+    URL.revokeObjectURL(element.href);
 
     this.downloading.set(false);
   }

@@ -180,7 +180,12 @@ export class PagedWordTreeFilterComponent {
 
     this.language.setValue(filter.language ?? null);
     this.pos.setValue(filter.pos ?? null);
-    this.valuePattern.setValue(filter.valuePattern ?? null);
+    // the filter uses SQL wildcards, while the UI uses * and ?
+    this.valuePattern.setValue(
+      filter.valuePattern
+        ? filter.valuePattern.replace(/%/g, '*').replace(/_/g, '?')
+        : null,
+    );
     this.minValueLength.setValue(filter.minValueLength ?? 0);
     this.maxValueLength.setValue(filter.maxValueLength ?? 0);
     this.minCount.setValue(filter.minCount ?? 0);
@@ -188,8 +193,8 @@ export class PagedWordTreeFilterComponent {
     this.sortOrder.setValue(
       this.sortEntries().find(
         (e) =>
-          e.value === filter.sortOrder &&
-          e.descending === filter.isSortDescending,
+          e.value === (filter.sortOrder ?? WordSortOrder.Default) &&
+          !!e.descending === !!filter.isSortDescending,
       ) ??
         this.sortEntries()[0] ??
         DEFAULT_SORT_ORDER_ENTRIES[0],
@@ -206,7 +211,7 @@ export class PagedWordTreeFilterComponent {
       language: this.language.value ?? undefined,
       pos: this.pos.value ?? undefined,
       valuePattern: this.valuePattern.value
-        ? this.valuePattern.value!.replace('*', '%').replace('?', '_')
+        ? this.valuePattern.value.replace(/\*/g, '%').replace(/\?/g, '_')
         : undefined,
       minValueLength: this.minValueLength.value || undefined,
       maxValueLength: this.maxValueLength.value || undefined,

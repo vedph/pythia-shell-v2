@@ -92,6 +92,8 @@
       mat-icon-button
       matTooltip="Reset"
       i18n-matTooltip
+      aria-label="Reset filters"
+      i18n-aria-label
       (click)="reset()"
     >
       <mat-icon>clear</mat-icon>
@@ -102,6 +104,8 @@
       mat-icon-button
       matTooltip="Apply"
       i18n-matTooltip
+      aria-label="Apply filters"
+      i18n-aria-label
       [disabled]="form.invalid"
     >
       <mat-icon>check_circle</mat-icon>
