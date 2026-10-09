@@ -142,7 +142,6 @@ export class MapPagedTreeBrowserComponent implements OnDestroy {
   }
 
   public onMapNodeClick(node: FlatMapNode): void {
-    console.log('map node click', node);
     this.mapNodeClick.emit(node.payload);
   }
 

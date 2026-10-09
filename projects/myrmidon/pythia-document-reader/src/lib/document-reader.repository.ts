@@ -14,6 +14,8 @@ export class DocumentReaderRepository {
   private _map$: BehaviorSubject<TextMapNode | undefined>;
   private _text$: BehaviorSubject<string | undefined>;
   private _loading$: BehaviorSubject<boolean>;
+  // incremented at each load, to discard stale responses
+  private _loadId = 0;
 
   public get loading$(): Observable<boolean> {
     return this._loading$.asObservable();
@@ -52,6 +54,8 @@ export class DocumentReaderRepository {
   }
 
   public reset(): void {
+    this._loadId++;
+    this._loading$.next(false);
     this._document$.next(undefined);
     this._map$.next(undefined);
     this._text$.next(undefined);
@@ -65,9 +69,24 @@ export class DocumentReaderRepository {
    * (not used for range requests).
    */
   public load(request: DocumentReadRequest, initialPath?: string): void {
+    const loadId = ++this._loadId;
     this._loading$.next(true);
+    const onError = (error: unknown) => {
+      if (loadId !== this._loadId) {
+        return;
+      }
+      this._loading$.next(false);
+      console.error(`Error loading document ${request.documentId}: `, error);
+    };
 
-    if (request.start && request.end) {
+    // a range may start at 0
+    if (
+      request.start !== undefined &&
+      request.start !== null &&
+      request.end !== undefined &&
+      request.end !== null &&
+      request.end > request.start
+    ) {
       forkJoin({
         doc: this._docService.getDocument(request.documentId),
         map: this._readService.getDocumentMap(request.documentId),
@@ -76,27 +95,41 @@ export class DocumentReaderRepository {
           request.start,
           request.end
         ),
-      }).subscribe((result) => {
-        this._loading$.next(false);
-        this.setNodeParents(result.map);
-        this._document$.next(result.doc);
-        this._map$.next(result.map);
-        this._text$.next(result.piece.text);
+      }).subscribe({
+        next: (result) => {
+          if (loadId !== this._loadId) {
+            return;
+          }
+          this._loading$.next(false);
+          this.setNodeParents(result.map);
+          this._document$.next(result.doc);
+          this._map$.next(result.map);
+          this._text$.next(this.extractBodyContent(result.piece.text));
+        },
+        error: onError,
       });
     } else {
       forkJoin({
         doc: this._docService.getDocument(request.documentId),
         map: this._readService.getDocumentMap(request.documentId),
-      }).subscribe((result) => {
-        this._loading$.next(false);
-        this.setNodeParents(result.map);
-        this._document$.next(result.doc);
-        this._map$.next(result.map);
-        this._text$.next(undefined);
-        // initial path if requested
-        if (initialPath) {
-          this.loadTextFromPath(initialPath);
-        }
+      }).subscribe({
+        next: (result) => {
+          if (loadId !== this._loadId) {
+            return;
+          }
+          this._loading$.next(false);
+          this.setNodeParents(result.map);
+          this._document$.next(result.doc);
+          this._map$.next(result.map);
+          this._text$.next(undefined);
+          // initial path if requested
+          if (initialPath) {
+            this.loadTextFromPath(initialPath).catch(() => {
+              // already logged
+            });
+          }
+        },
+        error: onError,
       });
     }
   }
@@ -118,10 +151,10 @@ export class DocumentReaderRepository {
     }
 
     // remove everything up to opening body
-    html = html.replace(/^.+<body\b[^>]*>/gs, '');
+    html = html.replace(/^.*<body\b[^>]*>/s, '');
 
     // remove everything from closing body
-    html = html.replace(/<\/body>$/gs, '');
+    html = html.replace(/<\/body>.*$/s, '');
 
     return html;
   }

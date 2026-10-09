@@ -88,8 +88,13 @@ export class DocumentReaderComponent {
     }
     this._busy = true;
     const path = this._readerService.getNodePath(node);
-    this._repository.loadTextFromPath(path).finally(() => {
-      this._busy = false;
-    });
+    this._repository
+      .loadTextFromPath(path)
+      .catch(() => {
+        // already logged by the repository
+      })
+      .finally(() => {
+        this._busy = false;
+      });
   }
 }

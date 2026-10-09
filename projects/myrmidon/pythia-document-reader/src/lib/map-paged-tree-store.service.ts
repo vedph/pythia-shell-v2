@@ -56,7 +56,9 @@ export class MapPagedTreeStoreService
 
   private flattenMap(node: TextMapNode, parent: FlatMapNode | null): void {
     const flatNode: FlatMapNode = {
-      id: node.start,
+      // IDs must be unique, while a parent and its first child usually
+      // share the same start; also, 0 would be a falsy ID
+      id: this._nodes.length + 1,
       parentId: parent?.id,
       y: this.getNodeDepth(node),
       x: node.parent
@@ -64,7 +66,7 @@ export class MapPagedTreeStoreService
         : this._nodes.filter((n) => n.parentId === undefined).length,
       label: node.label,
       payload: node,
-      hasChildren: !!node.children,
+      hasChildren: !!node.children?.length,
       expanded: false,
       paging: {
         pageNumber: 0,

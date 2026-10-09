@@ -22,6 +22,9 @@
     - `pythia-document-list`, `DocumentRepository`: same page size cache issue as the corpus list.
     - `pythia-document-list`, `DocumentCorpusComponent`: `apply` now also refuses non-editable corpora (the button was already disabled).
     - `pythia-document-list`: added accessible names to icon-only buttons and fixed the list table header markup; removed a duplicate export from the public API.
+    - `pythia-document-reader`, `MapPagedTreeStoreService`: flattened map nodes used their text start as ID, but a node and its first child usually share the same start (and the root's start 0 was treated as "no parent"), so expanding/collapsing nodes and listing children in the map browser could target the wrong nodes. Nodes now get unique sequential IDs; nodes with an empty children array are no longer shown as expandable.
+    - `pythia-document-reader`, `DocumentReaderRepository`: a requested range starting at 0 (e.g. a search hit at the beginning of a document) was ignored; a failed load left the progress bar spinning forever; a slower previous load could overwrite the current document; the text loaded for a range was not stripped of its HTML envelope like other texts; the body extraction failed when the HTML started with `<body>` or had content after `</body>`.
+    - `pythia-document-reader`: removed a leftover `console.log`, avoided unhandled promise rejections on text load errors, added accessible names to the map filter controls.
 - 2026-08-27: updated packages.
 
 ## 9.0.0
