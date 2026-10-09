@@ -79,7 +79,9 @@ export class CorpusListComponent {
 
   public reset(): void {
     this.loading.set(true);
-    this._store.reset();
+    // just clear the cache: the store's reset() would also load the
+    // unfiltered list, racing with the user-filtered one set here
+    this._store.clearCache();
     this._store
       .setFilter(
         this.admin()
@@ -112,6 +114,11 @@ export class CorpusListComponent {
 
   public onPageChange(event: PageEvent): void {
     this.loading.set(true);
+    // cached pages are keyed by number and filter only, so they are stale
+    // when the page size changes
+    if (event.pageSize !== this._store.pageSize) {
+      this._store.clearCache();
+    }
     this._store.setPage(event.pageIndex + 1, event.pageSize).finally(() => {
       this.loading.set(false);
     });

@@ -1,4 +1,4 @@
-<form [formGroup]="form" (submit)="apply()" ng-disabled="disabled">
+<form [formGroup]="form" (submit)="apply()">
   <!-- id -->
   <div>
     <mat-form-field>
@@ -23,7 +23,9 @@
       class="mat-warn"
       i18n-matTooltip
       matTooltip="Reset filters"
-      [disabled]="disabled"
+      i18n-aria-label
+      aria-label="Reset filters"
+      [disabled]="disabled()"
     >
       <mat-icon class="mat-warn">clear</mat-icon>
     </button>
@@ -31,9 +33,11 @@
       type="submit"
       mat-icon-button
       class="mat-primary"
-      [disabled]="disabled"
-      i18n-matmatTooltip
+      [disabled]="disabled()"
+      i18n-matTooltip
       matTooltip="Apply filters"
+      i18n-aria-label
+      aria-label="Apply filters"
     >
       <mat-icon class="mat-primary">check_circle</mat-icon>
     </button>

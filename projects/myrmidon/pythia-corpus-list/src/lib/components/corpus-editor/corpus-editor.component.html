@@ -6,7 +6,7 @@
       <input matInput [formControl]="id" />
       @if ($any(id).errors?.required && (id.dirty || id.touched)) {
       <mat-error i18n>ID required</mat-error>
-      } @if ($any(id).errors?.maxLength && (id.dirty || id.touched)) {
+      } @if ($any(id).errors?.maxlength && (id.dirty || id.touched)) {
       <mat-error i18n>ID too long</mat-error>
       }
     </mat-form-field>
@@ -19,7 +19,7 @@
       <input matInput [formControl]="title" />
       @if ($any(title).errors?.required && (title.dirty || title.touched)) {
       <mat-error i18n>title required</mat-error>
-      } @if ($any(title).errors?.maxLength && (title.dirty || title.touched)) {
+      } @if ($any(title).errors?.maxlength && (title.dirty || title.touched)) {
       <mat-error i18n>title too long</mat-error>
       }
     </mat-form-field>
@@ -30,7 +30,7 @@
     <mat-form-field class="long-text">
       <mat-label i18n>description</mat-label>
       <textarea matInput [formControl]="description"></textarea>
-      @if ( $any(description).errors?.maxLength && (description.dirty ||
+      @if ( $any(description).errors?.maxlength && (description.dirty ||
       description.touched) ) {
       <mat-error i18n>description too long</mat-error>
       }
@@ -54,14 +54,23 @@
 
   <!-- buttons -->
   <div role="group" aria-label="toolbar" style="margin: 10px 0">
-    <button mat-icon-button type="button" (click)="close()" class="mat-warn">
+    <button
+      mat-icon-button
+      type="button"
+      (click)="close()"
+      class="mat-warn"
+      i18n-aria-label
+      aria-label="Close"
+    >
       <mat-icon>clear</mat-icon>
     </button>
     <button
       type="submit"
       mat-icon-button
-      mat-class="primary"
+      class="mat-primary"
       [disabled]="form.invalid"
+      i18n-aria-label
+      aria-label="Save corpus"
     >
       <mat-icon>check_circle</mat-icon>
     </button>

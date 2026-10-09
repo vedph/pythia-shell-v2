@@ -20,12 +20,14 @@
     }
     <table>
       <thead>
-        <th></th>
-        <th>ID</th>
-        @if (admin()) {
-        <th i18n>user</th>
-        }
-        <th i18n>title</th>
+        <tr>
+          <th><span class="cdk-visually-hidden" i18n>actions</span></th>
+          <th>ID</th>
+          @if (admin()) {
+          <th i18n>user</th>
+          }
+          <th i18n>title</th>
+        </tr>
       </thead>
       <tbody>
         @for (c of page.items; track c) {
@@ -37,6 +39,8 @@
               type="button"
               i18n-matTooltip
               matTooltip="Edit this corpus"
+              i18n-aria-label
+              aria-label="Edit corpus"
               class="mat-primary"
               (click)="editCorpus(c)"
             >
@@ -48,6 +52,8 @@
               type="button"
               i18n-matTooltip
               matTooltip="Delete this corpus"
+              i18n-aria-label
+              aria-label="Delete corpus"
               class="mat-warn"
               (click)="deleteCorpus(c)"
             >
@@ -72,6 +78,8 @@
         class="mat-warn"
         i18n-matTooltip
         matTooltip="Refresh list"
+        i18n-aria-label
+        aria-label="Refresh list"
         (click)="reset()"
       >
         <mat-icon class="mat-warn">refresh</mat-icon>
@@ -90,6 +98,8 @@
           class="mat-primary"
           mat-flat-button
           (click)="addCorpus()"
+          i18n-aria-label
+          aria-label="Add corpus"
         >
           <mat-icon>add_circle</mat-icon> corpus
         </button>

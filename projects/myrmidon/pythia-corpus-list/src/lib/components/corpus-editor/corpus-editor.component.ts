@@ -137,8 +137,13 @@ export class CorpusEditorComponent {
       this.form.reset();
       return;
     }
-    const pi = this.parseId(corpus.id);
-    this.id.setValue(pi[1]);
+    // strip the current user's prefix when present (the username itself
+    // may contain underscores), else the conventional prefix
+    this.id.setValue(
+      this.idPrefix && corpus.id?.startsWith(this.idPrefix)
+        ? corpus.id.substring(this.idPrefix.length)
+        : this.parseId(corpus.id)[1],
+    );
     this.title.setValue(corpus.title);
     this.description.setValue(corpus.description);
     this.form.markAsPristine();

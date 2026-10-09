@@ -8,6 +8,12 @@
     - `pythia-api`, `ReaderService.getNodePath`: the path was built from the target node up to the root (e.g. `0.2.1` instead of `0.1.2`), so clicking any document map node below the first level loaded the wrong text (or none). The backend expects the path from the root down.
     - `pythia-api`, `DocumentService.getDocuments`: `minTimeModified`/`maxTimeModified` were sent via `Date.toString()` (e.g. `Fri Oct 09 2026 ... GMT+0200 (CEST)`), which the backend cannot bind to a `DateTime`, making the request fail. They are now sent in ISO format, as `TermService` already did.
     - `pythia-api`, `SearchService.search`: sort fields were sent as a single `sort` CSV parameter, which the backend ignores; they are now sent as repeated `sortFields` parameters, matching the backend `SearchBindingModel.SortFields` list.
+    - `pythia-corpus-list`, `CorpusFilterComponent`: the buttons were bound to the `disabled` signal function rather than its value (`[disabled]="disabled"`), so they were always disabled and the corpus filter could not be applied or reset.
+    - `pythia-corpus-list`, `CorpusEditorComponent`: the "too long" errors checked the `maxLength` error key, while Angular uses `maxlength`, so they were never shown.
+    - `pythia-corpus-list`, `CorpusEditorComponent`: when the user name contains `_`, the ID prefix was split at the first `_` (e.g. `john_doe_c1` was shown as `doe_c1` and saved as `john_doe_doe_c1`, creating a new corpus). The current user's prefix is now stripped as a whole when present.
+    - `pythia-corpus-list`, `CorpusListComponent`: refreshing the list (also after saving or deleting) called the store's `reset`, which loads the unfiltered list, and then set the user filter, issuing two concurrent requests: if the unfiltered one completed last, non-admin users were shown all the corpora. Now the cache is just cleared before setting the filter.
+    - `pythia-corpus-list`, `CorpusListComponent`: changing the page size could show a cached page of the previous size, as the store's cache keys do not include the page size (this is an upstream `@myrmidon/paged-data-browsers` issue): now the cache is cleared when the page size changes.
+    - `pythia-corpus-list`: added accessible names to icon-only buttons and fixed the list table header markup.
 - 2026-08-27: updated packages.
 
 ## 9.0.0
