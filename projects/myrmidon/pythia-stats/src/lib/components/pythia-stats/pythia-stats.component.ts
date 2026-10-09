@@ -53,13 +53,20 @@ export class PythiaStatsComponent implements OnInit {
     this.refresh();
   }
 
-  public refresh(): void {
-    const entries: StatEntry[] | null = this._localStorage.retrieve<
-      StatEntry[]
-    >('pythia-stats', true);
-    if (entries) {
-      this.entries.set(entries);
-      return;
+  /**
+   * Load the statistics, from the session cache when available.
+   *
+   * @param noCache True to load them from the server even when cached.
+   */
+  public refresh(noCache = false): void {
+    if (!noCache) {
+      const entries: StatEntry[] | null = this._localStorage.retrieve<
+        StatEntry[]
+      >('pythia-stats', true);
+      if (entries) {
+        this.entries.set(entries);
+        return;
+      }
     }
 
     this.loading.set(true);

@@ -23,6 +23,8 @@
         class="mat-primary"
         i18n-matTooltip
         matTooltip="Refresh stats"
+        [disabled]="loading()"
+        (click)="refresh(true)"
       >
         <mat-icon>refresh</mat-icon>
         <ng-container i18n>refresh</ng-container>
