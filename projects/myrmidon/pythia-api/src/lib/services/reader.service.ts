@@ -81,20 +81,23 @@ export class ReaderService {
   }
 
   /**
-   * Get the path to the specified text map node.
+   * Get the path to the specified text map node. The path starts with 0
+   * (=root node), followed by the sibling index of each node from the
+   * root's child down to the target node, e.g. 0.1.2 for the 3rd child
+   * of the 2nd child of the root.
    * @param node The node.
    * @returns The path.
    */
   public getNodePath(node: TextMapNode): string {
-    const sb: string[] = [];
-    sb.push('0'); // 0=root node
+    const steps: string[] = [];
 
     while (node && node.parent) {
       const i = node.parent!.children!.indexOf(node);
-      sb.push(i.toString());
+      steps.unshift(i.toString());
       node = node.parent;
     }
+    steps.unshift('0'); // 0=root node
 
-    return sb.join('.');
+    return steps.join('.');
   }
 }

@@ -89,9 +89,9 @@ export class SearchService {
       .set('pageSize', pageSize.toString());
 
     // add fields to parameters if specified
-    if (sortFields?.length) {
-      params = params.set('sort', sortFields.join(','));
-    }
+    sortFields?.forEach((field) => {
+      params = params.append('sortFields', field);
+    });
 
     return this._http
       .get<ErrorWrapper<DataPage<KwicSearchResult>>>(

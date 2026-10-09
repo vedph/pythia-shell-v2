@@ -82,13 +82,13 @@ export class DocumentService {
     if (filter.minTimeModified) {
       httpParams = httpParams.set(
         'minTimeModified',
-        filter.minTimeModified.toString()
+        filter.minTimeModified.toISOString()
       );
     }
     if (filter.maxTimeModified) {
       httpParams = httpParams.set(
         'maxTimeModified',
-        filter.maxTimeModified.toString()
+        filter.maxTimeModified.toISOString()
       );
     }
     if (filter.attributes?.length) {

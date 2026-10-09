@@ -1,6 +1,13 @@
 # History
 
-- 2026-10-09: updated Angular and packages.
+- 2026-10-09:
+  - updated Angular and packages.
+  - replaced the libraries build chain with `scripts/build-libs.mjs` (`pnpm run build:libs`), which builds the libraries in dependency order (derived from manifests and actual imports) after checking via `scripts/check-local-libs.js` that no local library is shadowed by a copy in `node_modules`. Use `pnpm run build:libs <name>` to rebuild a library and everything downstream of it.
+  - migrated library tests from Karma/Jasmine to Vitest (`@angular/build:unit-test`), removing the Karma and Jasmine packages and adding jsdom and Angular Testing Library. Run all the library tests with `pnpm run test:libs` (after `pnpm run build:libs`, as libraries import each other from `dist`).
+  - added unit tests for all the libraries, fixing these bugs:
+    - `pythia-api`, `ReaderService.getNodePath`: the path was built from the target node up to the root (e.g. `0.2.1` instead of `0.1.2`), so clicking any document map node below the first level loaded the wrong text (or none). The backend expects the path from the root down.
+    - `pythia-api`, `DocumentService.getDocuments`: `minTimeModified`/`maxTimeModified` were sent via `Date.toString()` (e.g. `Fri Oct 09 2026 ... GMT+0200 (CEST)`), which the backend cannot bind to a `DateTime`, making the request fail. They are now sent in ISO format, as `TermService` already did.
+    - `pythia-api`, `SearchService.search`: sort fields were sent as a single `sort` CSV parameter, which the backend ignores; they are now sent as repeated `sortFields` parameters, matching the backend `SearchBindingModel.SortFields` list.
 - 2026-08-27: updated packages.
 
 ## 9.0.0
