@@ -20,7 +20,6 @@
     "build:qbl": "ng build @myrmidon/pythia-query-builder",
     "build:src": "ng build @myrmidon/pythia-search",
     "build:crp": "ng build @myrmidon/pythia-corpus-list",
-    "test:cor": "ng test @myrmidon/pythia-core --watch=false",
     "test:api": "ng test @myrmidon/pythia-api --watch=false",
     "test:ui": "ng test @myrmidon/pythia-ui --watch=false",
     "test:dcr": "ng test @myrmidon/pythia-document-reader --watch=false",

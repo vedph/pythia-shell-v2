@@ -10,22 +10,28 @@
  *   node scripts/test-libs.mjs             test all libraries
  *   node scripts/test-libs.mjs <name>...   test only these libraries
  *
- * All the requested libraries are tested even when one fails; the exit
- * code is nonzero if any failed.
+ * Libraries without a test target in angular.json (e.g. those having only
+ * type declarations) are skipped. All the requested libraries are tested
+ * even when one fails; the exit code is nonzero if any failed.
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const LIBS_DIR = join(ROOT, 'projects', 'myrmidon');
 const NG = join(ROOT, 'node_modules', '@angular', 'cli', 'bin', 'ng.js');
 
-const local = readdirSync(LIBS_DIR)
-  .map((dir) => join(LIBS_DIR, dir, 'package.json'))
-  .filter((file) => existsSync(file))
-  .map((file) => JSON.parse(readFileSync(file, 'utf8')).name)
+const projects = JSON.parse(
+  readFileSync(join(ROOT, 'angular.json'), 'utf8'),
+).projects;
+const local = Object.keys(projects)
+  .filter(
+    (name) =>
+      name.startsWith('@myrmidon/') &&
+      projects[name].projectType === 'library' &&
+      projects[name].architect?.test,
+  )
   .sort();
 
 const requested = process.argv
@@ -33,7 +39,7 @@ const requested = process.argv
   .map((r) => (r.startsWith('@myrmidon/') ? r : `@myrmidon/${r}`));
 for (const name of requested) {
   if (!local.includes(name)) {
-    console.error(`ERROR: unknown library "${name}"`);
+    console.error(`ERROR: unknown or untestable library "${name}"`);
     process.exit(1);
   }
 }

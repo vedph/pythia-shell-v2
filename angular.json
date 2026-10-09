@@ -139,16 +139,6 @@
             }
           },
           "defaultConfiguration": "production"
-        },
-        "test": {
-          "builder": "@angular/build:unit-test",
-          "options": {
-            "tsConfig": "projects/myrmidon/pythia-core/tsconfig.spec.json",
-            "runner": "vitest",
-            "setupFiles": [
-              "projects/myrmidon/pythia-core/src/test-setup.ts"
-            ]
-          }
         }
       }
     },

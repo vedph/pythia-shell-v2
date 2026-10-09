@@ -11,8 +11,7 @@
     "forceConsistentCasingInFileNames": true
   },
   "exclude": [
-    "**/*.spec.ts",
-    "src/test-setup.ts"
+    "**/*.spec.ts"
   ],
   "angularCompilerOptions": {
     "extendedDiagnostics": {
