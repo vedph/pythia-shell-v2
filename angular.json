@@ -108,9 +108,13 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-api/tsconfig.spec.json"
+            "tsConfig": "projects/myrmidon/pythia-api/tsconfig.spec.json",
+            "runner": "vitest",
+            "setupFiles": [
+              "projects/myrmidon/pythia-api/src/test-setup.ts"
+            ]
           }
         }
       }
@@ -137,9 +141,13 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-core/tsconfig.spec.json"
+            "tsConfig": "projects/myrmidon/pythia-core/tsconfig.spec.json",
+            "runner": "vitest",
+            "setupFiles": [
+              "projects/myrmidon/pythia-core/src/test-setup.ts"
+            ]
           }
         }
       }
@@ -166,9 +174,13 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-corpus-list/tsconfig.spec.json"
+            "tsConfig": "projects/myrmidon/pythia-corpus-list/tsconfig.spec.json",
+            "runner": "vitest",
+            "setupFiles": [
+              "projects/myrmidon/pythia-corpus-list/src/test-setup.ts"
+            ]
           }
         }
       }
@@ -195,9 +207,13 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-document-list/tsconfig.spec.json"
+            "tsConfig": "projects/myrmidon/pythia-document-list/tsconfig.spec.json",
+            "runner": "vitest",
+            "setupFiles": [
+              "projects/myrmidon/pythia-document-list/src/test-setup.ts"
+            ]
           }
         }
       }
@@ -224,9 +240,13 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-document-reader/tsconfig.spec.json"
+            "tsConfig": "projects/myrmidon/pythia-document-reader/tsconfig.spec.json",
+            "runner": "vitest",
+            "setupFiles": [
+              "projects/myrmidon/pythia-document-reader/src/test-setup.ts"
+            ]
           }
         }
       }
@@ -253,9 +273,13 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-query-builder/tsconfig.spec.json"
+            "tsConfig": "projects/myrmidon/pythia-query-builder/tsconfig.spec.json",
+            "runner": "vitest",
+            "setupFiles": [
+              "projects/myrmidon/pythia-query-builder/src/test-setup.ts"
+            ]
           }
         }
       }
@@ -282,9 +306,13 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-search/tsconfig.spec.json"
+            "tsConfig": "projects/myrmidon/pythia-search/tsconfig.spec.json",
+            "runner": "vitest",
+            "setupFiles": [
+              "projects/myrmidon/pythia-search/src/test-setup.ts"
+            ]
           }
         }
       }
@@ -311,9 +339,13 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-stats/tsconfig.spec.json"
+            "tsConfig": "projects/myrmidon/pythia-stats/tsconfig.spec.json",
+            "runner": "vitest",
+            "setupFiles": [
+              "projects/myrmidon/pythia-stats/src/test-setup.ts"
+            ]
           }
         }
       }
@@ -340,9 +372,13 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-ui/tsconfig.spec.json"
+            "tsConfig": "projects/myrmidon/pythia-ui/tsconfig.spec.json",
+            "runner": "vitest",
+            "setupFiles": [
+              "projects/myrmidon/pythia-ui/src/test-setup.ts"
+            ]
           }
         }
       }
@@ -369,9 +405,13 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/myrmidon/pythia-word-index/tsconfig.spec.json"
+            "tsConfig": "projects/myrmidon/pythia-word-index/tsconfig.spec.json",
+            "runner": "vitest",
+            "setupFiles": [
+              "projects/myrmidon/pythia-word-index/src/test-setup.ts"
+            ]
           }
         }
       }
