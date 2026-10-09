@@ -87,7 +87,7 @@ export class DocumentCorpusComponent {
   }
 
   public apply(): void {
-    if (this.form.invalid) {
+    if (this.form.invalid || !this.editable()) {
       return;
     }
     this.corpusAction.emit({

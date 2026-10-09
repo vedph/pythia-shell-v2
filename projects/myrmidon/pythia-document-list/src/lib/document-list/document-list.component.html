@@ -4,6 +4,8 @@
     <mat-card>
       <mat-card-content>
         <pythia-document-filter
+          [filter]="filter$ | async"
+          [attributes]="attributes$ | async"
           [hiddenFilters]="hiddenFilters()"
           (filterChange)="onFilterChange($event)"
         />
@@ -19,14 +21,16 @@
       }
       <table>
         <thead>
-          <th></th>
-          <th i18n>id</th>
-          <th i18n>author</th>
-          <th i18n>title</th>
-          <th i18n>date</th>
-          <th i18n class="noif-lt-md">profile</th>
-          <th i18n class="noif-lt-md">source</th>
-          <th i18n class="noif-lt-md">last modified</th>
+          <tr>
+            <th><span class="cdk-visually-hidden" i18n>actions</span></th>
+            <th i18n>id</th>
+            <th i18n>author</th>
+            <th i18n>title</th>
+            <th i18n>date</th>
+            <th i18n class="noif-lt-md">profile</th>
+            <th i18n class="noif-lt-md">source</th>
+            <th i18n class="noif-lt-md">last modified</th>
+          </tr>
         </thead>
         <tbody>
           @for (item of page.items; track item) {
@@ -37,6 +41,8 @@
                   type="button"
                   i18n-matTooltip
                   matTooltip="Read this document"
+                  i18n-aria-label
+                  aria-label="Read document"
                   class="mat-primary"
                   (click)="requestRead(item)"
                 >
@@ -47,6 +53,8 @@
                   type="button"
                   i18n-matTooltip
                   matTooltip="View document info"
+                  i18n-aria-label
+                  aria-label="View document info"
                   (click)="selectDocument(item)"
                 >
                   <mat-icon>info</mat-icon>
@@ -73,6 +81,8 @@
           class="mat-warn"
           i18n-matTooltip
           matTooltip="Refresh"
+          i18n-aria-label
+          aria-label="Refresh"
           (click)="refresh()"
         >
           <mat-icon class="mat-warn">refresh</mat-icon>

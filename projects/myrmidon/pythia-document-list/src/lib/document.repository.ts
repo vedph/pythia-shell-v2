@@ -121,6 +121,11 @@ export class DocumentRepository
 
   public async setPage(pageNumber: number, pageSize: number): Promise<void> {
     this._loading$.next(true);
+    // cached pages are keyed by number and filter only, so they are stale
+    // when the page size changes
+    if (pageSize !== this._store.pageSize) {
+      this._store.clearCache();
+    }
     try {
       await this._store.setPage(pageNumber, pageSize);
     } catch (error) {

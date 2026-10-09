@@ -14,6 +14,14 @@
     - `pythia-corpus-list`, `CorpusListComponent`: refreshing the list (also after saving or deleting) called the store's `reset`, which loads the unfiltered list, and then set the user filter, issuing two concurrent requests: if the unfiltered one completed last, non-admin users were shown all the corpora. Now the cache is just cleared before setting the filter.
     - `pythia-corpus-list`, `CorpusListComponent`: changing the page size could show a cached page of the previous size, as the store's cache keys do not include the page size (this is an upstream `@myrmidon/paged-data-browsers` issue): now the cache is cleared when the page size changes.
     - `pythia-corpus-list`: added accessible names to icon-only buttons and fixed the list table header markup.
+    - `pythia-document-list`, `DocumentListComponent`: the document attributes loaded by the repository were never passed to the filter, so attribute filters were never available. They are now bound.
+    - `pythia-document-list`, `DocumentListComponent`: the filter UI was not bound to the store filter, so after "Refresh" (which resets the filter) the form still showed the old values while the list was unfiltered. The filter is now bound to the store filter.
+    - `pythia-document-list`, `DocumentFilterComponent`: when loading a filter, corpus and profile were restored only if both were present, because `forkJoin` emits nothing when a source (`from([])`) is empty. Unchanged corpus/profile are no longer refetched.
+    - `pythia-document-list`, `DocumentFilterComponent`: attribute filters without a value were sent as `name=undefined`; incomplete attribute filters are now skipped (the backend requires both name and value).
+    - `pythia-document-list`, `DocumentFilterComponent`: the profile chip had no remove button, so the profile filter could not be removed; the attribute value "too long" error checked the wrong error key (`maxLength` instead of `maxlength`).
+    - `pythia-document-list`, `DocumentRepository`: same page size cache issue as the corpus list.
+    - `pythia-document-list`, `DocumentCorpusComponent`: `apply` now also refuses non-editable corpora (the button was already disabled).
+    - `pythia-document-list`: added accessible names to icon-only buttons and fixed the list table header markup; removed a duplicate export from the public API.
 - 2026-08-27: updated packages.
 
 ## 9.0.0

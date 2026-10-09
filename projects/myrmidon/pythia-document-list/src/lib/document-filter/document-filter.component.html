@@ -13,6 +13,10 @@
       mat-icon-button
       class="mat-warn"
       (click)="removeCorpus()"
+      i18n-matTooltip
+      matTooltip="Remove corpus filter"
+      i18n-aria-label
+      aria-label="Remove corpus filter"
     >
       <mat-icon class="mat-warn">clear</mat-icon>
     </button>
@@ -60,9 +64,14 @@
       (itemChange)="onProfileChange($event)"
     />
     @if (profile.value) {
-    <mat-chip removable="true" (removed)="onProfileRemoved()">
-      {{ profile.value.id }}
-    </mat-chip>
+    <mat-chip-set>
+      <mat-chip (removed)="onProfileRemoved()">
+        {{ profile.value.id }}
+        <button matChipRemove i18n-aria-label aria-label="Remove profile filter">
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip>
+    </mat-chip-set>
     }
   </div>
   }
@@ -132,6 +141,8 @@
         class="mat-primary"
         i18n-matTooltip
         matTooltip="Add an attribute filter"
+        i18n-aria-label
+        aria-label="Add an attribute filter"
         (click)="addAttribute()"
       >
         <mat-icon class="mat-primary">add_circle</mat-icon>
@@ -150,6 +161,8 @@
             type="button"
             i18n-matTooltip
             matTooltip="Remove this attribute"
+            i18n-aria-label
+            aria-label="Remove this attribute"
             class="mat-warn"
             (click)="removeAttribute(i)"
           >
@@ -175,7 +188,7 @@
           <mat-form-field class="short-field">
             <mat-label i18n>value</mat-label>
             <input matInput formControlName="value" />
-            @if ( $any(item)['controls'].value.errors?.maxLength &&
+            @if ( $any(item)['controls'].value.errors?.maxlength &&
             ($any(item)['controls'].value.dirty ||
             $any(item)['controls'].value.touched) ) {
             <mat-error i18n>too long</mat-error>
@@ -217,6 +230,8 @@
       class="mat-warn"
       i18n-matTooltip
       matTooltip="Reset filters"
+      i18n-aria-label
+      aria-label="Reset filters"
       [disabled]="disabled()"
     >
       <mat-icon class="mat-warn">clear</mat-icon>
@@ -226,8 +241,10 @@
       mat-icon-button
       class="mat-primary"
       [disabled]="disabled()"
-      i18n-matmatTooltip
+      i18n-matTooltip
       matTooltip="Apply filters"
+      i18n-aria-label
+      aria-label="Apply filters"
     >
       <mat-icon class="mat-primary">check_circle</mat-icon>
     </button>

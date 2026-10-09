@@ -59,6 +59,7 @@ export class DocumentListComponent {
   public loading$: Observable<boolean>;
   public activeDocument$: Observable<Document | undefined>;
   public filter$: Observable<Readonly<DocumentFilter>>;
+  public attributes$: Observable<string[]>;
   public page$: Observable<Readonly<DataPage<Document>>>;
 
   /**
@@ -79,6 +80,7 @@ export class DocumentListComponent {
     this.loading$ = _repository.loading$;
     this.activeDocument$ = _repository.activeDocument$;
     this.filter$ = _repository.filter$;
+    this.attributes$ = _repository.attributes$;
     this.page$ = _repository.page$;
   }
 

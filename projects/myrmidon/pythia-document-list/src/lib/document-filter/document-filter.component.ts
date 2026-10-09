@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { forkJoin, from } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -79,7 +79,7 @@ export class DocumentFilterComponent {
   /**
    * The list of available document attributes.
    */
-  public readonly attributes = input<string[] | undefined>();
+  public readonly attributes = input<string[] | undefined | null>();
 
   /**
    * The list of document filters to be hidden.
@@ -185,16 +185,22 @@ export class DocumentFilterComponent {
       this.attrs.push(this.getAttributeGroup(attrs[i]));
     }
 
-    forkJoin({
-      corpus: filter.corpusId
-        ? this._corpusService.getCorpus(filter.corpusId, true)
-        : from([] as any),
-      profile: filter.profileId
-        ? this._profileService.getProfile(filter.profileId)
-        : from([] as any),
-    }).subscribe((result) => {
-      this.corpus.setValue(result.corpus as Corpus);
-      this.profile.setValue(result.profile as Profile);
+    // each source must emit (forkJoin emits nothing if any source is empty);
+    // reuse the corpus and profile already loaded when unchanged
+    const corpus$: Observable<Corpus | null> = !filter.corpusId
+      ? of(null)
+      : this.corpus.value?.id === filter.corpusId
+        ? of(this.corpus.value)
+        : this._corpusService.getCorpus(filter.corpusId, true);
+    const profile$: Observable<Profile | null> = !filter.profileId
+      ? of(null)
+      : this.profile.value?.id === filter.profileId
+        ? of(this.profile.value)
+        : this._profileService.getProfile(filter.profileId);
+
+    forkJoin({ corpus: corpus$, profile: profile$ }).subscribe((result) => {
+      this.corpus.setValue(result.corpus);
+      this.profile.setValue(result.profile);
       this.form.markAsPristine();
     });
   }
@@ -237,11 +243,12 @@ export class DocumentFilterComponent {
     const entries: Attribute[] = [];
     for (let i = 0; i < this.attrs.length; i++) {
       const g = this.attrs.at(i) as FormGroup;
-      entries.push({
-        targetId: 0, // not used
-        name: g.controls['name'].value?.trim(),
-        value: g.controls['value'].value?.trim(),
-      });
+      const name: string | undefined = g.controls['name'].value?.trim();
+      const value: string | undefined = g.controls['value'].value?.trim();
+      // the backend requires both name and value
+      if (name && value) {
+        entries.push({ targetId: 0, name, value });
+      }
     }
     return entries.length ? entries : undefined;
   }
