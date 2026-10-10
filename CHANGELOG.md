@@ -1,7 +1,7 @@
 # History
 
 - 2026-10-09:
-  - migrated to signal-based forms bumping major version.
+  - ⚠️ migrated to signal-based forms bumping major version to 11.
   - updated Angular and packages.
   - replaced the libraries build chain with `scripts/build-libs.mjs` (`pnpm run build:libs`), which builds the libraries in dependency order (derived from manifests and actual imports) after checking via `scripts/check-local-libs.js` that no local library is shadowed by a copy in `node_modules`. Use `pnpm run build:libs <name>` to rebuild a library and everything downstream of it.
   - ⚠️ migrated library tests from Karma/Jasmine to Vitest (`@angular/build:unit-test`), removing the Karma and Jasmine packages and adding jsdom and Angular Testing Library. Run all the library tests with `pnpm run test:libs` (after `pnpm run build:libs`, as libraries import each other from `dist`).
