@@ -1,6 +1,6 @@
 {
   "name": "@myrmidon/pythia-corpus-list",
-  "version": "11.0.0",
+  "version": "11.0.2",
   "description": "Pythia - corpus list.",
   "keywords": [
     "Pythia"
@@ -17,7 +17,7 @@
     "@angular/common": "^22.2.1",
     "@angular/core": "^22.2.1",
     "@angular/material": "^22.2.1",
-    "@myrmidon/cadmus-refs-lookup": "^11.0.8",
+    "@myrmidon/cadmus-refs-lookup": "^11.0.9",
     "@myrmidon/auth-jwt-login": "^10.0.0",
     "@myrmidon/ngx-tools": "^3.0.2",
     "@myrmidon/ngx-mat-tools": "^3.0.1",

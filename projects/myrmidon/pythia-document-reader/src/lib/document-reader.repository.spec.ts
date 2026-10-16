@@ -90,6 +90,38 @@ describe('DocumentReaderRepository', () => {
     expect(readService.getDocumentPieceFromRange).not.toHaveBeenCalled();
   });
 
+  it('should not load the map when not requested', () => {
+    const s = state();
+    repo.load({ documentId: 3 }, undefined, true);
+    expect(readService.getDocumentMap).not.toHaveBeenCalled();
+    expect(s.doc?.id).toBe(3);
+    expect(s.map).toBeUndefined();
+    expect(s.loading).toBe(false);
+  });
+
+  it('should load a range without the map when not requested', () => {
+    const s = state();
+    repo.load({ documentId: 3, start: 10, end: 20 }, undefined, true);
+    expect(readService.getDocumentMap).not.toHaveBeenCalled();
+    expect(s.map).toBeUndefined();
+    expect(s.text).toBe('range text');
+  });
+
+  it('should discard a stale path text response', async () => {
+    const slow = new Subject<{ text: string }>();
+    readService.getDocumentPieceFromPath.mockReturnValueOnce(slow);
+    const s = state();
+    repo.load({ documentId: 1 });
+    const pending = repo.loadTextFromPath('0.0');
+    // another document is loaded before the text arrives
+    repo.load({ documentId: 2, start: 1, end: 5 });
+    slow.next({ text: 'stale text' });
+    slow.complete();
+    expect(await pending).toBe(false);
+    expect(s.doc?.id).toBe(2);
+    expect(s.text).toBe('range text');
+  });
+
   it('should load the initial path', () => {
     const s = state();
     repo.load({ documentId: 3 }, '0.0');

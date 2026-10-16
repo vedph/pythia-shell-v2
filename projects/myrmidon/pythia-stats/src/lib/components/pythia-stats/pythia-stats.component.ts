@@ -94,7 +94,7 @@ export class PythiaStatsComponent implements OnInit {
           if (error) {
             console.error(error);
           }
-          this._snackbar.open('Error getting stats', 'OK');
+          this._snackbar.open($localize`Error getting stats`, 'OK');
         },
       });
   }

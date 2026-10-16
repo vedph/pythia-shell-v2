@@ -62,6 +62,7 @@ async function setup(
     initialQueryTerm?: string;
     hideAuthor?: boolean;
     hideTitle?: boolean;
+    hideMap?: boolean;
   } = {},
 ) {
   const searchService = {
@@ -88,6 +89,7 @@ async function setup(
       inputBinding('initialQueryTerm', signal(options.initialQueryTerm)),
       inputBinding('hideAuthor', signal(options.hideAuthor)),
       inputBinding('hideTitle', signal(options.hideTitle)),
+      inputBinding('hideMap', signal(options.hideMap)),
     ],
     providers: [
       { provide: SearchService, useValue: searchService },
@@ -224,6 +226,21 @@ describe('SearchComponent', () => {
     );
     expect(readerService.getDocumentMap).toHaveBeenCalledWith(102);
     expect(readerService.getDocumentPieceFromRange).not.toHaveBeenCalled();
+  });
+
+  it('should only read results in context when the map is hidden', async () => {
+    const { user, readerService } = await setup({ hideMap: true });
+    await user.type(queryBox(), 'q');
+    await user.click(searchButton());
+    expect(
+      within(bodyRows()[2]).queryByRole('button', { name: 'Read document' }),
+    ).toBeNull();
+    await user.click(
+      within(bodyRows()[2]).getByRole('button', { name: 'Read in context' }),
+    );
+    expect(await screen.findByText('piece')).toBeTruthy();
+    // the reader got hideMap, so that it did not load the map
+    expect(readerService.getDocumentMap).not.toHaveBeenCalled();
   });
 
   it('should keep queries history and pick from it', async () => {

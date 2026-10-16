@@ -91,7 +91,7 @@ describe('CorpusListComponent', () => {
       const { corpusService } = await setup();
       expect(corpusService.getCorpora).toHaveBeenCalledTimes(1);
       expect(corpusService.getCorpora).toHaveBeenCalledWith(
-        { userId: 'zeus' },
+        { userId: 'zeus', counts: true },
         1,
         20,
       );
@@ -101,7 +101,7 @@ describe('CorpusListComponent', () => {
     it('should load all corpora for admin and show user column', async () => {
       const { corpusService } = await setup({ admin: true });
       expect(corpusService.getCorpora).toHaveBeenCalledTimes(1);
-      expect(corpusService.getCorpora).toHaveBeenCalledWith({}, 1, 20);
+      expect(corpusService.getCorpora).toHaveBeenCalledWith({ counts: true }, 1, 20);
       expect(screen.getByRole('columnheader', { name: 'user' })).toBeTruthy();
       expect(within(rows()[1]).getByText('hera')).toBeTruthy();
     });
@@ -116,7 +116,7 @@ describe('CorpusListComponent', () => {
       await user.click(screen.getByRole('button', { name: 'Refresh list' }));
       expect(corpusService.getCorpora).toHaveBeenCalledTimes(2);
       expect(corpusService.getCorpora).toHaveBeenLastCalledWith(
-        { userId: 'zeus' },
+        { userId: 'zeus', counts: true },
         1,
         20,
       );
@@ -154,7 +154,7 @@ describe('CorpusListComponent', () => {
       await user.type(screen.getByRole('textbox', { name: 'ID' }), 'c1');
       await user.click(screen.getByRole('button', { name: 'Apply filters' }));
       expect(corpusService.getCorpora).toHaveBeenLastCalledWith(
-        { id: 'c1', title: undefined, userId: 'zeus' },
+        { id: 'c1', title: undefined, userId: 'zeus', counts: true },
         1,
         20,
       );
@@ -165,7 +165,7 @@ describe('CorpusListComponent', () => {
       await user.type(screen.getByRole('textbox', { name: 'title' }), 'x');
       await user.click(screen.getByRole('button', { name: 'Apply filters' }));
       expect(corpusService.getCorpora).toHaveBeenLastCalledWith(
-        { id: undefined, title: 'x' },
+        { id: undefined, title: 'x', counts: true },
         1,
         20,
       );
@@ -177,7 +177,7 @@ describe('CorpusListComponent', () => {
       const { user, corpusService } = await setup();
       await user.click(screen.getByRole('button', { name: 'Next page' }));
       expect(corpusService.getCorpora).toHaveBeenLastCalledWith(
-        { userId: 'zeus' },
+        { userId: 'zeus', counts: true },
         2,
         20,
       );
@@ -189,7 +189,7 @@ describe('CorpusListComponent', () => {
       await user.click(screen.getByRole('combobox'));
       await user.click(await screen.findByRole('option', { name: '5' }));
       expect(corpusService.getCorpora).toHaveBeenLastCalledWith(
-        { userId: 'zeus' },
+        { userId: 'zeus', counts: true },
         1,
         5,
       );

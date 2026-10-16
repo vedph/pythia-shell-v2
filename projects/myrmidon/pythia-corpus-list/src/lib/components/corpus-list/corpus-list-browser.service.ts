@@ -20,7 +20,12 @@ class CorpusServiceAdapter
     pageSize: number,
     filter: CorpusFilter
   ): Observable<DataPage<Corpus>> {
-    return this._service.getCorpora(filter, pageNumber, pageSize);
+    // the list does not need documents IDs: just get their counts
+    return this._service.getCorpora(
+      { ...filter, counts: true },
+      pageNumber,
+      pageSize
+    );
   }
 }
 

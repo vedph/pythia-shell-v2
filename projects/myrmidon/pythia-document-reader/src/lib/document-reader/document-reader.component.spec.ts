@@ -113,6 +113,15 @@ describe('DocumentReaderComponent', () => {
     expect(screen.queryByText(/root/)).toBeNull();
   });
 
+  it('should not load the map when hidden', async () => {
+    const { readerService } = await setup(
+      { documentId: 7, start: 0, end: 9 },
+      { hideMap: true },
+    );
+    expect(readerService.getDocumentMap).not.toHaveBeenCalled();
+    expect(screen.getByText('range')).toBeTruthy();
+  });
+
   it('should show the text of a requested range', async () => {
     const { readerService } = await setup({ documentId: 7, start: 0, end: 9 });
     expect(readerService.getDocumentPieceFromRange).toHaveBeenCalledWith(7, 0, 9);

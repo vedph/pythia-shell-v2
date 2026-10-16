@@ -76,12 +76,14 @@ export class SearchExportComponent implements OnDestroy {
         next: (csvData: string) => {
           this.downloadCsv(csvData);
           this.isExporting.set(false);
-          this._snackbar.open('Results exported', 'OK', { duration: 2000 });
+          this._snackbar.open($localize`Results exported`, 'OK', {
+            duration: 2000,
+          });
         },
         error: (error) => {
           console.error('Error exporting CSV:', error);
           this.isExporting.set(false);
-          this._snackbar.open('Error exporting results', 'Error');
+          this._snackbar.open($localize`Error exporting results`, 'OK');
         },
         complete: () => {
           this.isExporting.set(false);

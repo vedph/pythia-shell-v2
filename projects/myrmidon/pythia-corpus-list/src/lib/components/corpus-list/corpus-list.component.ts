@@ -156,7 +156,7 @@ export class CorpusListComponent {
           },
           error: (err) => {
             console.error(err);
-            this._snackbar.open('Error deleting corpus', 'OK');
+            this._snackbar.open($localize`Error deleting corpus`, 'OK');
           },
         });
       });
@@ -172,7 +172,7 @@ export class CorpusListComponent {
       },
       error: (err) => {
         console.error(err);
-        this._snackbar.open('Error saving corpus', 'OK');
+        this._snackbar.open($localize`Error saving corpus`, 'OK');
       },
     });
     this.editedCorpus.set(undefined);

@@ -21,11 +21,15 @@ describe('CorpusListBrowserService', () => {
     const service = TestBed.inject(CorpusListBrowserService);
 
     await service.store.setFilter({ title: 'x' });
-    expect(corpusService.getCorpora).toHaveBeenCalledWith({ title: 'x' }, 1, 20);
+    expect(corpusService.getCorpora).toHaveBeenCalledWith(
+      { title: 'x', counts: true },
+      1,
+      20,
+    );
 
     await service.store.setPage(2);
     expect(corpusService.getCorpora).toHaveBeenLastCalledWith(
-      { title: 'x' },
+      { title: 'x', counts: true },
       2,
       20,
     );

@@ -3,7 +3,7 @@ import {
   DocumentReadRequest,
   TextMapNode,
 } from '@myrmidon/pythia-core';
-import { BehaviorSubject, forkJoin, Observable } from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
 
 import { DocumentService, ReaderService } from '@myrmidon/pythia-api';
 import { Injectable } from '@angular/core';
@@ -67,9 +67,18 @@ export class DocumentReaderRepository {
    * @param request The request.
    * @param initialPath The optional initial path to open once text has been loaded
    * (not used for range requests).
+   * @param noMap True to avoid loading the document's map, e.g. when the
+   * map is hidden: in this case, map$ will be undefined.
    */
-  public load(request: DocumentReadRequest, initialPath?: string): void {
+  public load(
+    request: DocumentReadRequest,
+    initialPath?: string,
+    noMap = false,
+  ): void {
     const loadId = ++this._loadId;
+    const map$: Observable<TextMapNode | undefined> = noMap
+      ? of(undefined)
+      : this._readService.getDocumentMap(request.documentId);
     this._loading$.next(true);
     const onError = (error: unknown) => {
       if (loadId !== this._loadId) {
@@ -89,7 +98,7 @@ export class DocumentReaderRepository {
     ) {
       forkJoin({
         doc: this._docService.getDocument(request.documentId),
-        map: this._readService.getDocumentMap(request.documentId),
+        map: map$,
         piece: this._readService.getDocumentPieceFromRange(
           request.documentId,
           request.start,
@@ -101,7 +110,9 @@ export class DocumentReaderRepository {
             return;
           }
           this._loading$.next(false);
-          this.setNodeParents(result.map);
+          if (result.map) {
+            this.setNodeParents(result.map);
+          }
           this._document$.next(result.doc);
           this._map$.next(result.map);
           this._text$.next(this.extractBodyContent(result.piece.text));
@@ -111,14 +122,16 @@ export class DocumentReaderRepository {
     } else {
       forkJoin({
         doc: this._docService.getDocument(request.documentId),
-        map: this._readService.getDocumentMap(request.documentId),
+        map: map$,
       }).subscribe({
         next: (result) => {
           if (loadId !== this._loadId) {
             return;
           }
           this._loading$.next(false);
-          this.setNodeParents(result.map);
+          if (result.map) {
+            this.setNodeParents(result.map);
+          }
           this._document$.next(result.doc);
           this._map$.next(result.map);
           this._text$.next(undefined);
@@ -173,14 +186,24 @@ export class DocumentReaderRepository {
         return;
       }
 
+      // discard the response if another document was loaded meanwhile
+      const loadId = this._loadId;
       this._loading$.next(true);
       this._readService.getDocumentPieceFromPath(id, path).subscribe({
         next: (piece) => {
+          if (loadId !== this._loadId) {
+            resolve(false);
+            return;
+          }
           this._loading$.next(false);
           this._text$.next(this.extractBodyContent(piece.text));
           resolve(true);
         },
         error: (error) => {
+          if (loadId !== this._loadId) {
+            resolve(false);
+            return;
+          }
           this._loading$.next(false);
           console.error('Error loading text: ', error);
           reject('Error loading text from path ' + JSON.stringify(path));
@@ -202,16 +225,26 @@ export class DocumentReaderRepository {
         return;
       }
 
+      // discard the response if another document was loaded meanwhile
+      const loadId = this._loadId;
       this._loading$.next(true);
       this._readService
         .getDocumentPieceFromRange(this._document$.value.id, start, end)
         .subscribe({
           next: (piece) => {
+            if (loadId !== this._loadId) {
+              resolve(false);
+              return;
+            }
             this._loading$.next(false);
             this._text$.next(this.extractBodyContent(piece.text));
             resolve(true);
           },
           error: (error) => {
+            if (loadId !== this._loadId) {
+              resolve(false);
+              return;
+            }
             this._loading$.next(false);
             console.error(
               `Unable to load text ${this._document$.value?.id} at ${start}-${end}: `,

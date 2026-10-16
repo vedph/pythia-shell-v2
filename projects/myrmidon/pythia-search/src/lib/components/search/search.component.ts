@@ -77,6 +77,13 @@ export class SearchComponent implements OnInit {
    */
   public readonly hideTitle = input<boolean | undefined>();
 
+  /**
+   * Whether to hide the map in the document reader. When hidden, users can
+   * read only the context of each result, and not browse the whole document
+   * (so also the read document button is hidden).
+   */
+  public readonly hideMap = input<boolean | undefined>();
+
   public query$: Observable<string | undefined>;
   public lastQueries$: Observable<string[]>;
   public loading$: Observable<boolean | undefined>;
@@ -183,6 +190,10 @@ export class SearchComponent implements OnInit {
   }
 
   public readDocument(id: number) {
+    // reading a whole document requires browsing it via its map
+    if (this.hideMap()) {
+      return;
+    }
     this._repository.setReadRequest({
       documentId: id,
     });

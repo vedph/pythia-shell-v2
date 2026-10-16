@@ -1,5 +1,19 @@
 # History
 
+## unpublished
+
+- 2026-10-16:
+  - app: added `rateLimitInterceptor`, so that when the API rejects a request because of its rate limit (429 Too Many Requests), users get a message telling them to wait (with the seconds requested by the server's `Retry-After` header, if any) and try again, rather than a silent failure. Requests are automatically retried (up to 3 times) only when the server asks to wait for at most 5 seconds; the message is shown once for concurrent rejections, after any message opened by the consumer of the failed request, which still gets the original error.
+  - localized the snackbar messages which were hard-coded in English: `pythia-search` (`SearchExportComponent`: "Results exported", "Error exporting results", whose action label is now "OK" rather than "Error"), `pythia-stats` ("Error getting stats"; added the `@angular/localize` types to its `tsconfig.lib.json`, as this is its first localized message), `pythia-corpus-list` ("Error deleting corpus", "Error saving corpus"). Bump the versions of these packages before publishing them.
+
+## 11.1.0 - unpublished
+
+- 2026-10-16:
+  - `pythia-search`, `SearchComponent`: added the `hideMap` input, passed to its document reader, so that consumers can disable the document map (e.g. to let users read only the context of search results, without browsing whole documents). When the map is hidden, the "read document" button is hidden too, as reading a whole document requires its map.
+  - `pythia-document-reader`, `DocumentReaderComponent`: when `hideMap` is true, the map is not even loaded (new `noMap` parameter of `DocumentReaderRepository.load`).
+  - `pythia-document-reader`, `DocumentReaderRepository`: fixed a slower text load (from a map path or a range) overwriting the text of a document loaded meanwhile.
+  - `pythia-corpus-list`: the corpora list now requests documents counts rather than their IDs, which the list does not use. This matches the backend fix of the `counts` parameter, which was inverted (Pythia API 12.1.2).
+
 ## 11.0.0
 
 - 2026-10-09:

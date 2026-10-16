@@ -15,13 +15,17 @@ import { QUERY_BUILDER_ATTR_DEFS_KEY } from '@myrmidon/pythia-query-builder';
 import { routes } from './app.routes';
 import { ATTR_DEFS } from './attr-defs';
 import { I18nPaginatorIntlService } from './services/i18n-paginator-intl.service';
+import { rateLimitInterceptor } from './interceptors/rate-limit.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     //provideZoneChangeDetection({ eventCoalescing: true }),
     provideZonelessChangeDetection(),
     provideRouter(routes, withViewTransitions()),
-    provideHttpClient(withXhr(), withInterceptors([authJwtInterceptor])),
+    provideHttpClient(
+      withXhr(),
+      withInterceptors([authJwtInterceptor, rateLimitInterceptor]),
+    ),
     provideNativeDateAdapter(),
     // query builder
     {

@@ -79,7 +79,7 @@ describe('SearchExportComponent', () => {
     await user.click(exportButton());
     expect(snackbar.open).toHaveBeenCalledWith(
       'Error exporting results',
-      'Error',
+      'OK',
     );
     expect(exportButton().disabled).toBe(false);
   });

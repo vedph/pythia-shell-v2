@@ -46,7 +46,9 @@ export class DocumentReaderComponent {
   public readonly debug = input<boolean | undefined>();
 
   /**
-   * Whether to hide the map.
+   * Whether to hide the map. When the map is hidden, it is not even loaded,
+   * so that users can read only the text pieces they are given (e.g. the
+   * context of a search result) rather than browsing the whole document.
    */
   public readonly hideMap = input<boolean | undefined>();
 
@@ -71,8 +73,9 @@ export class DocumentReaderComponent {
 
     effect(() => {
       const request = this.request();
+      const hideMap = !!this.hideMap();
       if (request) {
-        this._repository.load(request, request.initialPath);
+        this._repository.load(request, request.initialPath, hideMap);
       } else {
         this._repository.reset();
       }
