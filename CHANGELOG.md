@@ -1,5 +1,7 @@
 # History
 
+## 11.0.0
+
 - 2026-10-09:
   - ⚠️ migrated to signal-based forms bumping major version to 11.
   - updated Angular and packages.

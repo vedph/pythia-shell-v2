@@ -15,3 +15,12 @@ minimumReleaseAgeExclude:
   - '@angular/platform-browser@22.0.3'
   - '@angular/router@22.0.3'
   - '@rollup/rollup-win32-arm64-msvc@4.64.3'
+  - '@angular-devkit/architect@0.2202.3'
+  - '@angular-devkit/core@22.2.3'
+  - '@angular-devkit/schematics@22.2.3'
+  - '@angular/build@22.2.3'
+  - '@angular/cli@22.2.3'
+  - '@schematics/angular@22.2.3'
+  - '@vitest/mocker@5.0.5'
+  - '@vitest/spy@5.0.5'
+  - vitest@5.0.5
