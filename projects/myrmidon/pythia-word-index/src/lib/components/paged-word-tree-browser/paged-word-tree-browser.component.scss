@@ -1,9 +1,9 @@
 .nr {
   margin: 0 4px;
   padding: 0 4px;
-  color: white;
-  background-color: rgb(61, 109, 232);
-  border: 1px solid rgb(61, 109, 232);
+  color: var(--mat-sys-on-primary);
+  background-color: var(--mat-sys-primary);
+  border: 1px solid var(--mat-sys-primary);
   border-radius: 4px;
 }
 .button-row {
@@ -32,7 +32,7 @@ div#list {
 }
 .node-ext {
   margin-left: 6px;
-  color: #107650;
+  color: light-dark(#107650, #6fd3a6);
 }
 
 /* lt-md */

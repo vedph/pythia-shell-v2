@@ -8,7 +8,7 @@
   flex: 0 0 auto;
 }
 fieldset {
-  border: 1px solid silver;
+  border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 6px;
   padding: 4px;
 }

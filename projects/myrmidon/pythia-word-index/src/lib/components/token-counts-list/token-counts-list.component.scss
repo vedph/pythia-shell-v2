@@ -22,14 +22,14 @@
 .token .tc {
   margin: 0 4px;
   padding: 4px;
-  border: 1px solid #807676;
+  border: 1px solid var(--mat-sys-secondary);
   border-radius: 6px;
-  background-color: #807676;
-  color: white;
+  background-color: var(--mat-sys-secondary);
+  color: var(--mat-sys-on-secondary);
 }
 .counts {
   margin: 4px 0;
   padding: 4px;
-  border: 1px solid silver;
+  border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 6px;
 }

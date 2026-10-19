@@ -4,10 +4,11 @@
   overflow: hidden;
 }
 h3.doc-head {
-  border: 1px solid aliceblue;
+  border: 1px solid var(--mat-sys-surface-container);
   border-radius: 8px;
   padding: 0 8px;
-  background-color: aliceblue;
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
 }
 div#container {
   display: grid;
@@ -23,7 +24,7 @@ div#progress {
 }
 div#map {
   grid-area: map;
-  border: 1px solid #f0f0f0;
+  border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 8px;
   padding: 0 8px;
 }

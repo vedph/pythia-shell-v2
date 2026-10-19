@@ -1,7 +1,3 @@
-h3 {
-  border-bottom: 1px solid silver;
-  color: silver;
-}
 .form-row {
   display: flex;
   gap: 8px;

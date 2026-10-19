@@ -8,7 +8,7 @@
   flex: 0 0 auto;
 }
 th {
-  color: silver;
+  color: var(--mat-sys-on-surface-variant);
   font-weight: normal;
   text-align: left;
 }

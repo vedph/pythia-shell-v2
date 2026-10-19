@@ -1,5 +1,13 @@
-import { CommonModule } from '@angular/common';
-import { Component, effect, input, signal, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
+import {
+  Component,
+  DestroyRef,
+  effect,
+  inject,
+  input,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatButtonModule } from '@angular/material/button';
@@ -60,10 +68,25 @@ export class TokenCountsComponent {
   public readonly total = signal(0);
   public readonly downloading = signal<boolean>(false);
 
+  // ECharts draws on canvas and cannot read CSS variables, so the legend
+  // text color is resolved from the page text color (--mat-sys-on-surface)
+  // and refreshed when the light/dark theme class on <html> changes.
+  private readonly _document = inject(DOCUMENT);
+  private readonly _textColor = signal(this.getTextColor());
+
   constructor(
     private _clipboard: Clipboard,
     private _snackbar: MatSnackBar,
   ) {
+    const observer = new MutationObserver(() =>
+      this._textColor.set(this.getTextColor()),
+    );
+    observer.observe(this._document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+    inject(DestroyRef).onDestroy(() => observer.disconnect());
+
     effect(() => {
       const counts = this.counts();
       if (counts && counts.length > 0) {
@@ -74,6 +97,10 @@ export class TokenCountsComponent {
         this.total.set(0);
       }
     });
+  }
+
+  private getTextColor(): string {
+    return getComputedStyle(this._document.documentElement).color;
   }
 
   private updateChart(counts: TokenCount[]): void {
@@ -92,6 +119,7 @@ export class TokenCountsComponent {
         legend: {
           orient: 'vertical',
           left: 10,
+          textStyle: { color: this._textColor() },
           data: counts.map((c) => c.attributeValue),
         },
         series: [

@@ -3,15 +3,15 @@ table {
   border-collapse: collapse;
 }
 thead tr {
-  background-color: lightgray;
+  background-color: var(--mat-sys-surface-container-highest);
 }
 tbody tr:nth-child(even) {
-  background-color: lightgray;
+  background-color: var(--mat-sys-surface-container);
 }
 table tr,
 td,
 th {
-  border: 1px solid lightgray;
+  border: 1px solid var(--mat-sys-outline-variant);
   padding: 0 8px;
 }
 th {

@@ -1,17 +1,24 @@
 table {
+  width: 100%;
   border-collapse: collapse;
+  color: var(--mat-sys-on-surface-variant);
 }
-tr:nth-child(odd) {
-  background-color: #f8f8f8;
+tbody tr:nth-child(odd) {
+  background-color: var(--mat-sys-surface-container);
 }
 th {
   text-align: left;
   font-weight: normal;
-  color: silver;
+  color: var(--mat-sys-on-surface-variant);
 }
-td {
-  padding: 4px;
+tbody tr:hover {
+  background-color: var(--mat-sys-surface-container-high);
 }
-td.command {
-  width: 24px;
+td.fit-width {
+  width: 1px;
+  white-space: nowrap;
+}
+tbody tr.selected {
+  background-color: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
 }

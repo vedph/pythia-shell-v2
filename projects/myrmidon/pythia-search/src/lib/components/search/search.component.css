@@ -1,51 +1,33 @@
 .error {
-  color: red;
+  color: var(--mat-sys-error);
   margin: 4px 0;
 }
 table {
-  border-collapse: collapse;
   width: 100%;
+  border-collapse: collapse;
+  color: var(--mat-sys-on-surface-variant);
+}
+tbody tr:nth-child(odd) {
+  background-color: var(--mat-sys-surface-container);
 }
 th {
+  text-align: left;
   font-weight: normal;
-  color: #a0a0a0;
-  background-color: #dedede;
+  color: var(--mat-sys-on-surface-variant);
 }
-th,
-td {
-  border: 1px solid #ddd;
+tbody tr:hover {
+  background-color: var(--mat-sys-surface-container-high);
 }
 td.fit-width {
   width: 1px;
   white-space: nowrap;
 }
-th:nth-child(1),
-th:nth-child(2) {
-  border: none;
-}
-tr:nth-child(even) {
-  background-color: #e8e8e8;
-}
-tr:hover {
-  background-color: #eee;
-}
-tbody td {
-  padding-left: 4px;
-  padding-right: 4px;
-  border-left: 1px solid silver;
-  border-right: 1px solid silver;
-}
-tbody td.command {
-  padding: 0px;
-  border: none;
-  width: 32px;
-}
-tbody > tr > td > a {
-  cursor: pointer;
-  text-decoration: underline;
+tbody tr.selected {
+  background-color: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
 }
 td.nr {
-  color: silver;
+  color: var(--mat-sys-on-surface-variant);
   text-align: center;
 }
 td.author {
@@ -55,15 +37,17 @@ td.title {
   font-size: 0.9em;
 }
 td.context {
-  color: #404040;
+  color: var(--mat-sys-on-surface);
   text-align: center;
 }
 td.value {
   cursor: pointer;
   text-align: center;
-  background-color: #dedede;
-}code {
-  color: #c04f05;
+  background-color: var(--mat-sys-surface-container-highest);
+  color: var(--mat-sys-on-surface);
+}
+code {
+  color: var(--mat-sys-tertiary);
 }
 .form-row {
   display: flex;
@@ -77,11 +61,12 @@ td.value {
 div#no-results {
   margin: 8px;
   text-align: center;
-  color: silver;
+  color: var(--mat-sys-on-surface-variant);
 }
 div#total {
-  background-color: #ffffe0;
-  border: 1px solid #707040;
+  background-color: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+  border: 1px solid var(--mat-sys-outline);
   border-radius: 6px;
   padding: 4px;
   font-weight: bold;

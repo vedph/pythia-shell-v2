@@ -2,13 +2,13 @@
   margin-top: 8px;
 }
 fieldset {
-  border: 1px solid silver;
+  border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 6px;
   padding: 6px;
   margin-bottom: 8px;
 }
 legend {
-  color: silver;
+  color: var(--mat-sys-on-surface-variant);
 }
 .form-row {
   display: flex;

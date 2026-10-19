@@ -2,6 +2,7 @@
 
 ## unpublished
 
+- 2026-10-19: migrated to M3 styles adding dark/light themes.
 - 2026-10-16:
   - app: added `rateLimitInterceptor`, so that when the API rejects a request because of its rate limit (429 Too Many Requests), users get a message telling them to wait (with the seconds requested by the server's `Retry-After` header, if any) and try again, rather than a silent failure. Requests are automatically retried (up to 3 times) only when the server asks to wait for at most 5 seconds; the message is shown once for concurrent rejections, after any message opened by the consumer of the failed request, which still gets the original error.
   - localized the snackbar messages which were hard-coded in English: `pythia-search` (`SearchExportComponent`: "Results exported", "Error exporting results", whose action label is now "OK" rather than "Error"), `pythia-stats` ("Error getting stats"; added the `@angular/localize` types to its `tsconfig.lib.json`, as this is its first localized message), `pythia-corpus-list` ("Error deleting corpus", "Error saving corpus"). Bump the versions of these packages before publishing them.

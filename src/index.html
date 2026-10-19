@@ -6,6 +6,15 @@
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="env.js"></script>
+    <script>
+      // Apply the saved theme before bootstrap to avoid a light flash
+      // (same storage key used by ThemeService from @myrmidon/ngx-mat-tools).
+      try {
+        if (localStorage.getItem("user-theme") === "dark") {
+          document.documentElement.classList.add("dark-mode");
+        }
+      } catch {}
+    </script>
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
