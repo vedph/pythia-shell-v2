@@ -1,3 +1,4 @@
+@use "@angular/cdk" as cdk;
 @use "@angular/material" as mat;
 
 // A theme object is still needed for mat.typography-hierarchy(), which
@@ -54,6 +55,9 @@ html {
 // Apply Material typography scale to .mat-typography (on <body>) and to
 // native h1–h6 elements contained within it.
 @include mat.typography-hierarchy($_theme);
+
+// .cdk-visually-hidden, for labels read only by assistive technologies
+@include cdk.a11y-visually-hidden();
 
 html,
 body {

@@ -110,24 +110,48 @@ export class TokenCountsComponent {
 
     // create pie chart from counts only if we have data
     if (totalCount > 0) {
+      const textColor = this._textColor();
       // https://www.npmjs.com/package/ngx-echarts
       this.chartOptions.set({
+        // describe the chart to assistive technologies
+        aria: { enabled: true },
         tooltip: {
           trigger: 'item',
-          formatter: '{a} <br/>{b}: {c} ({d}%)',
+          confine: true,
+          formatter: '{b}: {c} ({d}%)',
         },
+        // the legend is a single scrollable row below the pie, so that it
+        // never overlaps it whatever the number of values; truncated names
+        // are shown in full in their tooltip
         legend: {
-          orient: 'vertical',
-          left: 10,
-          textStyle: { color: this._textColor() },
+          type: 'scroll',
+          orient: 'horizontal',
+          left: 'center',
+          bottom: 0,
+          textStyle: { color: textColor, width: 160, overflow: 'truncate' },
+          pageTextStyle: { color: textColor },
+          pageIconColor: textColor,
+          pageIconInactiveColor: 'rgba(128, 128, 128, 0.5)',
+          tooltip: { show: true },
           data: counts.map((c) => c.attributeValue),
         },
         series: [
           {
             name: 'count',
             type: 'pie',
-            radius: '50%',
-            center: ['50%', '60%'],
+            radius: '58%',
+            center: ['50%', '46%'],
+            // labels of tiny or overlapping slices are hidden: their values
+            // are in the tooltips and in the data table
+            minShowLabelAngle: 4,
+            label: {
+              color: textColor,
+              textBorderWidth: 0,
+              width: 96,
+              overflow: 'truncate',
+            },
+            labelLine: { length: 8, length2: 8 },
+            labelLayout: { hideOverlap: true },
             data: counts.map((c) => ({
               name: c.attributeValue,
               value: c.value,

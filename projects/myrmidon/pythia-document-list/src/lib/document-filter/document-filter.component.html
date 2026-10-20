@@ -25,7 +25,7 @@
 
   <!-- author -->
   @if (!hiddenFilters()?.author) {
-    <div class="short-field">
+    <div>
       <mat-form-field>
         <mat-label i18n>author(s)</mat-label>
         <input matInput [formField]="form.author" (keydown.enter)="apply()" />
@@ -82,7 +82,7 @@
 
   <!-- date -->
   @if (!hiddenFilters()?.date) {
-    <div i18n>date</div>
+    <div class="group-title" role="heading" aria-level="3" i18n>date</div>
     <div class="form-row">
       <!-- minDateValue -->
       <mat-form-field class="short-field">
@@ -110,7 +110,7 @@
 
   <!-- time -->
   @if (!hiddenFilters()?.modified) {
-    <div i18n>modified</div>
+    <div class="group-title" role="heading" aria-level="3" i18n>modified</div>
     <div class="form-row">
       <!-- minTimeModified -->
       <mat-form-field class="time-field">
@@ -149,8 +149,8 @@
   <!-- attributes -->
   @if (attributes()?.length && !hiddenFilters()?.attributes) {
     <div>
-      <div>
-        <ng-container i18n>attributes</ng-container>
+      <div class="form-row">
+        <div class="group-title" role="heading" aria-level="3" i18n>attributes</div>
         <button
           type="button"
           mat-icon-button
@@ -222,7 +222,7 @@
   <!-- sort -->
   @if (sortable()) {
     <div>
-      <div i18n>sort order</div>
+      <div class="group-title" role="heading" aria-level="3" i18n>sort order</div>
       <div>
         <mat-form-field>
           <mat-label>sort</mat-label>

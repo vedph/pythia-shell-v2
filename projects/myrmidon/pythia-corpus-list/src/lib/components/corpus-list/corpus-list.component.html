@@ -18,59 +18,61 @@
       @if (loading()) {
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       }
-      <table>
-        <thead>
-          <tr>
-            <th><span class="cdk-visually-hidden" i18n>actions</span></th>
-            <th>ID</th>
-            @if (admin()) {
-              <th i18n>user</th>
-            }
-            <th i18n>title</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (c of page.items; track c) {
+      <div class="table-wrapper">
+        <table>
+          <thead>
             <tr>
-              <td class="fit-width">
-                @if (c | editable) {
-                  <button
-                    mat-icon-button
-                    type="button"
-                    i18n-matTooltip
-                    matTooltip="Edit this corpus"
-                    i18n-aria-label
-                    aria-label="Edit corpus"
-                    class="mat-primary"
-                    (click)="editCorpus(c)"
-                  >
-                    <mat-icon class="mat-primary">edit</mat-icon>
-                  </button>
-                }
-                @if (c | editable) {
-                  <button
-                    mat-icon-button
-                    type="button"
-                    i18n-matTooltip
-                    matTooltip="Delete this corpus"
-                    i18n-aria-label
-                    aria-label="Delete corpus"
-                    class="mat-warn"
-                    (click)="deleteCorpus(c)"
-                  >
-                    <mat-icon class="mat-warn">delete</mat-icon>
-                  </button>
-                }
-              </td>
-              <td>{{ c.id }}</td>
+              <th><span class="cdk-visually-hidden" i18n>actions</span></th>
+              <th>ID</th>
               @if (admin()) {
-                <td>{{ c.userId }}</td>
+                <th i18n>user</th>
               }
-              <td>{{ c.title }}</td>
+              <th i18n>title</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (c of page.items; track c) {
+              <tr>
+                <td class="fit-width">
+                  @if (c | editable) {
+                    <button
+                      mat-icon-button
+                      type="button"
+                      i18n-matTooltip
+                      matTooltip="Edit this corpus"
+                      i18n-aria-label
+                      aria-label="Edit corpus"
+                      class="mat-primary"
+                      (click)="editCorpus(c)"
+                    >
+                      <mat-icon class="mat-primary">edit</mat-icon>
+                    </button>
+                  }
+                  @if (c | editable) {
+                    <button
+                      mat-icon-button
+                      type="button"
+                      i18n-matTooltip
+                      matTooltip="Delete this corpus"
+                      i18n-aria-label
+                      aria-label="Delete corpus"
+                      class="mat-warn"
+                      (click)="deleteCorpus(c)"
+                    >
+                      <mat-icon class="mat-warn">delete</mat-icon>
+                    </button>
+                  }
+                </td>
+                <td>{{ c.id }}</td>
+                @if (admin()) {
+                  <td>{{ c.userId }}</td>
+                }
+                <td>{{ c.title }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
       <!-- pagination -->
       <div class="form-row" id="paginator">
         <button

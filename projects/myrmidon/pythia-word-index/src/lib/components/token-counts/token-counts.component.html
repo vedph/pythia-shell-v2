@@ -1,71 +1,65 @@
-<div id="container">
-  <!-- chart -->
-  <div id="chart">
-    <div echarts [options]="chartOptions()!" class="chart"></div>
-  </div>
+<!-- chart -->
+@if (chartOptions(); as options) {
+  <div echarts [options]="options" class="chart"></div>
+}
 
-  <!-- table -->
-  <div id="data">
-    <mat-expansion-panel>
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          {{ total() }}
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      <table>
-        <thead>
+<!-- table -->
+<mat-expansion-panel class="data">
+  <mat-expansion-panel-header>
+    <mat-panel-title>{{ total() }}</mat-panel-title>
+  </mat-expansion-panel-header>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th i18n>value</th>
+          <th i18n class="nr">nr.</th>
+          <th class="nr">%</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of counts(); track c) {
           <tr>
-            <th i18n>value</th>
-            <th i18n>nr.</th>
-            <th>%</th>
+            <td>{{ c.attributeValue }}</td>
+            <td class="nr">{{ c.value }}</td>
+            <td class="nr">{{ c.value | percentage: total() }}</td>
           </tr>
-        </thead>
-        <tbody>
-          @for (c of counts(); track c) {
-            <tr>
-              <td>{{ c.attributeValue }}</td>
-              <td>{{ c.value }}</td>
-              <td>{{ c.value | percentage: total() }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </mat-expansion-panel>
+        }
+      </tbody>
+    </table>
   </div>
+</mat-expansion-panel>
 
-  <!-- toolbar -->
-  @if (!hideToolbar() && counts()) {
-    <div id="toolbar" class="button-row">
-      <button
-        type="button"
-        mat-icon-button
-        matTooltip="Copy data"
-        i18n-matTooltip
-        aria-label="Copy data"
-        i18n-aria-label
-        (click)="copy()"
-      >
-        <mat-icon>content_copy</mat-icon>
-      </button>
+<!-- toolbar -->
+@if (!hideToolbar() && counts()) {
+  <div class="toolbar">
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Copy data"
+      i18n-matTooltip
+      aria-label="Copy data"
+      i18n-aria-label
+      (click)="copy()"
+    >
+      <mat-icon>content_copy</mat-icon>
+    </button>
 
-      <button
-        type="button"
-        mat-icon-button
-        matTooltip="Download data"
-        i18n-matTooltip
-        aria-label="Download data"
-        i18n-aria-label
-        (click)="download()"
-      >
-        <mat-icon class="mat-primary">download</mat-icon>
-      </button>
-    </div>
-  }
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Download data"
+      i18n-matTooltip
+      aria-label="Download data"
+      i18n-aria-label
+      (click)="download()"
+    >
+      <mat-icon class="mat-primary">download</mat-icon>
+    </button>
+  </div>
+}
 
-  <!-- progress bar -->
-  @if (downloading()) {
-    <div>
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    </div>
-  }
-</div>
+<!-- progress bar -->
+@if (downloading()) {
+  <mat-progress-bar mode="indeterminate" />
+}

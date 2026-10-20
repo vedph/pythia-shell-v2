@@ -1,3 +1,19 @@
+// A single column, so that the chart gets the full width: the legend is
+// drawn below the pie (see the chart options), and the data table is
+// collapsed below the chart.
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  container: pythia-token-counts / inline-size;
+}
+.chart {
+  width: 100%;
+  height: 360px;
+}
+.table-wrapper {
+  overflow-x: auto;
+}
 table {
   width: 100%;
   border-collapse: collapse;
@@ -8,7 +24,6 @@ thead tr {
 tbody tr:nth-child(even) {
   background-color: var(--mat-sys-surface-container);
 }
-table tr,
 td,
 th {
   border: 1px solid var(--mat-sys-outline-variant);
@@ -18,41 +33,20 @@ th {
   text-align: left;
   font-weight: normal;
 }
-.button-row {
+th.nr,
+td.nr {
+  text-align: right;
+  white-space: nowrap;
+}
+.toolbar {
   display: flex;
+  justify-content: flex-end;
   align-items: center;
   flex-wrap: wrap;
 }
-.button-row * {
-  flex: 0 0 auto;
-}
-div#container {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  grid-template-columns: 1fr auto;
-  grid-template-areas:
-    "chart data"
-    ". toolbar";
-  gap: 8px;
-}
-div#chart {
-  grid-area: chart;
-}
-div#data {
-  grid-area: data;
-}
-div#toolbar {
-  grid-area: toolbar;
-}
 
-/* lt-md */
-@media only screen and (max-width: 959px) {
-  div#container {
-    grid-template-rows: 1fr;
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "chart"
-      "data"
-      "toolbar";
+@container pythia-token-counts (width < 480px) {
+  .chart {
+    height: 300px;
   }
 }

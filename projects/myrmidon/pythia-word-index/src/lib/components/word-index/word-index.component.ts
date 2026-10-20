@@ -1,4 +1,15 @@
-import { Component, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  afterNextRender,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  inject,
+  Injector,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -34,6 +45,9 @@ import { WordTreeFilterSortOrderEntry } from '../paged-word-tree-filter/paged-wo
   styleUrl: './word-index.component.scss',
 })
 export class WordIndexComponent {
+  private readonly _injector = inject(Injector);
+  private readonly _counts = viewChild.required<ElementRef<HTMLElement>>('counts');
+
   public readonly token = signal<Word | Lemma | undefined>(undefined);
 
   /**
@@ -80,5 +94,32 @@ export class WordIndexComponent {
 
   public onCountsRequest(token: Word | Lemma): void {
     this.token.set(token);
+    afterNextRender(() => this.revealCounts(), { injector: this._injector });
+  }
+
+  /**
+   * Scroll the counts panel into view when its top is not visible. This
+   * happens in the single column layout, where the panel follows the tree;
+   * in the two columns layout the panel is sticky, so it is always in view.
+   */
+  private revealCounts(): void {
+    const element = this._counts().nativeElement;
+    const view = element.ownerDocument.defaultView;
+    if (!view) {
+      return;
+    }
+    const top = element.getBoundingClientRect().top;
+    const minTop = parseFloat(view.getComputedStyle(element).scrollMarginTop);
+    // the top bar with the attributes selector is about 64px tall
+    if (top >= (minTop || 0) && top <= view.innerHeight - 64) {
+      return;
+    }
+    const reduceMotion = view.matchMedia?.(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    element.scrollIntoView({
+      block: 'start',
+      behavior: reduceMotion ? 'auto' : 'smooth',
+    });
   }
 }

@@ -21,14 +21,15 @@
     }
     <!-- text -->
     <div id="text">
-      <h3 class="doc-head">
+      <div class="doc-head" role="heading" aria-level="3">
         @if (doc.author) {
           <span>{{ doc.author }} - </span>
         }
         {{ doc.title }}
-      </h3>
+      </div>
       @if (text$ | async; as text) {
-        <div id="body" [innerHtml]="text"></div>
+        <!-- focusable, so that keyboard users can scroll it -->
+        <div id="body" tabindex="0" [innerHtml]="text"></div>
       }
     </div>
   </div>

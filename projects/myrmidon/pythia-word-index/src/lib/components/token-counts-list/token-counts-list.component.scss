@@ -1,19 +1,32 @@
-.form-row {
+// A column whose top bar stays in place, while the counts scroll when the
+// host constrains the component height (e.g. in a sticky panel).
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+.top-bar {
+  flex: none;
   display: flex;
   gap: 8px;
   align-items: center;
   flex-wrap: wrap;
+  padding-top: 8px;
 }
-.form-row * {
-  flex: 0 0 auto;
+.top-bar .attributes {
+  flex: 1 1 12rem;
+  min-width: 0;
 }
 .token {
-  font-size: 1.2em;
+  flex: none;
+  font: var(--mat-sys-title-medium);
+  letter-spacing: var(--mat-sys-title-medium-tracking);
 }
 .token .tl {
   margin: 0 4px;
-  font-size: 0.9em;
   font-variant: small-caps;
+  color: var(--mat-sys-on-surface-variant);
 }
 .token .tv {
   margin: 0 4px;
@@ -21,15 +34,30 @@
 }
 .token .tc {
   margin: 0 4px;
-  padding: 4px;
-  border: 1px solid var(--mat-sys-secondary);
-  border-radius: 6px;
+  padding: 2px 8px;
+  border-radius: var(--mat-sys-corner-small);
   background-color: var(--mat-sys-secondary);
   color: var(--mat-sys-on-secondary);
+  font: var(--mat-sys-label-large);
+}
+.counts-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 .counts {
-  margin: 4px 0;
-  padding: 4px;
+  padding: 8px 12px;
   border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 6px;
+  border-radius: var(--mat-sys-corner-medium);
+}
+// the attribute name heading
+.title {
+  margin-bottom: 4px;
+  font: var(--mat-sys-title-medium);
+  letter-spacing: var(--mat-sys-title-medium-tracking);
+  color: var(--mat-sys-on-surface);
 }

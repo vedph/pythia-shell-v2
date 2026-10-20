@@ -28,42 +28,50 @@ tbody tr.selected {
   align-items: center;
   flex-wrap: wrap;
 }
-.form-row * {
+.form-row > * {
   flex: 0 0 auto;
+}
+.form-row > mat-paginator {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* the layout depends on the width available to the component rather than
+   on the window, so that it adapts to any host layout */
+:host {
+  display: block;
+  container: pythia-corpus-list / inline-size;
 }
 div#container {
   display: grid;
-  grid-template-rows: 1fr auto;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
-    "filters list"
-    "editor editor";
-  gap: 8px;
+    "list"
+    "filters";
+  gap: 16px;
 }
 div#filters {
   grid-area: filters;
+  min-width: 0;
 }
 div#list {
   grid-area: list;
+  min-width: 0;
 }
-div#editor {
-  grid-area: editor;
+.table-wrapper {
+  overflow-x: auto;
 }
-
-/* lt-md */
-@media only screen and (max-width: 959px) {
-  div#container {
-    grid-template-rows: 1fr auto auto;
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "list"
-      "filters"
-      "editor";
-  }
-  th.noif-lt-md {
-    display: none;
-  }
+@container pythia-corpus-list (width < 720px) {
+  th.noif-lt-md,
   td.noif-lt-md {
     display: none;
+  }
+}
+@container pythia-corpus-list (width >= 720px) {
+  div#container {
+    grid-template-columns: fit-content(24rem) minmax(0, 1fr);
+    grid-template-areas: "filters list";
+  }
+  div#filters {
+    align-self: start;
   }
 }

@@ -1,60 +1,56 @@
 @if (token()) {
-  <div>
-    <!-- top bar -->
-    <div class="form-row">
-      <div class="token">
-        @if (token()?.language) {
-          <span class="tl">{{ token()!.language }}</span>
-        }
-        <span class="tv">
-          {{ token()?.value }}
-        </span>
-        <span class="tc">
-          {{ token()?.count }}
-        </span>
-      </div>
-      <div>
-        <mat-form-field>
-          <mat-label i18n>attributes</mat-label>
-          <mat-select [formField]="form.names" multiple>
-            @for (a of attributes(); track a.name) {
-              <mat-option [value]="a.name"
-                >{{ a.name }}{{ a.type === 1 ? "\u207f" : "" }}</mat-option
-              >
-            }
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <button
-        type="button"
-        mat-icon-button
-        matTooltip="Set selected attributes"
-        i18n-matTooltip
-        aria-label="Set selected attributes"
-        i18n-aria-label
-        (click)="loadCounts(token())"
-        [disabled]="busy()"
-      >
-        <mat-icon class="mat-primary">check_circle</mat-icon>
-      </button>
+  <!-- top bar -->
+  <div class="top-bar">
+    <div class="token">
+      @if (token()?.language) {
+        <span class="tl">{{ token()!.language }}</span>
+      }
+      <span class="tv">
+        {{ token()?.value }}
+      </span>
+      <span class="tc">
+        {{ token()?.count }}
+      </span>
     </div>
-    <!-- progress -->
-    @if (busy()) {
-      <div>
-        <mat-progress-bar mode="indeterminate" />
-      </div>
-    }
-    <!-- counts -->
+    <mat-form-field class="attributes" subscriptSizing="dynamic">
+      <mat-label i18n>attributes</mat-label>
+      <mat-select [formField]="form.names" multiple>
+        @for (a of attributes(); track a.name) {
+          <mat-option [value]="a.name"
+            >{{ a.name }}{{ a.type === 1 ? "ⁿ" : "" }}</mat-option
+          >
+        }
+      </mat-select>
+    </mat-form-field>
+    <button
+      type="button"
+      mat-icon-button
+      matTooltip="Set selected attributes"
+      i18n-matTooltip
+      aria-label="Set selected attributes"
+      i18n-aria-label
+      (click)="loadCounts(token())"
+      [disabled]="busy()"
+    >
+      <mat-icon class="mat-primary">check_circle</mat-icon>
+    </button>
+  </div>
+  <!-- progress -->
+  @if (busy()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+  <!-- counts -->
+  <div class="counts-list">
     @for (a of selectedAttributes(); track a.name) {
       @if (counts()[a.name]) {
-        <div class="counts">
-          <h3>{{ a.name }}</h3>
+        <section class="counts">
+          <div class="title" role="heading" aria-level="3">{{ a.name }}</div>
           <pythia-token-counts
             [counts]="counts()[a.name]"
             [attribute]="a"
             [hideToolbar]="hideToolbar()"
           />
-        </div>
+        </section>
       }
     }
   </div>

@@ -13,6 +13,16 @@
 .time-field {
   width: 10em;
 }
+/* the title of a group of fields */
+.group-title {
+  margin-top: 8px;
+  font: var(--mat-sys-title-small);
+  letter-spacing: var(--mat-sys-title-small-tracking);
+  color: var(--mat-sys-on-surface-variant);
+}
+.form-row > .group-title {
+  margin-top: 0;
+}
 #toolbar {
   margin: 10px 0;
 }

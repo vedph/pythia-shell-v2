@@ -1,10 +1,18 @@
+// fields flow in rows when there is room (e.g. above the tree in a narrow
+// layout), else they stack (e.g. in a side column)
+.filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 16px;
+}
 .form-row {
   display: flex;
   gap: 8px;
   align-items: center;
   flex-wrap: wrap;
 }
-.form-row * {
+.form-row > * {
   flex: 0 0 auto;
 }
 .nr {

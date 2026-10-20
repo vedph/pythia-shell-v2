@@ -35,7 +35,6 @@
           <div class="form-row">
             <!-- submit -->
             <button
-              style="margin-top: -24px"
               type="button"
               class="mat-primary"
               mat-flat-button
@@ -48,7 +47,7 @@
 
             <!-- history -->
             @if (lastQueries$ | async; as queries) {
-              <mat-form-field>
+              <mat-form-field subscriptSizing="dynamic">
                 <mat-label>history</mat-label>
                 <mat-select [formField]="form.history">
                   @for (q of queries; track q) {
@@ -101,94 +100,96 @@
         </div>
       }
       @if (page.items.length) {
-        <table>
-          <thead>
-            <tr>
-              <th><span class="cdk-visually-hidden" i18n>actions</span></th>
-              <th class="noif-lt-md">
-                <span class="cdk-visually-hidden" i18n>number</span>
-              </th>
-              @if (!hideAuthor()) {
-                <th i18n>author</th>
-              }
-              @if (!hideTitle()) {
-                <th i18n>title</th>
-              }
-              @for (l of leftContextLabels(); track l) {
-                <th>{{ l }}</th>
-              }
-              <th i18n>value</th>
-              @for (l of rightContextLabels(); track l) {
-                <th>{{ l }}</th>
-              }
-            </tr>
-          </thead>
-          <tbody>
-            @for (r of page.items; track r.key; let index = $index) {
+        <div class="table-wrapper">
+          <table>
+            <thead>
               <tr>
-                <td class="fit-width">
-                  <!-- read -->
-                  <button
-                    mat-icon-button
-                    type="button"
-                    i18n-matTooltip
-                    matTooltip="Read in context"
-                    i18n-aria-label
-                    aria-label="Read in context"
-                    [disabled]="loading$ | async"
-                    (click)="readDocumentPiece(r.documentId, r.index, r.length)"
-                  >
-                    <mat-icon class="mat-primary">find_in_page</mat-icon>
-                  </button>
-                  <!-- read-doc (requires the map to browse the document) -->
-                  @if (!hideMap()) {
+                <th><span class="cdk-visually-hidden" i18n>actions</span></th>
+                <th class="noif-lt-md">
+                  <span class="cdk-visually-hidden" i18n>number</span>
+                </th>
+                @if (!hideAuthor()) {
+                  <th i18n>author</th>
+                }
+                @if (!hideTitle()) {
+                  <th i18n>title</th>
+                }
+                @for (l of leftContextLabels(); track l) {
+                  <th>{{ l }}</th>
+                }
+                <th i18n>value</th>
+                @for (l of rightContextLabels(); track l) {
+                  <th>{{ l }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of page.items; track r.key; let index = $index) {
+                <tr>
+                  <td class="fit-width">
+                    <!-- read -->
                     <button
                       mat-icon-button
                       type="button"
                       i18n-matTooltip
-                      matTooltip="Read document"
+                      matTooltip="Read in context"
                       i18n-aria-label
-                      aria-label="Read document"
+                      aria-label="Read in context"
                       [disabled]="loading$ | async"
-                      (click)="readDocument(r.documentId)"
+                      (click)="readDocumentPiece(r.documentId, r.index, r.length)"
                     >
-                      <mat-icon>description</mat-icon>
+                      <mat-icon class="mat-primary">find_in_page</mat-icon>
                     </button>
+                    <!-- read-doc (requires the map to browse the document) -->
+                    @if (!hideMap()) {
+                      <button
+                        mat-icon-button
+                        type="button"
+                        i18n-matTooltip
+                        matTooltip="Read document"
+                        i18n-aria-label
+                        aria-label="Read document"
+                        [disabled]="loading$ | async"
+                        (click)="readDocument(r.documentId)"
+                      >
+                        <mat-icon>description</mat-icon>
+                      </button>
+                    }
+                  </td>
+                  <td class="nr noif-lt-md">{{ index + 1 }}.</td>
+                  <!-- author -->
+                  @if (!hideAuthor()) {
+                    <td class="author">{{ r.author }}</td>
                   }
-                </td>
-                <td class="nr noif-lt-md">{{ index + 1 }}.</td>
-                <!-- author -->
-                @if (!hideAuthor()) {
-                  <td class="author">{{ r.author }}</td>
-                }
-                <!-- title -->
-                @if (!hideTitle()) {
-                  <td class="title">{{ r.title }}</td>
-                }
-                <!-- left -->
-                @for (l of leftContextLabels(); track l; let i = $index) {
-                  <td class="context">
-                    {{ r.leftContext[i] }}
+                  <!-- title -->
+                  @if (!hideTitle()) {
+                    <td class="title">{{ r.title }}</td>
+                  }
+                  <!-- left -->
+                  @for (l of leftContextLabels(); track l; let i = $index) {
+                    <td class="context">
+                      {{ r.leftContext[i] }}
+                    </td>
+                  }
+                  <!-- value -->
+                  <td
+                    class="value"
+                    [matTooltip]="r.value"
+                    (click)="readDocumentPiece(r.documentId, r.index, r.length)"
+                  >
+                    {{ r.text }}
                   </td>
-                }
-                <!-- value -->
-                <td
-                  class="value"
-                  [matTooltip]="r.value"
-                  (click)="readDocumentPiece(r.documentId, r.index, r.length)"
-                >
-                  {{ r.text }}
-                </td>
-                <!-- right -->
-                @for (l of rightContextLabels(); track l; let i = $index) {
-                  <td class="context">
-                    {{ r.rightContext[i] }}
-                  </td>
-                }
-              </tr>
-            }
-          </tbody>
-        </table>
+                  <!-- right -->
+                  @for (l of rightContextLabels(); track l; let i = $index) {
+                    <td class="context">
+                      {{ r.rightContext[i] }}
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
         <!-- pagination -->
         <mat-paginator
           [length]="page.total"
@@ -201,14 +202,14 @@
       } @else {
         <div id="no-results" i18n>(no results)</div>
       }
-    </div>
 
-    <!-- export -->
-    @if (query$ | async) {
-      <div>
-        <pythia-search-export [query]="query$ | async" />
-      </div>
-    }
+      <!-- export -->
+      @if (query$ | async) {
+        <div class="toolbar">
+          <pythia-search-export [query]="query$ | async" />
+        </div>
+      }
+    </div>
   }
 
   <!-- reader -->

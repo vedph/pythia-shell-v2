@@ -10,7 +10,7 @@
       (countsRequest)="onCountsRequest($event)"
     />
   </div>
-  <div id="counts">
+  <div id="counts" #counts>
     <pythia-token-counts-list [token]="token()" [attributes]="attributes()" />
   </div>
 </div>

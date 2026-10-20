@@ -72,10 +72,26 @@ div#total {
   font-weight: bold;
   text-align: center;
 }
+.table-wrapper {
+  overflow-x: auto;
+}
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+/* the layout depends on the width available to the component rather than
+   on the window, so that it adapts to any host layout */
+:host {
+  display: block;
+  container: pythia-search / inline-size;
+}
 div#container {
   display: grid;
-  grid-template-rows: auto auto auto;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     "query"
     "results"
@@ -84,30 +100,29 @@ div#container {
 }
 div#query {
   grid-area: query;
+  min-width: 0;
 }
 div#results {
   grid-area: results;
+  min-width: 0;
 }
 div#reader {
   grid-area: reader;
+  min-width: 0;
 }
 
-/* lt-md */
-@media only screen and (max-width: 959px) {
-  div#container {
-    grid-template-columns: 1fr;
-  }
+@container pythia-search (width < 720px) {
   .noif-lt-md {
     display: none;
   }
 }
-/* gt-lg */
-@media only screen and (min-width: 1920px) {
+/* results and reader side by side only when both have room */
+@container pythia-search (width >= 1600px) {
   div#container {
-    grid-template-rows: auto 1fr;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas:
       "query query"
       "results reader";
+    align-items: start;
   }
 }

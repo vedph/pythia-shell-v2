@@ -1,47 +1,76 @@
-#document-reader-tree .mat-tree-node {
+/* This component has no view encapsulation (so that its styles reach the
+   rendered text HTML), so all its rules are scoped under its element. */
+
+/* the layout depends on the width available to the component rather than
+   on the window, as the reader is often embedded (e.g. next to results) */
+pythia-document-reader {
+  display: block;
+  container: pythia-document-reader / inline-size;
+}
+pythia-document-reader #document-reader-tree .mat-tree-node {
   min-height: 1.5em !important;
   height: 1.5em;
   overflow: hidden;
 }
-h3.doc-head {
-  border: 1px solid var(--mat-sys-surface-container);
-  border-radius: 8px;
-  padding: 0 8px;
+/* the document author and title heading */
+pythia-document-reader div.doc-head {
+  margin-bottom: 8px;
+  padding: 4px 12px;
+  border-radius: var(--mat-sys-corner-small);
   background-color: var(--mat-sys-surface-container);
   color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-title-medium);
+  letter-spacing: var(--mat-sys-title-medium-tracking);
 }
-div#container {
+pythia-document-reader div#container {
   display: grid;
-  grid-template-rows: auto 1fr;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
-    "progress progress"
-    "map text";
+    "progress"
+    "map"
+    "text";
   gap: 8px;
 }
-div#progress {
+pythia-document-reader div#progress {
   grid-area: progress;
 }
-div#map {
+/* The map and the text scroll in boxes of limited height, so that a whole
+   document does not take several screens below the content hosting the
+   reader. Set --pythia-reader-max-height to change the limit. */
+pythia-document-reader div#map {
   grid-area: map;
+  min-width: 0;
+  max-height: var(--pythia-reader-max-height, 70dvh);
+  overflow-y: auto;
   border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 8px;
+  border-radius: var(--mat-sys-corner-small);
   padding: 0 8px;
 }
-div#text {
+pythia-document-reader div#text {
   grid-area: text;
+  min-width: 0;
 }
-div#body {
-  column-count: 4;
-  column-width: 400px;
+/* a single flow rather than CSS columns, whose reading order (down a column,
+   then up to the next one) does not fit a vertically scrolling box */
+pythia-document-reader div#body {
+  max-height: var(--pythia-reader-max-height, 70dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  overflow-wrap: break-word;
+  padding: 0 8px;
 }
-/* lt-md */
-@media only screen and (max-width: 959px) {
-  div#container {
-    grid-template-columns: 1fr;
+pythia-document-reader div#body:focus-visible {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+@container pythia-document-reader (width >= 720px) {
+  pythia-document-reader div#container {
+    grid-template-columns: fit-content(22rem) minmax(0, 1fr);
     grid-template-areas:
-      "progress"
-      "map"
-      "text";
+      "progress progress"
+      "map text";
+  }
+  pythia-document-reader div#map {
+    align-self: start;
   }
 }

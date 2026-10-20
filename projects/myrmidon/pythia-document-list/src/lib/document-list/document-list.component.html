@@ -19,60 +19,62 @@
       @if (loading$ | async) {
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       }
-      <table>
-        <thead>
-          <tr>
-            <th><span class="cdk-visually-hidden" i18n>actions</span></th>
-            <th i18n>id</th>
-            <th i18n>author</th>
-            <th i18n>title</th>
-            <th i18n>date</th>
-            <th i18n class="noif-lt-md">profile</th>
-            <th i18n class="noif-lt-md">source</th>
-            <th i18n class="noif-lt-md">last modified</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (item of page.items; track item.id) {
+      <div class="table-wrapper">
+        <table>
+          <thead>
             <tr>
-              <td class="fit-width">
-                <button
-                  mat-icon-button
-                  type="button"
-                  i18n-matTooltip
-                  matTooltip="Read this document"
-                  i18n-aria-label
-                  aria-label="Read document"
-                  class="mat-primary"
-                  (click)="requestRead(item)"
-                >
-                  <mat-icon class="mat-primary">auto_stories</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  type="button"
-                  i18n-matTooltip
-                  matTooltip="View document info"
-                  i18n-aria-label
-                  aria-label="View document info"
-                  (click)="selectDocument(item)"
-                >
-                  <mat-icon>info</mat-icon>
-                </button>
-              </td>
-              <td>{{ item.id }}</td>
-              <td>{{ item.author }}</td>
-              <td>{{ item.title }}</td>
-              <td>{{ item.dateValue }}</td>
-              <td class="noif-lt-md">{{ item.profileId }}</td>
-              <td class="noif-lt-md">{{ item.source }}</td>
-              <td class="noif-lt-md">
-                {{ item.lastModified | date: "short" }}
-              </td>
+              <th><span class="cdk-visually-hidden" i18n>actions</span></th>
+              <th i18n>id</th>
+              <th i18n>author</th>
+              <th i18n>title</th>
+              <th i18n>date</th>
+              <th i18n class="noif-lt-md">profile</th>
+              <th i18n class="noif-lt-md">source</th>
+              <th i18n class="noif-lt-md">last modified</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (item of page.items; track item.id) {
+              <tr>
+                <td class="fit-width">
+                  <button
+                    mat-icon-button
+                    type="button"
+                    i18n-matTooltip
+                    matTooltip="Read this document"
+                    i18n-aria-label
+                    aria-label="Read document"
+                    class="mat-primary"
+                    (click)="requestRead(item)"
+                  >
+                    <mat-icon class="mat-primary">auto_stories</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    type="button"
+                    i18n-matTooltip
+                    matTooltip="View document info"
+                    i18n-aria-label
+                    aria-label="View document info"
+                    (click)="selectDocument(item)"
+                  >
+                    <mat-icon>info</mat-icon>
+                  </button>
+                </td>
+                <td>{{ item.id }}</td>
+                <td>{{ item.author }}</td>
+                <td>{{ item.title }}</td>
+                <td>{{ item.dateValue }}</td>
+                <td class="noif-lt-md">{{ item.profileId }}</td>
+                <td class="noif-lt-md">{{ item.source }}</td>
+                <td class="noif-lt-md">
+                  {{ item.lastModified | date: "short" }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
       <!-- pagination -->
       <div class="form-row" id="pagination">
         <button

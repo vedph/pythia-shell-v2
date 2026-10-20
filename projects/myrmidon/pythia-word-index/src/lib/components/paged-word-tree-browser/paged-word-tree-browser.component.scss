@@ -4,43 +4,61 @@
   color: var(--mat-sys-on-primary);
   background-color: var(--mat-sys-primary);
   border: 1px solid var(--mat-sys-primary);
-  border-radius: 4px;
+  border-radius: var(--mat-sys-corner-extra-small);
 }
 .button-row {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
 }
-.button-row * {
+.button-row > * {
   flex: 0 0 auto;
 }
 
+// The layout depends on the width available to the component rather than on
+// the window, so that it adapts to any host layout. When narrow, the filters
+// come before the tree, which can grow very tall.
+:host {
+  display: block;
+  container: pythia-word-tree-browser / inline-size;
+}
 div#container {
   display: grid;
-  grid-template-rows: auto;
-  grid-template-columns: auto 1fr;
-  grid-template-areas: "filters list";
-  gap: 24px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "filters"
+    "list";
+  gap: 16px;
 }
 div#filters {
   grid-area: filters;
-  max-width: 280px;
-  margin: 16px;
+  min-width: 0;
+  padding-top: 8px;
 }
 div#list {
   grid-area: list;
+  min-width: 0;
 }
 .node-ext {
   margin-left: 6px;
   color: light-dark(#107650, #6fd3a6);
 }
 
-/* lt-md */
-@media only screen and (max-width: 959px) {
+@container pythia-word-tree-browser (width >= 600px) {
   div#container {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "list"
-      "filters";
+    grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
+    grid-template-areas: "filters list";
+    gap: 24px;
+  }
+  // keep the filters in view while scrolling a tall tree
+  div#filters {
+    align-self: start;
+    position: sticky;
+    top: calc(var(--pythia-sticky-top, 64px) + 8px);
+    max-height: calc(100dvh - var(--pythia-sticky-top, 64px) - 16px);
+    overflow-y: auto;
+    // contain the icon buttons touch targets (48px around a 40px button),
+    // which would otherwise overflow and show a useless scrollbar
+    padding-bottom: 8px;
   }
 }

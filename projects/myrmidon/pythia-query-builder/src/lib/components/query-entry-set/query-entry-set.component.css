@@ -1,3 +1,6 @@
+.table-wrapper {
+  overflow-x: auto;
+}
 table {
   width: 100%;
   border-collapse: collapse;
@@ -43,6 +46,7 @@ td.error {
 }
 .bar-row {
   display: flex;
+  gap: 8px;
   align-items: center;
   flex-wrap: wrap;
 }

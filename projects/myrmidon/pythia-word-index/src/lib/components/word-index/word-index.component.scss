@@ -1,24 +1,48 @@
+// The layout depends on the width available to the component rather than on
+// the window, so that it adapts to any host layout.
+//
+// --pythia-sticky-top: the height of any sticky header of the host app, which
+// the counts panel must not slide under (default: 64px, a Material toolbar).
+:host {
+  display: block;
+  container: pythia-word-index / inline-size;
+}
 div#container {
   display: grid;
-  grid-template-rows: 1fr;
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas: "browser counts";
-  gap: 8px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "browser"
+    "counts";
+  gap: 16px;
 }
 div#browser {
   grid-area: browser;
+  min-width: 0;
 }
 div#counts {
   grid-area: counts;
+  min-width: 0;
+  // when scrolled into view, stop below the host app sticky header
+  scroll-margin-top: calc(var(--pythia-sticky-top, 64px) + 8px);
 }
 
-/* lt-md */
-@media only screen and (max-width: 959px) {
+@container pythia-word-index (width >= 960px) {
   div#container {
-    grid-template-rows: auto auto;
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "browser"
-      "counts";
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "browser counts";
+  }
+  // keep the attributes selector and the charts in view while scrolling
+  // a tall tree; the charts scroll inside the panel when they do not fit
+  div#counts {
+    align-self: start;
+    position: sticky;
+    top: calc(var(--pythia-sticky-top, 64px) + 8px);
+    max-height: calc(100dvh - var(--pythia-sticky-top, 64px) - 16px);
+    display: flex;
+    flex-direction: column;
+  }
+  pythia-token-counts-list {
+    flex: 1 1 auto;
+    min-height: 0;
   }
 }

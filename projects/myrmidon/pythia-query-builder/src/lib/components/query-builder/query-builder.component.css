@@ -7,6 +7,9 @@ fieldset {
   padding: 6px;
   margin-bottom: 8px;
 }
+.toolbar {
+  margin-top: 8px;
+}
 legend {
   color: var(--mat-sys-on-surface-variant);
 }
@@ -16,6 +19,6 @@ legend {
   align-items: center;
   flex-wrap: wrap;
 }
-.form-row * {
+.form-row > * {
   flex: 0 0 auto;
 }
