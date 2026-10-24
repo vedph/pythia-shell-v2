@@ -21,7 +21,6 @@ export const routes: Routes = [
   {
     path: 'reset-password',
     component: ResetPasswordComponent,
-    canActivate: [AuthJwtGuardService],
   },
   {
     path: 'register-user',

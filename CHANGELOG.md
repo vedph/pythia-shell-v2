@@ -2,6 +2,7 @@
 
 ## unpublished
 
+- 2026-10-24: fixes to reset password page.
 - 2026-10-19:
   - migrated to M3 styles adding dark/light themes.
   - responsive layout revision. The library views now lay out according to the width available to them (CSS container queries) rather than to the window width, so that they adapt also when embedded in a narrower host. Grid columns use `minmax(0, ...)`, so that wide content (tables, charts) never pushes the page beyond the window; wide tables scroll horizontally inside their own wrapper. Sticky panels stop below the host app sticky header, whose height is read from the `--pythia-sticky-top` CSS variable (default `64px`, a Material toolbar).

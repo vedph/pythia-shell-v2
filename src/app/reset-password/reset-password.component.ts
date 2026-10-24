@@ -1,6 +1,11 @@
-
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { FormField, email, form, required } from '@angular/forms/signals';
+import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import {
+  FormField,
+  FormRoot,
+  email,
+  form,
+  required,
+} from '@angular/forms/signals';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -15,38 +20,55 @@ import { AuthJwtAccountService } from '@myrmidon/auth-jwt-admin';
 
 @Component({
   selector: 'cadmus-reset-password',
+  standalone: true,
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     FormField,
+    FormRoot,
     MatButtonModule,
     MatCardModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
     MatProgressBarModule,
-    MatTooltipModule
-],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    MatTooltipModule,
+  ],
 })
 export class ResetPasswordComponent {
-  public readonly busy = signal(false);
-  public readonly form = form(signal({ email: '' }), (path) => {
-    required(path.email);
-    email(path.email);
-  });
+  public readonly busy = signal<boolean>(false);
+
+  /**
+   * The form. This page is a real submission root: submitting it
+   * runs reset() when the form is valid.
+   */
+  public readonly form = form(
+    signal({ email: '' }),
+    (p) => {
+      required(p.email);
+      email(p.email);
+    },
+    {
+      submission: {
+        action: async () => {
+          this.reset();
+          return undefined;
+        },
+      },
+    },
+  );
 
   constructor(
     private _snackbar: MatSnackBar,
-    private _accountService: AuthJwtAccountService
+    private _accountService: AuthJwtAccountService,
   ) {}
 
   public reset(): void {
-    if (this.busy() || this.form().invalid()) {
-      this.form().markAsTouched();
+    const address = this.form.email().value();
+    if (this.busy() || !address) {
       return;
     }
-    const address = this.form.email().value();
 
     this.busy.set(true);
     this._accountService.resetPassword(address).subscribe({
